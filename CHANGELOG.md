@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.6 - Launch-Ready: Only Real Product Images (2026-02-12)
+- Removed 49 emoji-only placeholder packs from shop - only 26 packs with real DALL-E 3 product images are live
+- All visible packs now have professional product photography - zero placeholders
+- Updated TEMPLATE_COLLECTIONS to only show collections with real packs (6 active collections)
+- Updated mega bundle, homepage, templates page, shop page to reflect actual pack counts
+- Dynamic pack counts (TEMPLATE_PACKS.length) instead of hardcoded "75" everywhere
+- 49 pack definitions kept in code (hidden) - ready to enable when images are generated
+
 ## v1.5.1 - Fix 49 Broken Pack Images (2026-02-12)
 - FIXED: 49/75 template packs showed broken `<img>` tags instead of gradient+emoji fallback
 - Added `PACKS_WITH_IMAGES` set in constants.ts - only 26 packs with real .png files get image paths

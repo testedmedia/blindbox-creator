@@ -1,7 +1,7 @@
 export const SITE_NAME = "Blind Box Generator";
 export const SITE_DESCRIPTION = "Create kawaii paper blind boxes with AI-generated Japanese-style characters. Print, fold, and surprise!";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://blindbox-creator.vercel.app";
-export const VERSION = "v1.5.1";
+export const VERSION = "v1.6";
 
 export const BRAND = {
   blue: "#4A90D9",
@@ -68,20 +68,18 @@ export const COLLECTION_GRADIENTS: Record<string, string> = {
 // Organized by collection for browsing
 // ═══════════════════════════════════════════════
 
+// Only collections with launch-ready packs (have real product images)
 export const TEMPLATE_COLLECTIONS = [
-  { id: "chibi-animals", name: "Chibi Animals", emoji: "🐱", count: 10 },
-  { id: "sweet-bakery", name: "Sweet Bakery & Treats", emoji: "🍰", count: 8 },
-  { id: "cherry-blossom", name: "Cherry Blossom & Nature", emoji: "🌸", count: 8 },
+  { id: "chibi-animals", name: "Chibi Animals", emoji: "🐱", count: 9 },
   { id: "magical-girls", name: "Magical Girls & Boys", emoji: "✨", count: 7 },
-  { id: "celestial", name: "Celestial & Stars", emoji: "🌙", count: 7 },
-  { id: "ocean-kawaii", name: "Ocean Kawaii", emoji: "🐚", count: 7 },
-  { id: "forest-friends", name: "Little Forest Friends", emoji: "🍄", count: 7 },
-  { id: "pastel-fantasy", name: "Pastel Fantasy", emoji: "🦄", count: 7 },
-  { id: "food-cuties", name: "Food Cuties", emoji: "🍙", count: 7 },
-  { id: "seasonal", name: "Seasonal Kawaii", emoji: "🎀", count: 7 },
+  { id: "forest-friends", name: "Little Forest Friends", emoji: "🍄", count: 4 },
+  { id: "pastel-fantasy", name: "Pastel Fantasy", emoji: "🦄", count: 4 },
+  { id: "cherry-blossom", name: "Cherry Blossom & Nature", emoji: "🌸", count: 1 },
+  { id: "celestial", name: "Celestial & Stars", emoji: "🌙", count: 1 },
 ];
 
-export const TEMPLATE_PACKS: Product[] = [
+// All 75 packs defined (49 hidden until product images are generated)
+const _ALL_TEMPLATE_PACKS: Product[] = [
   // ── Chibi Animals (10) ──────────────────────
   tp("chibi-kitty-club", "Chibi Kitty Club", "Adorable chibi kittens in pastel outfits. Tabby, calico, Persian, Siamese, and more with bows and ribbons.", "chibi-animals", "Best Seller", "🐱"),
   tp("chibi-puppy-parade", "Chibi Puppy Parade", "Kawaii puppies in tiny sweaters and hats. Shiba Inu, Corgi, Pomeranian, and Golden Retriever cuties.", "chibi-animals", undefined, "🐕"),
@@ -178,6 +176,9 @@ export const TEMPLATE_PACKS: Product[] = [
   tp("new-year-osechi", "New Year Osechi", "Oshogatsu (New Year) characters: kagami mochi, daruma dolls, maneki-neko, and kadomatsu.", "seasonal", undefined, "🎍"),
 ];
 
+// Only export packs with real product images (launch-ready)
+export const TEMPLATE_PACKS = _ALL_TEMPLATE_PACKS.filter(p => PACKS_WITH_IMAGES.has(p.id));
+
 export const PARTY_KITS: Product[] = [
   {
     id: "kawaii-birthday-kit",
@@ -245,14 +246,14 @@ export const CLASSROOM_BUNDLES: Product[] = [
 export const MEGA_BUNDLE: Product = {
   id: "mega-bundle",
   name: "Ultimate Kawaii Collection",
-  description: "Get ALL 75 kawaii template packs! 900 unique chibi characters across every collection. The complete Blind Box Generator library.",
+  description: "Get ALL kawaii template packs! Hundreds of unique chibi characters across every collection. The complete Blind Box Generator library.",
   price: 14999,
   type: "digital",
   category: "bundle",
   collection: "bundle",
   image: "/bundles/mega.svg",
   badge: "Save 60%",
-  features: ["All 75 template packs", "900 unique kawaii characters", "300 box designs", "All assembly guides", "Free future updates", "Commercial usage rights"],
+  features: ["All template packs included", "300+ unique kawaii characters", "100+ box designs", "All assembly guides", "Free future updates", "Commercial usage rights"],
 };
 
 export const SUBSCRIPTION_TIERS = [
