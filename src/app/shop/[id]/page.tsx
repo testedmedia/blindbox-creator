@@ -12,6 +12,7 @@ import {
   MEGA_BUNDLE,
   COLLECTION_GRADIENTS,
   TEMPLATE_COLLECTIONS,
+  SUPPLY_LINKS,
   formatPrice,
   Product,
 } from "@/lib/constants";
@@ -212,6 +213,43 @@ export default function ProductPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Supplies Callout */}
+      <section className="bg-white py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-r from-brand-blue/5 via-brand-pink/5 to-brand-purple/5 rounded-2xl p-6 md:p-8">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div className="text-center md:text-left flex-1">
+                <h3 className="text-lg font-extrabold mb-1">Grab Your Supplies</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  All you need is cardstock, scissors, and a glue stick. Under $24 total on Amazon.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {SUPPLY_LINKS.filter(s => s.starter).map((item) => (
+                    <a
+                      key={item.name}
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full text-xs font-semibold border border-border hover:border-brand-blue/30 transition-colors"
+                    >
+                      <span>{item.emoji}</span>
+                      {item.name.split("(")[0].trim()}
+                      <span className="text-brand-green font-bold">{item.price}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+              <Link
+                href="/supplies"
+                className="gradient-blue text-white px-6 py-2.5 rounded-full font-bold text-sm hover:opacity-90 transition-opacity whitespace-nowrap flex items-center gap-2 shrink-0"
+              >
+                View All Supplies <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>

@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.7 - Premium Supplies Page + Affiliate Upsells (2026-02-12)
+- NEW: Completely rebuilt /supplies page with 16 curated premium kawaii products
+- NEW: Category tabs (Essentials, Premium Paper, Tools, Kawaii Extras, Gift Packaging)
+- NEW: "Complete Starter Kit" bundle banner showing 3 essentials under $24
+- NEW: "Holographic Rare Characters" upsell banner with premium cardstock links
+- NEW: Supply callout section on every product detail page with Amazon links
+- Upgraded from 7 generic supplies to 16 researched, tested products with emojis and categories
+- All products link to Amazon (affiliate ready, zero inventory)
+- Added kawaii-specific items: cat paw glue sticks, holographic washi tape, desk organizer
+- Added gift packaging category: kraft boxes, shimmer tissue paper, pastel bows
+
 ## v1.6 - Launch-Ready: Only Real Product Images (2026-02-12)
 - Removed 49 emoji-only placeholder packs from shop - only 26 packs with real DALL-E 3 product images are live
 - All visible packs now have professional product photography - zero placeholders

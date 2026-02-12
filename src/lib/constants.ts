@@ -1,7 +1,7 @@
 export const SITE_NAME = "Blind Box Generator";
 export const SITE_DESCRIPTION = "Create kawaii paper blind boxes with AI-generated Japanese-style characters. Print, fold, and surprise!";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://blindbox-creator.vercel.app";
-export const VERSION = "v1.6";
+export const VERSION = "v1.7";
 
 export const BRAND = {
   blue: "#4A90D9",
@@ -315,55 +315,173 @@ export const SUBSCRIPTION_TIERS = [
   },
 ];
 
+export type SupplyCategory = "essential" | "premium" | "tools" | "kawaii" | "packaging";
+
+export const SUPPLY_CATEGORIES = [
+  { id: "all" as const, label: "All Supplies" },
+  { id: "essential" as SupplyCategory, label: "Essentials" },
+  { id: "premium" as SupplyCategory, label: "Premium Paper" },
+  { id: "tools" as SupplyCategory, label: "Tools" },
+  { id: "kawaii" as SupplyCategory, label: "Kawaii Extras" },
+  { id: "packaging" as SupplyCategory, label: "Gift Packaging" },
+];
+
 export const SUPPLY_LINKS = [
+  // ── Essentials ─────────────────────────────
   {
-    name: "65lb White Cardstock (250 sheets)",
-    description: "Perfect weight for kawaii blind box characters. Crisp whites for vibrant pastel printing.",
+    name: "80lb White Cardstock (250 Sheets)",
+    description: "The perfect weight for blind boxes: sturdy enough to hold shape, easy enough to fold. Crisp whites for vibrant printing.",
     url: "https://amazon.com/dp/B08XQ7T7RR",
     price: "$12.99",
     tag: "Essential",
+    category: "essential" as SupplyCategory,
+    emoji: "📄",
+    starter: true,
   },
   {
-    name: "Pastel Cardstock Variety Pack",
-    description: "50 sheets in soft pastels: baby pink, lavender, mint, sky blue, cream. Perfect for kawaii vibes.",
-    url: "https://amazon.com/dp/B07FFRXFKJ",
-    price: "$8.99",
-    tag: "Popular",
-  },
-  {
-    name: "Holographic Cardstock Pack",
-    description: "Add sparkle to ultra-rare characters! 20 sheets of holographic shimmer paper.",
-    url: "https://amazon.com/dp/B07T7LWMQJ",
-    price: "$9.99",
-    tag: "Premium",
-  },
-  {
-    name: "Craft Scissors Set (6 patterns)",
-    description: "Decorative edge scissors for fancy box borders. Scallop, wave, and zigzag patterns.",
-    url: "https://amazon.com/dp/B07F3XQ7SJ",
-    price: "$7.99",
-    tag: "Tools",
-  },
-  {
-    name: "Glue Stick Set (12 pack)",
-    description: "Acid-free, quick-drying glue sticks perfect for paper crafts. Won't wrinkle delicate prints.",
+    name: "Glue Stick Set (12 Pack)",
+    description: "Acid-free, quick-drying, and won't wrinkle your prints. The only adhesive you need for perfect blind boxes.",
     url: "https://amazon.com/dp/B00006IBKJ",
     price: "$5.99",
-    tag: "Tools",
+    tag: "Essential",
+    category: "essential" as SupplyCategory,
+    emoji: "🧴",
+    starter: true,
   },
   {
-    name: "Kawaii Sticker Seals (200 pack)",
-    description: "Seal your blind boxes with adorable kawaii stickers. Hearts, stars, and chibi faces.",
-    url: "https://amazon.com/dp/B07X3V8VDQ",
-    price: "$6.99",
-    tag: "Upgrade",
+    name: "Fiskars Kid-Safe Scissors",
+    description: "Trusted brand with blunt tips and easy-grip handles. Safe for ages 4+ and cuts cardstock like butter.",
+    url: "https://amazon.com/dp/B0027J1HY0",
+    price: "$4.99",
+    tag: "Essential",
+    category: "essential" as SupplyCategory,
+    emoji: "✂️",
+    starter: true,
+  },
+
+  // ── Premium Paper ──────────────────────────
+  {
+    name: "Pastel Cardstock Variety (60 Sheets)",
+    description: "Professional-grade 80lb cardstock in 15 soft pastel colors. Baby pink, lavender, mint, sky blue, and more.",
+    url: "https://amazon.com/dp/B07SYD7K4M",
+    price: "$25.99",
+    tag: "Popular",
+    category: "premium" as SupplyCategory,
+    emoji: "🎨",
   },
   {
-    name: "Mini Kraft Gift Boxes (25 pack)",
-    description: "Mini kraft boxes to use as actual blind boxes. Decorate with stickers and stamps!",
-    url: "https://amazon.com/dp/B09XYZ1234",
+    name: "Holographic Cardstock (100 Sheets)",
+    description: "Stars, gems, and laser patterns that shimmer in the light. Makes ultra-rare characters absolutely magical.",
+    url: "https://amazon.com/dp/B0C2CJJ15W",
+    price: "$17.99",
+    tag: "Best Seller",
+    category: "premium" as SupplyCategory,
+    emoji: "✨",
+  },
+  {
+    name: "Metallic Cardstock (200 Sheets, 20 Colors)",
+    description: "Mirror-finish metallic paper in gold, silver, rose gold, and 17 more colors. Premium thickness for special editions.",
+    url: "https://amazon.com/dp/B0CSBB8LBG",
+    price: "$22.99",
+    tag: "Premium",
+    category: "premium" as SupplyCategory,
+    emoji: "🪙",
+  },
+
+  // ── Tools ──────────────────────────────────
+  {
+    name: "Decorative Edge Scissors (18 Patterns)",
+    description: "Zig-zag, scallop, wave, and 15 more edge patterns. Turn ordinary box edges into works of art.",
+    url: "https://amazon.com/dp/B089N2YTFN",
+    price: "$18.99",
+    tag: "Popular",
+    category: "tools" as SupplyCategory,
+    emoji: "🌊",
+  },
+  {
+    name: "Double-Sided Tape Runners (6 Pack)",
+    description: "Cleaner than glue, zero mess, instant bond. Perfect for younger kids who struggle with glue sticks.",
+    url: "https://amazon.com/dp/B09GVJ47N8",
+    price: "$13.99",
+    tag: "Pro Tip",
+    category: "tools" as SupplyCategory,
+    emoji: "📏",
+  },
+  {
+    name: "Bone Folder Scoring Tool Set",
+    description: "Teflon non-stick tools for razor-sharp fold lines. The secret to professional-looking blind boxes.",
+    url: "https://amazon.com/dp/B07TKCK8X8",
     price: "$14.99",
-    tag: "Upgrade",
+    tag: "Pro",
+    category: "tools" as SupplyCategory,
+    emoji: "🦴",
+  },
+
+  // ── Kawaii Extras ──────────────────────────
+  {
+    name: "Kawaii Sticker Sheets (100 Sheets, 600+)",
+    description: "Transparent PET stickers with animals, flowers, food, and stars. Decorate your boxes, seal them, trade them.",
+    url: "https://amazon.com/dp/B09KMTR7K6",
+    price: "$11.99",
+    tag: "Best Seller",
+    category: "kawaii" as SupplyCategory,
+    emoji: "🌟",
+  },
+  {
+    name: "Holographic Washi Tape (20 Rolls)",
+    description: "Rainbow holographic patterns that catch the light. Use as decorative borders, seals, and box accents.",
+    url: "https://amazon.com/dp/B087CFJNLM",
+    price: "$15.99",
+    tag: "Popular",
+    category: "kawaii" as SupplyCategory,
+    emoji: "🌈",
+  },
+  {
+    name: "Cat Paw Kawaii Glue Sticks (5 Pack)",
+    description: "Adorable cat-paw shaped glue sticks in random pastel colors. Kids fight over who gets to use these.",
+    url: "https://amazon.com/dp/B0B5PHLG4J",
+    price: "$8.99",
+    tag: "Cute",
+    category: "kawaii" as SupplyCategory,
+    emoji: "🐱",
+  },
+  {
+    name: "Kawaii Desk Organizer (2 Drawers)",
+    description: "Keep all your blind box supplies organized in this adorable storage box. 5 compartments + 2 drawers + DIY stickers.",
+    url: "https://amazon.com/dp/B0CRLB6F94",
+    price: "$18.99",
+    tag: "New",
+    category: "kawaii" as SupplyCategory,
+    emoji: "🗃️",
+  },
+
+  // ── Gift Packaging ─────────────────────────
+  {
+    name: "Mini Kraft Gift Boxes (30 Pack)",
+    description: "Real mini boxes (3x3x1\") for the ultimate blind box experience. Fill with characters, close, shake, and open!",
+    url: "https://amazon.com/dp/B0733HN27V",
+    price: "$11.99",
+    tag: "Must-Have",
+    category: "packaging" as SupplyCategory,
+    emoji: "📦",
+  },
+  {
+    name: "Shimmer Pastel Tissue Paper (70 Sheets)",
+    description: "Pearlescent metallic shimmer in 7 pastel colors. Wrap characters in tissue before boxing for real blind box magic.",
+    url: "https://amazon.com/dp/B0D12PHW5P",
+    price: "$13.99",
+    tag: "Premium",
+    category: "packaging" as SupplyCategory,
+    emoji: "🎀",
+  },
+  {
+    name: "Pastel Pull Bows (30 Pack)",
+    description: "One-pull instant bows in pink, blue, yellow, mint, and lavender. Tie on boxes for a gift-ready finish in 2 seconds.",
+    url: "https://amazon.com/dp/B07GHS6H7M",
+    price: "$14.99",
+    tag: "Gift Ready",
+    category: "packaging" as SupplyCategory,
+    emoji: "🎁",
   },
 ];
 
