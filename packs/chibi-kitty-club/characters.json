@@ -1,0 +1,99 @@
+{
+  "packId": "chibi-kitty-club",
+  "packName": "Chibi Kitty Club",
+  "collection": "chibi-animals",
+  "theme": {
+    "primary": "#FFB5C8",
+    "secondary": "#FF8BA7",
+    "accent": "#FFF0F3",
+    "text": "#4A3333",
+    "pattern": "paw-prints",
+    "boxAccent": "#FFD1DC"
+  },
+  "characters": [
+    {
+      "id": "tabby-tom",
+      "name": "Tabby Tom",
+      "description": "Orange tabby with bell collar",
+      "rarity": "common",
+      "prompt": "orange tabby cat, sitting pose, warm orange and brown stripes, big sparkly green eyes, tiny gold bell collar, fluffy tail curled around body"
+    },
+    {
+      "id": "calico-cupcake",
+      "name": "Calico Cupcake",
+      "description": "Tri-color calico in cupcake apron",
+      "rarity": "common",
+      "prompt": "calico cat with orange white and black patches, standing pose, wearing tiny pastel pink cupcake apron, big sparkly amber eyes, holding a wooden spoon"
+    },
+    {
+      "id": "siamese-suki",
+      "name": "Siamese Suki",
+      "description": "Elegant Siamese with blue eyes",
+      "rarity": "common",
+      "prompt": "Siamese cat, cream body with dark brown points on ears face paws and tail, big sparkly blue eyes, sitting elegantly, tiny blue bow on neck"
+    },
+    {
+      "id": "ginger-snap",
+      "name": "Ginger Snap",
+      "description": "Ginger kitten with cookie",
+      "rarity": "common",
+      "prompt": "small ginger kitten, playful pose with one paw up, bright orange fur, big sparkly golden eyes, holding a tiny star-shaped cookie, crumbs on cheeks"
+    },
+    {
+      "id": "mittens",
+      "name": "Mittens",
+      "description": "White cat with gray paw tips",
+      "rarity": "common",
+      "prompt": "white cat with gray paw tips like mittens, sitting pose, big sparkly teal eyes, playing with a pastel pink yarn ball, fluffy chest fur"
+    },
+    {
+      "id": "tuxedo-max",
+      "name": "Tuxedo Max",
+      "description": "Dapper black & white cat",
+      "rarity": "common",
+      "prompt": "black and white tuxedo cat, standing upright pose, wearing tiny red bowtie, big sparkly green eyes, one paw adjusting bowtie, dapper gentleman look"
+    },
+    {
+      "id": "dusty-earl",
+      "name": "Dusty Earl",
+      "description": "Gray British shorthair with teacup",
+      "rarity": "common",
+      "prompt": "gray British shorthair cat, round chubby face, sitting pose, big sparkly copper eyes, holding tiny floral teacup, plump and cozy looking"
+    },
+    {
+      "id": "princess-persian",
+      "name": "Princess Persian",
+      "description": "Fluffy white Persian with tiara",
+      "rarity": "rare",
+      "prompt": "fluffy white Persian cat, luxurious long fur, sitting on tiny velvet cushion, wearing sparkly pink crystal tiara, big sparkly blue eyes, pink nose, regal pose"
+    },
+    {
+      "id": "scottish-sora",
+      "name": "Scottish Sora",
+      "description": "Cream fold-ear with cozy scarf",
+      "rarity": "rare",
+      "prompt": "Scottish fold cat with folded ears, cream and beige fur, wearing chunky knit pastel rainbow scarf, big sparkly round amber eyes, cozy winter look"
+    },
+    {
+      "id": "bengal-blaze",
+      "name": "Bengal Blaze",
+      "description": "Spotted Bengal with sparkler",
+      "rarity": "rare",
+      "prompt": "Bengal cat with golden spotted rosette pattern, dynamic action pose leaping, big sparkly green eyes, holding tiny sparkler firework, athletic and energetic"
+    },
+    {
+      "id": "ragdoll-rosie",
+      "name": "Ragdoll Rosie",
+      "description": "Blue-eyed ragdoll with rose crown",
+      "rarity": "epic",
+      "prompt": "Ragdoll cat with blue point markings, long silky fur, wearing crown made of tiny pink roses and baby's breath, big sparkly deep blue eyes, ethereal and dreamy, floating flower petals around"
+    },
+    {
+      "id": "galaxy-nova",
+      "name": "Galaxy Nova",
+      "description": "Cosmic cat with star crown and cape",
+      "rarity": "legendary",
+      "prompt": "magical galaxy cat, cosmic purple and deep blue fur covered in tiny stars and nebula swirls, golden sparkles throughout fur, wearing tiny golden star crown and flowing starry cape, big sparkly rainbow iridescent eyes, magical floating pose with stardust trail, most majestic and rare"
+    }
+  ]
+}

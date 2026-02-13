@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assembly Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ========================================
+     ASSEMBLY GUIDE - PREMIUM KAWAII EDITION
+     2 pages, US Letter, 300 DPI, sRGB
+     Page 1: 6-step visual instructions w/ SVG
+     Page 2: Tips, supplies, paper recs, QR
+     ======================================== */
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page {
+    size: letter;
+    margin: 0.25in;
+  }
+
+  html, body {
+    font-family: 'Quicksand', sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-profile: sRGB;
+    background: white;
+    font-size: 9pt;
+    color: #333;
+  }
+
+  .page {
+    width: 8in;
+    height: 10.5in;
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    padding: 0.15in;
+    position: relative;
+    overflow: hidden;
+  }
+  .page:last-child { page-break-after: avoid; }
+
+  /* Page background decoration */
+  .page::before {
+    content: '';
+    position: absolute;
+    top: -0.5in;
+    right: -0.5in;
+    width: 3in;
+    height: 3in;
+    background: radial-gradient(circle, var(--theme-accent, #FFF0F3) 0%, transparent 70%);
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .page::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5in;
+    left: -0.5in;
+    width: 3in;
+    height: 3in;
+    background: radial-gradient(circle, var(--theme-accent, #FFF0F3) 0%, transparent 70%);
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ---------- Title ---------- */
+  .guide-title {
+    text-align: center;
+    margin-bottom: 0.18in;
+    position: relative;
+    z-index: 1;
+  }
+  .guide-title h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 20pt;
+    font-weight: 400;
+    color: var(--theme-text, #4A3333);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    position: relative;
+    display: inline-block;
+  }
+  .guide-title .title-stars {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.12in;
+    margin-bottom: 0.04in;
+  }
+  .guide-title .title-star {
+    flex-shrink: 0;
+  }
+  .guide-title .tagline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 9pt;
+    color: var(--theme-secondary, #FF8BA7);
+    font-weight: 600;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.04);
+  }
+  .guide-title-bar {
+    width: 4in;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--theme-primary, #FFB5C8), var(--theme-secondary, #FF8BA7), var(--theme-primary, #FFB5C8), transparent);
+    margin: 0.06in auto 0;
+    border-radius: 2px;
+  }
+
+  /* ---------- Steps Grid ---------- */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 0.18in;
+    flex: 1;
+    margin-bottom: 0.15in;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-card {
+    border: 2px solid var(--theme-primary, #FFB5C8);
+    border-radius: 0.14in;
+    padding: 0.12in 0.12in 0.10in;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, var(--theme-accent, #FFF0F3) 100%);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.2s;
+  }
+
+  .step-number {
+    width: 0.4in;
+    height: 0.4in;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--theme-secondary, #FF8BA7), var(--theme-primary, #FFB5C8));
+    color: white;
+    font-family: 'Fredoka One', cursive;
+    font-size: 14pt;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.05in;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .step-icon-svg {
+    width: 0.8in;
+    height: 0.7in;
+    margin-bottom: 0.04in;
+    position: relative;
+    z-index: 1;
+  }
+  .step-icon-svg svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .step-label {
+    font-family: 'Fredoka One', cursive;
+    font-size: 11pt;
+    font-weight: 400;
+    color: var(--theme-text, #4A3333);
+    text-shadow: 0 1px 1px rgba(0,0,0,0.06);
+    margin-bottom: 0.03in;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 0.5px;
+  }
+
+  .step-desc {
+    font-size: 7pt;
+    color: #555;
+    line-height: 1.55;
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+  }
+
+  /* ---------- Footer ---------- */
+  .guide-footer {
+    text-align: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 8pt;
+    font-weight: 400;
+    color: white;
+    padding: 0.06in 0;
+    background: linear-gradient(90deg, var(--theme-primary, #FFB5C8), var(--theme-secondary, #FF8BA7), var(--theme-primary, #FFB5C8));
+    border-radius: 0.06in;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.12);
+  }
+
+  /* ======== PAGE 2 ======== */
+
+  .page2-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.18in;
+    position: relative;
+    z-index: 1;
+  }
+
+  .info-section {
+    background: linear-gradient(135deg, rgba(255,255,255,0.97) 0%, var(--theme-accent, #FFF0F3) 100%);
+    border: 2px solid var(--theme-primary, #FFB5C8);
+    border-radius: 0.14in;
+    padding: 0.15in 0.2in;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .info-header {
+    font-family: 'Fredoka One', cursive;
+    font-size: 11pt;
+    font-weight: 400;
+    color: var(--theme-secondary, #FF8BA7);
+    margin-bottom: 0.08in;
+    display: flex;
+    align-items: center;
+    gap: 0.08in;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.06);
+  }
+  .info-header-icon {
+    width: 0.22in;
+    height: 0.22in;
+    flex-shrink: 0;
+  }
+  .info-header-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .info-list {
+    list-style: none;
+    position: relative;
+    z-index: 1;
+  }
+  .info-list li {
+    font-size: 7.5pt;
+    color: #444;
+    padding: 0.025in 0;
+    padding-left: 0.2in;
+    position: relative;
+    line-height: 1.55;
+    font-weight: 500;
+  }
+  .info-list li .bullet-icon {
+    position: absolute;
+    left: 0;
+    top: 0.03in;
+    width: 0.12in;
+    height: 0.12in;
+  }
+  .info-list li .bullet-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Supplies grid */
+  .supplies-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.12in;
+    position: relative;
+    z-index: 1;
+  }
+  .supply-item {
+    text-align: center;
+    padding: 0.1in 0.06in;
+    border-radius: 0.08in;
+    background: rgba(255,255,255,0.85);
+    border: 1.5px solid var(--theme-primary, #FFB5C8);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .supply-icon-svg {
+    width: 0.45in;
+    height: 0.38in;
+    margin: 0 auto 0.04in;
+  }
+  .supply-icon-svg svg {
+    width: 100%;
+    height: 100%;
+  }
+  .supply-label {
+    font-family: 'Fredoka One', cursive;
+    font-size: 6.5pt;
+    font-weight: 400;
+    color: var(--theme-text, #4A3333);
+    text-shadow: 0 1px 1px rgba(0,0,0,0.04);
+  }
+
+  /* Paper recommendations */
+  .paper-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.12in;
+    position: relative;
+    z-index: 1;
+  }
+  .paper-item {
+    text-align: center;
+    padding: 0.1in;
+    border: 2px solid transparent;
+    border-radius: 0.08in;
+    background: rgba(255,255,255,0.85);
+    position: relative;
+  }
+  .paper-item::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 0.1in;
+    background: linear-gradient(135deg, var(--theme-primary, #FFB5C8), var(--theme-accent, #FFF0F3));
+    z-index: -1;
+  }
+  .paper-weight {
+    font-family: 'Fredoka One', cursive;
+    font-size: 13pt;
+    font-weight: 400;
+    color: var(--theme-secondary, #FF8BA7);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .paper-label {
+    font-family: 'Fredoka One', cursive;
+    font-size: 6.5pt;
+    font-weight: 400;
+    color: var(--theme-text, #4A3333);
+  }
+  .paper-desc {
+    font-size: 5.5pt;
+    color: #888;
+    font-weight: 500;
+  }
+  .paper-recommended::before {
+    background: linear-gradient(135deg, var(--theme-secondary, #FF8BA7), var(--theme-primary, #FFB5C8), var(--theme-secondary, #FF8BA7));
+  }
+  .paper-recommended {
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .paper-tag {
+    font-family: 'Fredoka One', cursive;
+    font-size: 5pt;
+    font-weight: 400;
+    color: white;
+    background: linear-gradient(90deg, var(--theme-secondary, #FF8BA7), var(--theme-primary, #FFB5C8));
+    padding: 1px 6px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 0.02in;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  }
+
+  /* QR / Help section */
+  .help-section {
+    display: flex;
+    align-items: center;
+    gap: 0.2in;
+    position: relative;
+    z-index: 1;
+  }
+  .qr-placeholder {
+    width: 0.95in;
+    height: 0.95in;
+    border: 2.5px dashed var(--theme-secondary, #FF8BA7);
+    border-radius: 0.1in;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #FAFAFA, var(--theme-accent, #FFF0F3));
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .qr-label {
+    font-family: 'Fredoka One', cursive;
+    font-size: 5.5pt;
+    font-weight: 400;
+    color: var(--theme-secondary, #FF8BA7);
+    margin-top: 0.03in;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .qr-icon-svg {
+    width: 0.4in;
+    height: 0.4in;
+  }
+  .qr-icon-svg svg {
+    width: 100%;
+    height: 100%;
+  }
+  .help-text {
+    flex: 1;
+  }
+  .help-text p {
+    font-size: 7.5pt;
+    color: #555;
+    line-height: 1.55;
+    margin-bottom: 0.04in;
+    font-weight: 500;
+  }
+  .help-url {
+    font-family: 'Fredoka One', cursive;
+    font-size: 9pt;
+    font-weight: 400;
+    color: var(--theme-secondary, #FF8BA7);
+    text-shadow: 0 1px 1px rgba(0,0,0,0.06);
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/**
+ * Premium Kawaii Edition Assembly Guide
+ * Render 2-page assembly guide with SVG illustrations.
+ * Page 1: 6 build steps with inline SVG art.
+ * Page 2: Tips, supplies, paper recs, QR.
+ */
+
+/* ==========================================
+   SVG ILLUSTRATION LIBRARY
+   ========================================== */
+
+function svgPrinter(primary, secondary, accent) {
+  return `<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+    <!-- Printer body -->
+    <rect x="10" y="25" width="80" height="35" rx="6" fill="${primary}" stroke="${secondary}" stroke-width="2"/>
+    <!-- Paper tray top -->
+    <rect x="25" y="8" width="50" height="20" rx="3" fill="#fff" stroke="${secondary}" stroke-width="1.5"/>
+    <!-- Paper coming out (colorful page) -->
+    <rect x="28" y="2" width="44" height="18" rx="2" fill="#fff" stroke="${accent}" stroke-width="1"/>
+    <rect x="33" y="6" width="20" height="2.5" rx="1" fill="${secondary}" opacity="0.7"/>
+    <rect x="33" y="11" width="28" height="2" rx="1" fill="${primary}" opacity="0.5"/>
+    <rect x="33" y="15" width="15" height="2" rx="1" fill="${secondary}" opacity="0.4"/>
+    <!-- Paper output slot -->
+    <rect x="22" y="48" width="56" height="4" rx="2" fill="${secondary}" opacity="0.3"/>
+    <!-- Printed page coming out bottom -->
+    <rect x="26" y="50" width="48" height="22" rx="2" fill="#fff" stroke="${primary}" stroke-width="1.5"/>
+    <rect x="31" y="55" width="24" height="2" rx="1" fill="${secondary}" opacity="0.6"/>
+    <rect x="31" y="59" width="34" height="2" rx="1" fill="${primary}" opacity="0.5"/>
+    <rect x="31" y="63" width="18" height="2" rx="1" fill="${secondary}" opacity="0.4"/>
+    <circle cx="58" cy="60" r="5" fill="${accent}" stroke="${primary}" stroke-width="1" opacity="0.6"/>
+    <!-- Button -->
+    <circle cx="74" cy="38" r="4" fill="${secondary}"/>
+    <circle cx="74" cy="38" r="2" fill="#fff" opacity="0.5"/>
+    <!-- LED -->
+    <circle cx="64" cy="38" r="2" fill="#7ddf7d"/>
+  </svg>`;
+}
+
+function svgScissors(primary, secondary, accent) {
+  return `<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+    <!-- Paper with dotted line -->
+    <rect x="30" y="10" width="60" height="60" rx="3" fill="#fff" stroke="${primary}" stroke-width="1.5"/>
+    <line x1="30" y1="40" x2="90" y2="40" stroke="${secondary}" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <!-- Content lines on paper -->
+    <rect x="40" y="18" width="35" height="2" rx="1" fill="${primary}" opacity="0.3"/>
+    <rect x="40" y="24" width="40" height="2" rx="1" fill="${primary}" opacity="0.2"/>
+    <rect x="40" y="50" width="30" height="2" rx="1" fill="${primary}" opacity="0.3"/>
+    <rect x="40" y="56" width="38" height="2" rx="1" fill="${primary}" opacity="0.2"/>
+    <!-- Scissors -->
+    <g transform="translate(8, 30)">
+      <!-- Top blade -->
+      <path d="M15,8 L50,2" stroke="${secondary}" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path d="M15,8 L50,2" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.4"/>
+      <!-- Bottom blade -->
+      <path d="M15,14 L50,20" stroke="${secondary}" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path d="M15,14 L50,20" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.4"/>
+      <!-- Pivot -->
+      <circle cx="50" cy="11" r="4" fill="${secondary}" stroke="#fff" stroke-width="1.5"/>
+      <!-- Handle top -->
+      <ellipse cx="8" cy="5" rx="8" ry="6" fill="none" stroke="${primary}" stroke-width="3" transform="rotate(-5, 8, 5)"/>
+      <!-- Handle bottom -->
+      <ellipse cx="8" cy="17" rx="8" ry="6" fill="none" stroke="${primary}" stroke-width="3" transform="rotate(5, 8, 17)"/>
+    </g>
+    <!-- Cut pieces separating -->
+    <path d="M32,10 L28,8" stroke="${accent}" stroke-width="1" opacity="0.5"/>
+    <path d="M32,70 L28,72" stroke="${accent}" stroke-width="1" opacity="0.5"/>
+  </svg>`;
+}
+
+function svgFold(primary, secondary, accent) {
+  return `<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+    <!-- Back half of paper (folded part, slightly rotated) -->
+    <path d="M20,15 L80,15 L80,65 L50,65 L50,40 L20,40 Z" fill="${accent}" stroke="${primary}" stroke-width="1.5" opacity="0.5"/>
+    <!-- Front half of paper -->
+    <path d="M20,40 L50,40 L50,65 L20,65 Z" fill="#fff" stroke="${primary}" stroke-width="1.5"/>
+    <!-- Dashed fold line -->
+    <line x1="20" y1="40" x2="80" y2="40" stroke="${secondary}" stroke-width="2" stroke-dasharray="5 3"/>
+    <!-- Folding piece (lifting up) -->
+    <path d="M50,40 L80,40 L80,15 L50,15 Z" fill="#fff" stroke="${primary}" stroke-width="1.5" opacity="0.9" transform="rotate(-15, 50, 40)"/>
+    <!-- Content lines on front -->
+    <rect x="25" y="47" width="18" height="2" rx="1" fill="${primary}" opacity="0.3"/>
+    <rect x="25" y="53" width="20" height="2" rx="1" fill="${primary}" opacity="0.2"/>
+    <!-- Curved arrow showing fold direction -->
+    <path d="M68,18 C78,18 82,28 78,36" fill="none" stroke="${secondary}" stroke-width="2.5" stroke-linecap="round"/>
+    <polygon points="75,35 81,37 78,31" fill="${secondary}"/>
+    <!-- Small fold label -->
+    <text x="85" y="28" font-family="Fredoka One, cursive" font-size="7" fill="${secondary}" opacity="0.7">FOLD</text>
+  </svg>`;
+}
+
+function svgGlue(primary, secondary, accent) {
+  return `<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+    <!-- Paper/tab in background -->
+    <rect x="45" y="20" width="48" height="50" rx="3" fill="#fff" stroke="${primary}" stroke-width="1.5"/>
+    <!-- Tab area highlighted -->
+    <rect x="47" y="22" width="15" height="46" rx="2" fill="${accent}" stroke="${secondary}" stroke-width="1" stroke-dasharray="3 2"/>
+    <text x="50" y="48" font-family="Quicksand, sans-serif" font-size="5" fill="${secondary}" font-weight="600" transform="rotate(-90, 50, 48)">TAB</text>
+    <!-- Glue stick body -->
+    <rect x="8" y="15" width="28" height="55" rx="6" fill="${primary}"/>
+    <rect x="8" y="15" width="28" height="55" rx="6" fill="none" stroke="${secondary}" stroke-width="1.5"/>
+    <!-- Glue stick cap -->
+    <rect x="12" y="8" width="20" height="12" rx="4" fill="${secondary}"/>
+    <!-- Glue tip -->
+    <ellipse cx="22" cy="8" rx="7" ry="3" fill="#fff" opacity="0.8"/>
+    <!-- Label on glue stick -->
+    <rect x="12" y="32" width="20" height="14" rx="2" fill="#fff" opacity="0.8"/>
+    <text x="22" y="40" font-family="Fredoka One, cursive" font-size="5" fill="${secondary}" text-anchor="middle">GLUE</text>
+    <circle cx="22" cy="54" r="4" fill="${secondary}" opacity="0.3"/>
+    <!-- Glue being applied (dots) -->
+    <circle cx="40" cy="30" r="2.5" fill="${secondary}" opacity="0.5"/>
+    <circle cx="42" cy="38" r="2" fill="${secondary}" opacity="0.4"/>
+    <circle cx="41" cy="46" r="2.5" fill="${secondary}" opacity="0.5"/>
+    <circle cx="43" cy="54" r="2" fill="${secondary}" opacity="0.3"/>
+    <!-- Sparkle -->
+    <path d="M70,30 L72,26 L74,30 L78,32 L74,34 L72,38 L70,34 L66,32 Z" fill="${accent}" stroke="${primary}" stroke-width="0.5" opacity="0.6"/>
+  </svg>`;
+}
+
+function svgFill(primary, secondary, accent) {
+  return `<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+    <!-- Open box (3D perspective) -->
+    <!-- Box bottom -->
+    <path d="M20,45 L50,55 L80,45 L50,35 Z" fill="${accent}" stroke="${primary}" stroke-width="1.5"/>
+    <!-- Box left wall -->
+    <path d="M20,45 L20,70 L50,78 L50,55 Z" fill="${primary}" stroke="${secondary}" stroke-width="1"/>
+    <!-- Box right wall -->
+    <path d="M80,45 L80,70 L50,78 L50,55 Z" fill="${primary}" stroke="${secondary}" stroke-width="1" opacity="0.7"/>
+    <!-- Box back wall -->
+    <path d="M20,45 L50,35 L80,45 L80,70 L50,78 L20,70 Z" fill="none" stroke="${secondary}" stroke-width="1.5"/>
+    <!-- Open flap left -->
+    <path d="M20,45 L10,30 L40,22 L50,35 Z" fill="#fff" stroke="${primary}" stroke-width="1.5" opacity="0.8"/>
+    <!-- Open flap right -->
+    <path d="M80,45 L90,30 L60,22 L50,35 Z" fill="#fff" stroke="${primary}" stroke-width="1.5" opacity="0.7"/>
+    <!-- Character card going in -->
+    <g transform="translate(38, 5) rotate(5)">
+      <rect x="0" y="0" width="22" height="30" rx="3" fill="#fff" stroke="${secondary}" stroke-width="1.5"/>
+      <!-- Simple character face on card -->
+      <circle cx="11" cy="11" r="6" fill="${accent}"/>
+      <circle cx="8" cy="10" r="1.2" fill="${secondary}"/>
+      <circle cx="14" cy="10" r="1.2" fill="${secondary}"/>
+      <path d="M8,14 Q11,17 14,14" fill="none" stroke="${secondary}" stroke-width="1" stroke-linecap="round"/>
+      <rect x="4" y="22" width="14" height="1.5" rx="0.75" fill="${primary}" opacity="0.4"/>
+      <rect x="6" y="25.5" width="10" height="1.5" rx="0.75" fill="${primary}" opacity="0.3"/>
+    </g>
+    <!-- Down arrow -->
+    <path d="M50,38 L50,48" stroke="${secondary}" stroke-width="2" stroke-dasharray="2 2" opacity="0.6"/>
+    <polygon points="46,46 54,46 50,52" fill="${secondary}" opacity="0.6"/>
+  </svg>`;
+}
+
+function svgSeal(primary, secondary, accent) {
+  return `<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+    <!-- Closed gift box bottom -->
+    <path d="M15,38 L50,48 L85,38 L85,65 L50,75 L15,65 Z" fill="${primary}" stroke="${secondary}" stroke-width="1.5"/>
+    <!-- Box front face -->
+    <path d="M15,38 L15,65 L50,75 L50,48 Z" fill="${primary}" stroke="${secondary}" stroke-width="1"/>
+    <!-- Box right face -->
+    <path d="M50,48 L50,75 L85,65 L85,38 Z" fill="${secondary}" stroke="${secondary}" stroke-width="1" opacity="0.6"/>
+    <!-- Lid -->
+    <path d="M10,28 L50,38 L90,28 L50,18 Z" fill="${accent}" stroke="${primary}" stroke-width="1.5"/>
+    <path d="M10,28 L10,38 L50,48 L50,38 Z" fill="${accent}" stroke="${primary}" stroke-width="1"/>
+    <path d="M50,38 L50,48 L90,38 L90,28 Z" fill="${primary}" stroke="${secondary}" stroke-width="1" opacity="0.4"/>
+    <!-- Ribbon horizontal -->
+    <path d="M10,33 L50,43 L90,33" fill="none" stroke="${secondary}" stroke-width="3"/>
+    <!-- Ribbon vertical -->
+    <path d="M50,18 L50,75" stroke="${secondary}" stroke-width="3"/>
+    <!-- Bow -->
+    <ellipse cx="43" cy="18" rx="10" ry="6" fill="${secondary}" stroke="#fff" stroke-width="1" transform="rotate(-15, 43, 18)"/>
+    <ellipse cx="57" cy="18" rx="10" ry="6" fill="${secondary}" stroke="#fff" stroke-width="1" transform="rotate(15, 57, 18)"/>
+    <circle cx="50" cy="18" r="4" fill="${primary}" stroke="#fff" stroke-width="1"/>
+    <!-- Sparkle stars -->
+    <path d="M20,12 L22,8 L24,12 L28,14 L24,16 L22,20 L20,16 L16,14 Z" fill="${accent}" stroke="${secondary}" stroke-width="0.5"/>
+    <path d="M78,10 L79.5,7 L81,10 L84,11.5 L81,13 L79.5,16 L78,13 L75,11.5 Z" fill="${accent}" stroke="${secondary}" stroke-width="0.5"/>
+    <path d="M88,20 L89,18 L90,20 L92,21 L90,22 L89,24 L88,22 L86,21 Z" fill="${secondary}" opacity="0.5"/>
+    <path d="M12,22 L13,20 L14,22 L16,23 L14,24 L13,26 L12,24 L10,23 Z" fill="${secondary}" opacity="0.4"/>
+    <!-- Question mark (surprise!) -->
+    <text x="50" y="63" font-family="Fredoka One, cursive" font-size="10" fill="#fff" text-anchor="middle" opacity="0.7">?</text>
+  </svg>`;
+}
+
+/* SVG for header icons on Page 2 */
+function svgToolsIcon(primary, secondary) {
+  return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14.7,6.3a1,1,0,0,0,0,1.4l1.6,1.6a1,1,0,0,0,1.4,0l3.77-3.77a6,6,0,0,1-7.94,7.94L6.36,20.54a2.12,2.12,0,0,1-3-3l7.07-7.07A6,6,0,0,1,18.37,2.53Z" fill="none" stroke="${secondary}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+function svgLightbulbIcon(primary, secondary) {
+  return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9,18h6M10,22h4M12,2a7,7,0,0,0-4,12.7V17a1,1,0,0,0,1,1h6a1,1,0,0,0,1-1V14.7A7,7,0,0,0,12,2Z" fill="none" stroke="${secondary}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="12" y1="2" x2="12" y2="2" stroke="${secondary}" stroke-width="2" stroke-linecap="round"/>
+  </svg>`;
+}
+function svgPaperIcon(primary, secondary) {
+  return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14,2H6A2,2,0,0,0,4,4V20a2,2,0,0,0,2,2H18a2,2,0,0,0,2-2V8Z" fill="none" stroke="${secondary}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <polyline points="14 2 14 8 20 8" fill="none" stroke="${secondary}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="8" y1="13" x2="16" y2="13" stroke="${secondary}" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8" y1="17" x2="12" y2="17" stroke="${secondary}" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>`;
+}
+function svgHelpIcon(primary, secondary) {
+  return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="10" fill="none" stroke="${secondary}" stroke-width="1.8"/>
+    <path d="M9.09,9a3,3,0,0,1,5.83,1c0,2-3,3-3,3" fill="none" stroke="${secondary}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="12" cy="17" r="0.5" fill="${secondary}" stroke="${secondary}" stroke-width="1"/>
+  </svg>`;
+}
+
+/* SVG for supply items */
+function svgSupplyPrinter(primary, secondary) {
+  return `<svg viewBox="0 0 48 40" xmlns="http://www.w3.org/2000/svg">
+    <rect x="6" y="14" width="36" height="16" rx="3" fill="${primary}" stroke="${secondary}" stroke-width="1.2"/>
+    <rect x="14" y="5" width="20" height="11" rx="2" fill="#fff" stroke="${secondary}" stroke-width="1"/>
+    <rect x="12" y="28" width="24" height="10" rx="1.5" fill="#fff" stroke="${primary}" stroke-width="1"/>
+    <circle cx="35" cy="20" r="2" fill="${secondary}"/>
+    <rect x="16" y="32" width="12" height="1.2" rx="0.6" fill="${secondary}" opacity="0.4"/>
+    <rect x="16" y="35" width="8" height="1.2" rx="0.6" fill="${primary}" opacity="0.3"/>
+  </svg>`;
+}
+function svgSupplyScissors(primary, secondary) {
+  return `<svg viewBox="0 0 48 40" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(10, 5)">
+      <path d="M12,14 L28,6" stroke="${secondary}" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M12,18 L28,26" stroke="${secondary}" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="28" cy="16" r="3" fill="${secondary}" stroke="#fff" stroke-width="1"/>
+      <ellipse cx="6" cy="12" rx="6" ry="5" fill="none" stroke="${primary}" stroke-width="2.5"/>
+      <ellipse cx="6" cy="20" rx="6" ry="5" fill="none" stroke="${primary}" stroke-width="2.5"/>
+    </g>
+  </svg>`;
+}
+function svgSupplyRuler(primary, secondary) {
+  return `<svg viewBox="0 0 48 40" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="12" width="40" height="16" rx="2" fill="${primary}" stroke="${secondary}" stroke-width="1.2" transform="rotate(-8, 24, 20)"/>
+    <g transform="rotate(-8, 24, 20)">
+      <line x1="10" y1="12" x2="10" y2="18" stroke="${secondary}" stroke-width="1"/>
+      <line x1="16" y1="12" x2="16" y2="16" stroke="${secondary}" stroke-width="0.8"/>
+      <line x1="22" y1="12" x2="22" y2="18" stroke="${secondary}" stroke-width="1"/>
+      <line x1="28" y1="12" x2="28" y2="16" stroke="${secondary}" stroke-width="0.8"/>
+      <line x1="34" y1="12" x2="34" y2="18" stroke="${secondary}" stroke-width="1"/>
+      <line x1="40" y1="12" x2="40" y2="16" stroke="${secondary}" stroke-width="0.8"/>
+    </g>
+  </svg>`;
+}
+function svgSupplyGlue(primary, secondary) {
+  return `<svg viewBox="0 0 48 40" xmlns="http://www.w3.org/2000/svg">
+    <rect x="15" y="10" width="18" height="26" rx="4" fill="${primary}" stroke="${secondary}" stroke-width="1.2"/>
+    <rect x="18" y="4" width="12" height="8" rx="3" fill="${secondary}"/>
+    <ellipse cx="24" cy="4" rx="4.5" ry="2" fill="#fff" opacity="0.7"/>
+    <rect x="18" y="18" width="12" height="8" rx="1.5" fill="#fff" opacity="0.7"/>
+    <text x="24" y="24" font-family="Fredoka One, cursive" font-size="4.5" fill="${secondary}" text-anchor="middle">GLUE</text>
+  </svg>`;
+}
+
+/* SVG for QR placeholder icon */
+function svgQRIcon(primary, secondary) {
+  return `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="2" width="14" height="14" rx="2" fill="none" stroke="${secondary}" stroke-width="2"/>
+    <rect x="5" y="5" width="8" height="8" rx="1" fill="${secondary}" opacity="0.3"/>
+    <rect x="24" y="2" width="14" height="14" rx="2" fill="none" stroke="${secondary}" stroke-width="2"/>
+    <rect x="27" y="5" width="8" height="8" rx="1" fill="${secondary}" opacity="0.3"/>
+    <rect x="2" y="24" width="14" height="14" rx="2" fill="none" stroke="${secondary}" stroke-width="2"/>
+    <rect x="5" y="27" width="8" height="8" rx="1" fill="${secondary}" opacity="0.3"/>
+    <rect x="24" y="24" width="5" height="5" rx="1" fill="${secondary}" opacity="0.4"/>
+    <rect x="33" y="24" width="5" height="5" rx="1" fill="${secondary}" opacity="0.4"/>
+    <rect x="24" y="33" width="5" height="5" rx="1" fill="${secondary}" opacity="0.4"/>
+    <rect x="33" y="33" width="5" height="5" rx="1" fill="${secondary}" opacity="0.4"/>
+    <rect x="20" y="18" width="3" height="3" rx="0.5" fill="${primary}" opacity="0.5"/>
+  </svg>`;
+}
+
+/* SVG star for title decoration */
+function svgTitleStar(secondary, size) {
+  return `<svg class="title-star" width="${size}" height="${size}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12,1 L14.5,8.5 L22,9.5 L16.5,14.5 L18,22 L12,18 L6,22 L7.5,14.5 L2,9.5 L9.5,8.5 Z" fill="${secondary}" opacity="0.6"/>
+  </svg>`;
+}
+
+/* SVG paw print for bullet points */
+function svgPawBullet(primary, secondary) {
+  return `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="8" cy="10.5" rx="4" ry="3.5" fill="${secondary}" opacity="0.7"/>
+    <circle cx="4.5" cy="6" r="1.8" fill="${secondary}" opacity="0.6"/>
+    <circle cx="8" cy="4.5" r="1.8" fill="${secondary}" opacity="0.6"/>
+    <circle cx="11.5" cy="6" r="1.8" fill="${secondary}" opacity="0.6"/>
+  </svg>`;
+}
+
+
+/* ==========================================
+   RENDER FUNCTION
+   ========================================== */
+
+function render(data) {
+  const root = document.getElementById('root');
+  root.innerHTML = '';
+
+  const t = data.theme || {};
+  const primary = t.primary || '#FFB5C8';
+  const secondary = t.secondary || '#FF8BA7';
+  const accent = t.accent || '#FFF0F3';
+
+  // =========== PAGE 1: Build Steps ===========
+  const p1 = document.createElement('div');
+  p1.className = 'page';
+  setThemeVars(p1, t);
+
+  // Title with decorative stars
+  const title = document.createElement('div');
+  title.className = 'guide-title';
+  title.innerHTML = `
+    <div class="title-stars">
+      ${svgTitleStar(secondary, 18)}
+      ${svgTitleStar(secondary, 14)}
+      <h1>How to Build Your ${esc(data.packName)} Blind Box!</h1>
+      ${svgTitleStar(secondary, 14)}
+      ${svgTitleStar(secondary, 18)}
+    </div>
+    <div class="tagline">6 easy steps to kawaii crafting bliss</div>
+    <div class="guide-title-bar"></div>
+  `;
+  p1.appendChild(title);
+
+  // Steps with SVG illustrations
+  const steps = [
+    { num: 1, label: 'PRINT',           svg: svgPrinter(primary, secondary, accent),  desc: 'Print pages on white cardstock (65-110lb). Use "Actual Size" in print settings for accurate dimensions.' },
+    { num: 2, label: 'CUT',             svg: svgScissors(primary, secondary, accent),  desc: 'Cut along all SOLID lines with scissors or a craft knife. Use a ruler for straight edges.' },
+    { num: 3, label: 'FOLD',            svg: svgFold(primary, secondary, accent),      desc: 'Fold on all DASHED lines. Use a ruler and bone folder for crisp, clean folds.' },
+    { num: 4, label: 'GLUE',            svg: svgGlue(primary, secondary, accent),      desc: 'Apply glue stick to the numbered tabs. Press firmly and hold for 10 seconds.' },
+    { num: 5, label: 'FILL',            svg: svgFill(primary, secondary, accent),      desc: 'Place a character standee face-down inside the box. The surprise is half the fun!' },
+    { num: 6, label: 'SEAL & SURPRISE', svg: svgSeal(primary, secondary, accent),      desc: 'Close the box top and trade with friends. Who will get the legendary?' }
+  ];
+
+  const grid = document.createElement('div');
+  grid.className = 'steps-grid';
+
+  steps.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'step-card';
+    card.innerHTML = `
+      <div class="step-number">${s.num}</div>
+      <div class="step-icon-svg">${s.svg}</div>
+      <div class="step-label">${s.label}</div>
+      <div class="step-desc">${s.desc}</div>
+    `;
+    grid.appendChild(card);
+  });
+  p1.appendChild(grid);
+
+  // Footer with gradient bar
+  const footer = document.createElement('div');
+  footer.className = 'guide-footer';
+  footer.textContent = `${data.packName} \u00B7 blindboxcreator.com`;
+  p1.appendChild(footer);
+
+  root.appendChild(p1);
+
+  // =========== PAGE 2: Tips & Info ===========
+  const p2 = document.createElement('div');
+  p2.className = 'page';
+  setThemeVars(p2, t);
+
+  const p2Title = document.createElement('div');
+  p2Title.className = 'guide-title';
+  p2Title.innerHTML = `
+    <div class="title-stars">
+      ${svgTitleStar(secondary, 16)}
+      <h1>Tips & Info</h1>
+      ${svgTitleStar(secondary, 16)}
+    </div>
+    <div class="guide-title-bar"></div>
+  `;
+  p2.appendChild(p2Title);
+
+  const content = document.createElement('div');
+  content.className = 'page2-content';
+
+  // Paw bullet SVG for reuse
+  const pawBullet = svgPawBullet(primary, secondary);
+
+  // Recommended Supplies with SVG icons
+  const suppliesSec = document.createElement('div');
+  suppliesSec.className = 'info-section';
+  suppliesSec.innerHTML = `
+    <div class="info-header">
+      <span class="info-header-icon">${svgToolsIcon(primary, secondary)}</span>
+      Recommended Supplies
+    </div>
+    <div class="supplies-grid">
+      <div class="supply-item">
+        <div class="supply-icon-svg">${svgSupplyPrinter(primary, secondary)}</div>
+        <div class="supply-label">Color Printer</div>
+      </div>
+      <div class="supply-item">
+        <div class="supply-icon-svg">${svgSupplyScissors(primary, secondary)}</div>
+        <div class="supply-label">Sharp Scissors</div>
+      </div>
+      <div class="supply-item">
+        <div class="supply-icon-svg">${svgSupplyRuler(primary, secondary)}</div>
+        <div class="supply-label">Ruler</div>
+      </div>
+      <div class="supply-item">
+        <div class="supply-icon-svg">${svgSupplyGlue(primary, secondary)}</div>
+        <div class="supply-label">Glue Stick</div>
+      </div>
+    </div>
+  `;
+  content.appendChild(suppliesSec);
+
+  // Pro Tips with paw print bullets
+  const tips = [
+    'Score fold lines with an empty ballpoint pen before folding for cleaner creases',
+    'Let glue dry completely on each tab before moving to the next one',
+    'Use a bone folder or butter knife handle for crisp folds',
+    'Print a test page on regular paper first to practice',
+    'Laminate trading cards for extra durability',
+    'Place standees face-down in the box so they\'re a surprise when opened!',
+    'Use double-sided tape instead of glue for a cleaner finish'
+  ];
+
+  const tipsSec = document.createElement('div');
+  tipsSec.className = 'info-section';
+  tipsSec.innerHTML = `
+    <div class="info-header">
+      <span class="info-header-icon">${svgLightbulbIcon(primary, secondary)}</span>
+      Pro Tips
+    </div>
+    <ul class="info-list">
+      ${tips.map(tip => `<li><span class="bullet-icon">${pawBullet}</span>${tip}</li>`).join('')}
+    </ul>
+  `;
+  content.appendChild(tipsSec);
+
+  // Paper Recommendations with gradient borders
+  const paperSec = document.createElement('div');
+  paperSec.className = 'info-section';
+  paperSec.innerHTML = `
+    <div class="info-header">
+      <span class="info-header-icon">${svgPaperIcon(primary, secondary)}</span>
+      Paper Recommendations
+    </div>
+    <div class="paper-grid">
+      <div class="paper-item">
+        <div class="paper-weight">65 lb</div>
+        <div class="paper-label">Lightweight Card</div>
+        <div class="paper-desc">Easy to fold, good for beginners</div>
+      </div>
+      <div class="paper-item paper-recommended">
+        <div class="paper-weight">80 lb</div>
+        <div class="paper-label">Medium Card</div>
+        <div class="paper-desc">Best balance of strength &amp; foldability</div>
+        <div class="paper-tag">RECOMMENDED</div>
+      </div>
+      <div class="paper-item">
+        <div class="paper-weight">110 lb</div>
+        <div class="paper-label">Heavy Card</div>
+        <div class="paper-desc">Premium feel, needs scoring to fold</div>
+      </div>
+    </div>
+  `;
+  content.appendChild(paperSec);
+
+  // Help / QR section with themed styling
+  const helpSec = document.createElement('div');
+  helpSec.className = 'info-section';
+  helpSec.innerHTML = `
+    <div class="info-header">
+      <span class="info-header-icon">${svgHelpIcon(primary, secondary)}</span>
+      Having Trouble?
+    </div>
+    <div class="help-section">
+      <div class="qr-placeholder">
+        <div class="qr-icon-svg">${svgQRIcon(primary, secondary)}</div>
+        <div class="qr-label">Scan Me</div>
+      </div>
+      <div class="help-text">
+        <p>Visit our website for video tutorials, FAQ, and troubleshooting help. You can also share your creations with the community!</p>
+        <div class="help-url">blindboxcreator.com</div>
+      </div>
+    </div>
+  `;
+  content.appendChild(helpSec);
+
+  p2.appendChild(content);
+
+  // Footer with gradient bar
+  const footer2 = document.createElement('div');
+  footer2.className = 'guide-footer';
+  footer2.textContent = `${data.packName} \u00B7 blindboxcreator.com`;
+  p2.appendChild(footer2);
+
+  root.appendChild(p2);
+}
+
+function setThemeVars(el, t) {
+  el.style.setProperty('--theme-text', t.text || '#4A3333');
+  el.style.setProperty('--theme-primary', t.primary || '#FFB5C8');
+  el.style.setProperty('--theme-secondary', t.secondary || '#FF8BA7');
+  el.style.setProperty('--theme-accent', t.accent || '#FFF0F3');
+}
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.__PACK_DATA) render(window.__PACK_DATA);
+});
+</script>
+</body>
+</html>

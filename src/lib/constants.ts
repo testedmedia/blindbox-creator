@@ -1,7 +1,7 @@
 export const SITE_NAME = "Blind Box Generator";
 export const SITE_DESCRIPTION = "Create kawaii paper blind boxes with AI-generated Japanese-style characters. Print, fold, and surprise!";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://blindbox-creator.vercel.app";
-export const VERSION = "v1.7";
+export const VERSION = "v3.4";
 
 export const BRAND = {
   blue: "#4A90D9",
@@ -27,21 +27,13 @@ export interface Product {
   features?: string[];
 }
 
-// Pack IDs that have actual .png files in public/products/packs/
-const PACKS_WITH_IMAGES = new Set([
-  "chibi-bunny-garden", "chibi-deer-meadow", "chibi-duck-pond", "chibi-fox-festival",
-  "chibi-hamster-house", "chibi-kitty-club", "chibi-panda-cafe", "chibi-penguin-winter",
-  "chibi-puppy-parade", "crystal-fairies", "dragon-nursery", "fairy-tale-princesses",
-  "firefly-festival", "frog-choir", "hedgehog-garden", "idol-stage", "mahou-shoujo",
-  "moon-rabbit", "ninja-cuties", "pegasus-sky", "raccoon-camp", "samurai-sweethearts",
-  "unicorn-dreams", "witch-academy", "wizard-workshop", "zen-garden",
-]);
+// All 75 packs now have product images in public/products/packs/
 
 // Helper to create template packs consistently
 function tp(id: string, name: string, description: string, collection: string, badge?: string, emoji?: string): Product {
   return {
     id, name, description, price: 499, type: "digital", category: "template",
-    collection, image: PACKS_WITH_IMAGES.has(id) ? `/products/packs/${id}.png` : "", badge, emoji: emoji || "🎨",
+    collection, image: `/products/packs/${id}.png`, badge, emoji: emoji || "🎨",
     features: ["12 kawaii characters", "4 box designs", "Print-ready PDF (300 DPI)", "Assembly guide"],
   };
 }
@@ -176,8 +168,8 @@ const _ALL_TEMPLATE_PACKS: Product[] = [
   tp("new-year-osechi", "New Year Osechi", "Oshogatsu (New Year) characters: kagami mochi, daruma dolls, maneki-neko, and kadomatsu.", "seasonal", undefined, "🎍"),
 ];
 
-// Only export packs with real product images (launch-ready)
-export const TEMPLATE_PACKS = _ALL_TEMPLATE_PACKS.filter(p => PACKS_WITH_IMAGES.has(p.id));
+// All 75 packs have product images
+export const TEMPLATE_PACKS = _ALL_TEMPLATE_PACKS;
 
 export const PARTY_KITS: Product[] = [
   {
@@ -331,7 +323,7 @@ export const SUPPLY_LINKS = [
   {
     name: "80lb White Cardstock (250 Sheets)",
     description: "The perfect weight for blind boxes: sturdy enough to hold shape, easy enough to fold. Crisp whites for vibrant printing.",
-    url: "https://amazon.com/dp/B08XQ7T7RR",
+    url: "https://www.amazon.com/dp/B08XQ7T7RR",
     price: "$12.99",
     tag: "Essential",
     category: "essential" as SupplyCategory,
@@ -341,7 +333,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Glue Stick Set (12 Pack)",
     description: "Acid-free, quick-drying, and won't wrinkle your prints. The only adhesive you need for perfect blind boxes.",
-    url: "https://amazon.com/dp/B00006IBKJ",
+    url: "https://www.amazon.com/dp/B00006IBKJ",
     price: "$5.99",
     tag: "Essential",
     category: "essential" as SupplyCategory,
@@ -351,7 +343,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Fiskars Kid-Safe Scissors",
     description: "Trusted brand with blunt tips and easy-grip handles. Safe for ages 4+ and cuts cardstock like butter.",
-    url: "https://amazon.com/dp/B0027J1HY0",
+    url: "https://www.amazon.com/dp/B0027J1HY0",
     price: "$4.99",
     tag: "Essential",
     category: "essential" as SupplyCategory,
@@ -363,7 +355,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Pastel Cardstock Variety (60 Sheets)",
     description: "Professional-grade 80lb cardstock in 15 soft pastel colors. Baby pink, lavender, mint, sky blue, and more.",
-    url: "https://amazon.com/dp/B07SYD7K4M",
+    url: "https://www.amazon.com/dp/B07SYD7K4M",
     price: "$25.99",
     tag: "Popular",
     category: "premium" as SupplyCategory,
@@ -372,7 +364,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Holographic Cardstock (100 Sheets)",
     description: "Stars, gems, and laser patterns that shimmer in the light. Makes ultra-rare characters absolutely magical.",
-    url: "https://amazon.com/dp/B0C2CJJ15W",
+    url: "https://www.amazon.com/dp/B0C2CJJ15W",
     price: "$17.99",
     tag: "Best Seller",
     category: "premium" as SupplyCategory,
@@ -381,7 +373,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Metallic Cardstock (200 Sheets, 20 Colors)",
     description: "Mirror-finish metallic paper in gold, silver, rose gold, and 17 more colors. Premium thickness for special editions.",
-    url: "https://amazon.com/dp/B0CSBB8LBG",
+    url: "https://www.amazon.com/dp/B0CSBB8LBG",
     price: "$22.99",
     tag: "Premium",
     category: "premium" as SupplyCategory,
@@ -392,7 +384,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Decorative Edge Scissors (18 Patterns)",
     description: "Zig-zag, scallop, wave, and 15 more edge patterns. Turn ordinary box edges into works of art.",
-    url: "https://amazon.com/dp/B089N2YTFN",
+    url: "https://www.amazon.com/dp/B089N2YTFN",
     price: "$18.99",
     tag: "Popular",
     category: "tools" as SupplyCategory,
@@ -401,7 +393,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Double-Sided Tape Runners (6 Pack)",
     description: "Cleaner than glue, zero mess, instant bond. Perfect for younger kids who struggle with glue sticks.",
-    url: "https://amazon.com/dp/B09GVJ47N8",
+    url: "https://www.amazon.com/dp/B09GVJ47N8",
     price: "$13.99",
     tag: "Pro Tip",
     category: "tools" as SupplyCategory,
@@ -410,7 +402,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Bone Folder Scoring Tool Set",
     description: "Teflon non-stick tools for razor-sharp fold lines. The secret to professional-looking blind boxes.",
-    url: "https://amazon.com/dp/B07TKCK8X8",
+    url: "https://www.amazon.com/dp/B07TKCK8X8",
     price: "$14.99",
     tag: "Pro",
     category: "tools" as SupplyCategory,
@@ -421,7 +413,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Kawaii Sticker Sheets (100 Sheets, 600+)",
     description: "Transparent PET stickers with animals, flowers, food, and stars. Decorate your boxes, seal them, trade them.",
-    url: "https://amazon.com/dp/B09KMTR7K6",
+    url: "https://www.amazon.com/dp/B0CPXV5P9F",
     price: "$11.99",
     tag: "Best Seller",
     category: "kawaii" as SupplyCategory,
@@ -430,7 +422,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Holographic Washi Tape (20 Rolls)",
     description: "Rainbow holographic patterns that catch the light. Use as decorative borders, seals, and box accents.",
-    url: "https://amazon.com/dp/B087CFJNLM",
+    url: "https://www.amazon.com/dp/B087CFJNLM",
     price: "$15.99",
     tag: "Popular",
     category: "kawaii" as SupplyCategory,
@@ -439,7 +431,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Cat Paw Kawaii Glue Sticks (5 Pack)",
     description: "Adorable cat-paw shaped glue sticks in random pastel colors. Kids fight over who gets to use these.",
-    url: "https://amazon.com/dp/B0B5PHLG4J",
+    url: "https://www.amazon.com/dp/B0C1JN4M8R",
     price: "$8.99",
     tag: "Cute",
     category: "kawaii" as SupplyCategory,
@@ -448,7 +440,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Kawaii Desk Organizer (2 Drawers)",
     description: "Keep all your blind box supplies organized in this adorable storage box. 5 compartments + 2 drawers + DIY stickers.",
-    url: "https://amazon.com/dp/B0CRLB6F94",
+    url: "https://www.amazon.com/dp/B0CRLB6F94",
     price: "$18.99",
     tag: "New",
     category: "kawaii" as SupplyCategory,
@@ -459,7 +451,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Mini Kraft Gift Boxes (30 Pack)",
     description: "Real mini boxes (3x3x1\") for the ultimate blind box experience. Fill with characters, close, shake, and open!",
-    url: "https://amazon.com/dp/B0733HN27V",
+    url: "https://www.amazon.com/dp/B0733HN27V",
     price: "$11.99",
     tag: "Must-Have",
     category: "packaging" as SupplyCategory,
@@ -468,7 +460,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Shimmer Pastel Tissue Paper (70 Sheets)",
     description: "Pearlescent metallic shimmer in 7 pastel colors. Wrap characters in tissue before boxing for real blind box magic.",
-    url: "https://amazon.com/dp/B0D12PHW5P",
+    url: "https://www.amazon.com/dp/B0D12PHW5P",
     price: "$13.99",
     tag: "Premium",
     category: "packaging" as SupplyCategory,
@@ -477,7 +469,7 @@ export const SUPPLY_LINKS = [
   {
     name: "Pastel Pull Bows (30 Pack)",
     description: "One-pull instant bows in pink, blue, yellow, mint, and lavender. Tie on boxes for a gift-ready finish in 2 seconds.",
-    url: "https://amazon.com/dp/B07GHS6H7M",
+    url: "https://www.amazon.com/dp/B07GHS6H7M",
     price: "$14.99",
     tag: "Gift Ready",
     category: "packaging" as SupplyCategory,
@@ -486,10 +478,11 @@ export const SUPPLY_LINKS = [
 ];
 
 export const NAV_LINKS = [
+  { href: "/create", label: "Create", highlight: true },
   { href: "/shop", label: "Shop" },
   { href: "/templates", label: "Templates" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/features", label: "AI Generator" },
+  { href: "/affiliate", label: "Earn 50%" },
   { href: "/supplies", label: "Supplies" },
 ];
 

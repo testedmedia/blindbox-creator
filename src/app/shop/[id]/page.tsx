@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { ShoppingCart, ArrowLeft, CheckCircle, Package, Printer, Scissors, Gift, Star, ArrowRight } from "lucide-react";
 import {
   TEMPLATE_PACKS,
@@ -20,31 +20,55 @@ import {
 const ALL_PRODUCTS: Product[] = [...TEMPLATE_PACKS, ...PARTY_KITS, ...CLASSROOM_BUNDLES, MEGA_BUNDLE];
 
 const STEPS = [
-  { icon: Printer, title: "Print It", description: "Hit print on any home printer. Regular paper works, cardstock is even better. That's it." },
-  { icon: Scissors, title: "Cut It Out", description: "Cut along the thick lines. Kids 6+ can do this solo. Younger ones? Perfect parent-kid activity." },
-  { icon: Package, title: "Fold & Glue", description: "Fold on the dotted lines, glue the tabs. A glue stick is all you need. Done in 5 minutes." },
-  { icon: Gift, title: "Open & Surprise!", description: "Put characters in the box, close it, shuffle, and open! Trade with siblings, friends, the whole family." },
+  { icon: Printer, title: "Print", description: "Hit print on any home printer. Regular paper works, cardstock is even better. That's it - one click." },
+  { icon: Scissors, title: "Cut & Fold", description: "Cut along the solid lines, fold on the dotted lines, glue the tabs. Kids 6+ can do it solo. Done in 5 minutes." },
+  { icon: Gift, title: "Surprise!", description: "Put characters in the box, close it up, shuffle, and open! Trade with siblings, friends, the whole class." },
 ];
 
-// Lifestyle gallery photos (shared across all products)
-const GALLERY_PHOTOS = [
-  { src: "/products/hero-kawaii-collection.png", alt: "Kawaii paper blind box collection" },
-  { src: "/products/child-crafting-closeup.png", alt: "Child crafting a kawaii character" },
-  { src: "/products/hero-process.png", alt: "Step by step assembly process" },
-  { src: "/products/product-lifestyle-desk.png", alt: "Complete craft kit on desk" },
-  { src: "/products/girl-surprised-unboxing.png", alt: "Girl surprised opening blind box" },
-  { src: "/products/template-closeup.png", alt: "Template sheet closeup" },
-  { src: "/products/hero-unboxing.png", alt: "Unboxing flat lay" },
-  { src: "/products/finished-collection-display.png", alt: "Collection on display shelf" },
-  { src: "/products/gift-wrapping-scene.png", alt: "Gift wrapping a blind box kit" },
-  { src: "/products/girl-birthday-party.png", alt: "Birthday party with blind boxes" },
-];
+// Pack-specific product preview images (up to 10 per product)
+function getProductGallery(product: Product) {
+  const images: { src: string; alt: string }[] = [];
+
+  // 1. Hero/pack image
+  if (product.image?.startsWith("/products/packs/")) {
+    images.push({ src: product.image, alt: product.name });
+  }
+
+  // 2. Character gallery (3x4 grid of all 12 characters)
+  images.push({ src: `/products/previews/${product.id}-gallery.png`, alt: `${product.name} - Character Gallery` });
+
+  // 3. Character sheet preview (shows the 12 characters they get)
+  images.push({ src: `/products/previews/${product.id}-characters.png`, alt: `${product.name} - All 12 Characters` });
+
+  // 4. Template preview (shows the printable sheet)
+  images.push({ src: `/products/previews/${product.id}-template.png`, alt: `${product.name} - Printable Template` });
+
+  // 5. Assembled box preview
+  images.push({ src: `/products/previews/${product.id}-assembled.png`, alt: `${product.name} - Assembled Boxes` });
+
+  // 6. All-pages flat lay
+  images.push({ src: `/products/previews/${product.id}-flatlay.png`, alt: `${product.name} - All Pages Preview` });
+
+  // 7. Trading cards close-up
+  images.push({ src: `/products/previews/${product.id}-cards.png`, alt: `${product.name} - Trading Cards` });
+
+  // 8-10. Universal step-by-step images (shared across all packs)
+  images.push({ src: `/products/steps/step-1-print.png`, alt: `Step 1 - Print` });
+  images.push({ src: `/products/steps/step-2-cut.png`, alt: `Step 2 - Cut & Fold` });
+  images.push({ src: `/products/steps/step-3-surprise.png`, alt: `Step 3 - Surprise!` });
+
+  return images;
+}
 
 export default function ProductPage() {
   const params = useParams();
   const id = params.id as string;
   const product = ALL_PRODUCTS.find((p) => p.id === id);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const handleImageError = useCallback((src: string) => {
+    setFailedImages(prev => new Set(prev).add(src));
+  }, []);
 
   if (!product) {
     return (
@@ -65,10 +89,9 @@ export default function ProductPage() {
   const hasPackImage = product.image?.startsWith("/products/packs/");
   const collection = TEMPLATE_COLLECTIONS.find((c) => c.id === product.collection);
 
-  // Build gallery: pack image first (if exists), then lifestyle photos
-  const gallery = hasPackImage
-    ? [{ src: product.image, alt: product.name }, ...GALLERY_PHOTOS]
-    : GALLERY_PHOTOS;
+  // Build gallery from pack-specific product images, filtering out broken ones
+  const allGallery = getProductGallery(product);
+  const gallery = allGallery.filter(img => !failedImages.has(img.src));
 
   // Related products from same collection
   const related = TEMPLATE_PACKS.filter((p) => p.collection === product.collection && p.id !== product.id).slice(0, 4);
@@ -102,14 +125,16 @@ export default function ProductPage() {
             <div>
               {/* Main image */}
               <div className={`bg-gradient-to-br ${gradient} rounded-2xl overflow-hidden mb-3 aspect-square`}>
+                {gallery.length > 0 && (
                 <Image
-                  src={gallery[selectedImage].src}
-                  alt={gallery[selectedImage].alt}
+                  src={gallery[selectedImage]?.src || gallery[0]?.src}
+                  alt={gallery[selectedImage]?.alt || product.name}
                   width={800}
                   height={800}
                   className="w-full h-full object-cover"
                   priority
-                />
+                  onError={() => handleImageError(gallery[selectedImage]?.src)}
+                />)}
               </div>
               {/* Thumbnails */}
               <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
@@ -121,7 +146,7 @@ export default function ProductPage() {
                       selectedImage === i ? "border-brand-pink shadow-pink" : "border-transparent opacity-70 hover:opacity-100"
                     }`}
                   >
-                    <Image src={img.src} alt={img.alt} width={100} height={100} className="w-full h-full object-cover" />
+                    <Image src={img.src} alt={img.alt} width={100} height={100} className="w-full h-full object-cover" onError={() => handleImageError(img.src)} />
                   </button>
                 ))}
               </div>
@@ -180,35 +205,39 @@ export default function ProductPage() {
         </div>
       </section>
 
-      {/* How to Use - Step by Step */}
+      {/* How to Build - 3 Steps */}
       <section className="bg-gradient-to-b from-pink-50/50 to-white py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl md:text-3xl font-extrabold text-center mb-3">
-            Seriously, It&apos;s This Easy
+            How to Build Your {product.name}
           </h2>
           <p className="text-muted-foreground text-center mb-10 max-w-lg mx-auto">
-            No craft skills needed. No special tools. Just a printer, scissors, and a glue stick. Your kids will do most of the work!
+            No craft skills needed. Just a printer, scissors, and a glue stick. Done in under 10 minutes!
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {STEPS.map((step, i) => {
-              const photos = [
-                "/products/template-closeup.png",
-                "/products/child-crafting-closeup.png",
-                "/products/hero-process.png",
-                "/products/girl-surprised-unboxing.png",
-              ];
+              // Universal step images shared across all packs
+              const stepNames = ["step-1-print", "step-2-cut", "step-3-surprise"];
+              const stepImg = `/products/steps/${stepNames[i]}.png`;
               return (
                 <div key={step.title} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-border">
-                  <div className="h-32 overflow-hidden">
-                    <Image src={photos[i]} alt={step.title} width={300} height={200} className="w-full h-full object-cover" />
+                  <div className="h-48 overflow-hidden bg-gradient-to-br from-pink-50 to-purple-50">
+                    <Image
+                      src={stepImg}
+                      alt={`${product.name} - ${step.title}`}
+                      width={400}
+                      height={300}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
                   </div>
-                  <div className="p-4 text-center">
-                    <div className="bg-brand-pink w-10 h-10 rounded-full flex items-center justify-center mx-auto -mt-9 relative z-10 shadow-lg border-4 border-white">
-                      <span className="text-white font-bold text-sm">{i + 1}</span>
+                  <div className="p-5 text-center">
+                    <div className="bg-brand-pink w-12 h-12 rounded-full flex items-center justify-center mx-auto -mt-11 relative z-10 shadow-lg border-4 border-white">
+                      <span className="text-white font-extrabold text-lg">{i + 1}</span>
                     </div>
-                    <h3 className="font-bold mt-2 mb-1">{step.title}</h3>
-                    <p className="text-xs text-muted-foreground">{step.description}</p>
+                    <h3 className="font-bold text-lg mt-3 mb-1.5">{step.title}</h3>
+                    <p className="text-sm text-muted-foreground">{step.description}</p>
                   </div>
                 </div>
               );
@@ -255,18 +284,20 @@ export default function ProductPage() {
       </section>
 
       {/* Product Gallery */}
+      {gallery.length > 1 && (
       <section className="bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-extrabold mb-6">Product Gallery</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            {gallery.slice(0, 10).map((img, i) => (
+          <h2 className="text-2xl font-extrabold mb-6">What You Get</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {gallery.map((img, i) => (
               <div key={i} className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => { setSelectedImage(i); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-                <Image src={img.src} alt={img.alt} width={300} height={300} className="w-full aspect-square object-cover hover:scale-105 transition-transform duration-300" />
+                <Image src={img.src} alt={img.alt} width={300} height={300} className="w-full aspect-square object-cover hover:scale-105 transition-transform duration-300" onError={() => handleImageError(img.src)} />
               </div>
             ))}
           </div>
         </div>
       </section>
+      )}
 
       {/* Mega Bundle Upsell */}
       <section className="bg-gradient-to-r from-brand-purple/5 via-brand-pink/5 to-brand-blue/5 py-10">

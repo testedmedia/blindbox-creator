@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Box Net</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ========================================
+     BOX NET TEMPLATE v2 - PREMIUM KAWAII EDITION
+     4 pages, 1 foldable cube net per page
+     Each panel: 2.5"x2.5" (fits US Letter)
+     EVERY panel has cute kawaii artwork with FULL COLOR characters
+     ======================================== */
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page {
+    size: letter;
+    margin: 0.25in;
+  }
+
+  html, body {
+    font-family: 'Quicksand', sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: white;
+  }
+
+  /* ---------- Page container ---------- */
+  .page {
+    width: 8in;
+    height: 10.5in;
+    page-break-after: always;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .page:last-child { page-break-after: avoid; }
+
+  /* ---------- Net Container ---------- */
+  .net-container {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.5in 2.5in 2.5in;
+    grid-template-rows: 2.5in 2.5in 2.5in 2.5in 0.5in;
+  }
+
+  /* Panel placement */
+  .panel-top    { grid-column: 2; grid-row: 1; }
+  .panel-left   { grid-column: 1; grid-row: 2; }
+  .panel-front  { grid-column: 2; grid-row: 2; }
+  .panel-right  { grid-column: 3; grid-row: 2; }
+  .panel-bottom { grid-column: 2; grid-row: 3; }
+  .panel-back   { grid-column: 2; grid-row: 4; }
+  .panel-glue   { grid-column: 2; grid-row: 5; }
+
+  /* ---------- Panel Base ---------- */
+  .panel {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* CUT/FOLD lines */
+  .panel-top {
+    border-top: 1.5pt solid black;
+    border-left: 1.5pt solid black;
+    border-right: 1.5pt solid black;
+    border-bottom: 1pt dashed #888;
+  }
+  .panel-left {
+    border-top: 1.5pt solid black;
+    border-left: 1.5pt solid black;
+    border-bottom: 1.5pt solid black;
+    border-right: 1pt dashed #888;
+  }
+  .panel-front {
+    border: 1pt dashed #888;
+  }
+  .panel-right {
+    border-top: 1.5pt solid black;
+    border-right: 1.5pt solid black;
+    border-bottom: 1.5pt solid black;
+    border-left: 1pt dashed #888;
+  }
+  .panel-bottom {
+    border-left: 1.5pt solid black;
+    border-right: 1.5pt solid black;
+    border-top: 1pt dashed #888;
+    border-bottom: 1pt dashed #888;
+  }
+  .panel-back {
+    border-left: 1.5pt solid black;
+    border-right: 1.5pt solid black;
+    border-bottom: 1.5pt solid black;
+    border-top: 1pt dashed #888;
+  }
+  .panel-glue {
+    border-left: 1.5pt solid black;
+    border-right: 1.5pt solid black;
+    border-bottom: 1.5pt solid black;
+    border-top: 1pt dashed #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- Panel Art Layer ---------- */
+  .panel-art {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0.08in;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .panel-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  /* ---------- Decorative Inner Frame ---------- */
+  .inner-frame {
+    position: absolute;
+    inset: 0.06in;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 0.08in;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .inner-frame-double {
+    position: absolute;
+    inset: 0.1in;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 0.06in;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* ---------- SVG Sparkle Stars ---------- */
+  .sparkle-star {
+    position: absolute;
+    z-index: 2;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .sparkle-star svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ---------- FRONT PANEL ---------- */
+  .front-pack-name {
+    font-family: 'Fredoka One', 'Quicksand', sans-serif;
+    font-size: 18pt;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15);
+    z-index: 3;
+    position: relative;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+    margin-bottom: 0.04in;
+  }
+
+  .front-character {
+    width: 1.4in;
+    height: 1.4in;
+    z-index: 3;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
+  }
+  .front-character img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .front-subtitle {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 6pt;
+    font-weight: 700;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    z-index: 3;
+    position: relative;
+    margin-top: 0.02in;
+  }
+
+  /* ---------- BACK PANEL ---------- */
+  .back-logo {
+    font-family: 'Fredoka One', 'Quicksand', sans-serif;
+    font-size: 12pt;
+    color: white;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    z-index: 3;
+    position: relative;
+    margin-bottom: 0.06in;
+  }
+
+  .back-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 0.03in;
+    width: 2in;
+    height: 1.5in;
+    z-index: 3;
+    position: relative;
+  }
+  .back-mini-char {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 0.03in;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(2px);
+  }
+  .back-mini-char img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+  }
+
+  .back-collect-text {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 7pt;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    z-index: 3;
+    position: relative;
+    margin-top: 0.04in;
+    letter-spacing: 1px;
+  }
+
+  /* ---------- TOP PANEL ---------- */
+  .top-open-text {
+    font-family: 'Fredoka One', 'Quicksand', sans-serif;
+    font-size: 22pt;
+    color: white;
+    text-shadow: 0 3px 8px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15);
+    z-index: 3;
+    position: relative;
+    margin-bottom: 0.04in;
+  }
+  .top-arrows {
+    font-size: 14pt;
+    color: white;
+    z-index: 3;
+    opacity: 0.7;
+    letter-spacing: 6px;
+    position: relative;
+  }
+
+  /* ---------- BOTTOM PANEL ---------- */
+  .bottom-pack-name {
+    font-family: 'Fredoka One', 'Quicksand', sans-serif;
+    font-size: 10pt;
+    color: white;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    z-index: 3;
+    position: relative;
+    margin-bottom: 0.04in;
+  }
+  .bottom-collection {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 6pt;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+    z-index: 3;
+    position: relative;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 0.06in;
+  }
+  .bottom-url {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 5pt;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    z-index: 3;
+    position: relative;
+  }
+
+  /* ---------- SIDE PANELS ---------- */
+  .side-chars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.06in;
+    z-index: 3;
+    position: relative;
+    align-items: center;
+  }
+  .side-char-row {
+    display: flex;
+    gap: 0.04in;
+  }
+  .side-mini-char {
+    width: 0.6in;
+    height: 0.6in;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.04in;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(2px);
+    overflow: hidden;
+  }
+  .side-mini-char img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+  }
+  .side-pack-name {
+    font-family: 'Fredoka One', 'Quicksand', sans-serif;
+    font-size: 7pt;
+    color: rgba(255,255,255,0.6);
+    z-index: 3;
+    position: relative;
+    writing-mode: vertical-rl;
+    letter-spacing: 1.5px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+  .side-name-left { position: absolute; right: 0.04in; top: 50%; transform: translateY(-50%); }
+  .side-name-right { position: absolute; left: 0.04in; top: 50%; transform: translateY(-50%) rotate(180deg); }
+
+  /* ---------- Glue Tabs ---------- */
+  .tab {
+    position: absolute;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+    border: 1.5pt solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  .tab-label {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 4.5pt;
+    color: rgba(0,0,0,0.3);
+    font-weight: 700;
+    transform-origin: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* Tab positions */
+  .tab-top-left {
+    width: 0.4in; height: 2.1in; top: 0.2in; left: -0.4in;
+    clip-path: polygon(100% 0, 100% 100%, 0 90%, 0 10%);
+  }
+  .tab-top-right {
+    width: 0.4in; height: 2.1in; top: 0.2in; right: -0.4in;
+    clip-path: polygon(0 0, 0 100%, 100% 90%, 100% 10%);
+  }
+  .tab-top-top {
+    width: 2.1in; height: 0.4in; top: -0.4in; left: 0.2in;
+    clip-path: polygon(0 100%, 100% 100%, 90% 0, 10% 0);
+  }
+  .tab-left-top {
+    width: 2.1in; height: 0.4in; top: -0.4in; left: 0.2in;
+    clip-path: polygon(0 100%, 100% 100%, 90% 0, 10% 0);
+  }
+  .tab-left-bottom {
+    width: 2.1in; height: 0.4in; bottom: -0.4in; left: 0.2in;
+    clip-path: polygon(10% 100%, 90% 100%, 100% 0, 0 0);
+  }
+  .tab-left-left {
+    width: 0.4in; height: 2.1in; top: 0.2in; left: -0.4in;
+    clip-path: polygon(100% 0, 100% 100%, 0 90%, 0 10%);
+  }
+  .tab-right-top {
+    width: 2.1in; height: 0.4in; top: -0.4in; left: 0.2in;
+    clip-path: polygon(0 100%, 100% 100%, 90% 0, 10% 0);
+  }
+  .tab-right-bottom {
+    width: 2.1in; height: 0.4in; bottom: -0.4in; left: 0.2in;
+    clip-path: polygon(10% 100%, 90% 100%, 100% 0, 0 0);
+  }
+  .tab-right-right {
+    width: 0.4in; height: 2.1in; top: 0.2in; right: -0.4in;
+    clip-path: polygon(0 0, 0 100%, 100% 90%, 100% 10%);
+  }
+  .tab-back-bottom {
+    width: 2.1in; height: 0.4in; bottom: -0.4in; left: 0.2in;
+    clip-path: polygon(10% 100%, 90% 100%, 100% 0, 0 0);
+  }
+
+  .glue-tab-label {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 5.5pt;
+    color: rgba(0,0,0,0.25);
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  /* ---------- Cut/Fold Legend ---------- */
+  .legend {
+    position: absolute;
+    bottom: 0.05in;
+    right: 0.1in;
+    display: flex;
+    gap: 0.15in;
+    font-size: 4.5pt;
+    font-family: 'Quicksand', sans-serif;
+    color: #999;
+    z-index: 20;
+    font-weight: 600;
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.04in; }
+  .legend-line-cut { width: 0.2in; height: 0; border-top: 1.5pt solid black; }
+  .legend-line-fold { width: 0.2in; height: 0; border-top: 1pt dashed #888; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/** SVG sparkle star as inline HTML */
+function sparkleStarSVG(size, color) {
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="' + color + '"/>' +
+    '</svg>';
+}
+
+/** 4-point small sparkle */
+function miniSparkleSVG(size, color) {
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M8 1L9.5 6.5L15 8L9.5 9.5L8 15L6.5 9.5L1 8L6.5 6.5L8 1Z" fill="' + color + '"/>' +
+    '</svg>';
+}
+
+/** Heart SVG */
+function heartSVG(size, color) {
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="' + color + '"/>' +
+    '</svg>';
+}
+
+function getPatternSVG(motif, color1, color2) {
+  var c1 = encodeURIComponent(color1);
+  var c2 = encodeURIComponent(color2);
+  var patterns = {
+    'paw-prints': "<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='20' cy='14' r='5' fill='" + c1 + "'/><circle cx='12' cy='8' r='3' fill='" + c1 + "'/><circle cx='28' cy='8' r='3' fill='" + c1 + "'/><circle cx='10' cy='16' r='2.5' fill='" + c1 + "'/><circle cx='30' cy='16' r='2.5' fill='" + c1 + "'/></svg>",
+    'stars': "<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><polygon points='20,4 23,15 34,15 25,22 28,33 20,26 12,33 15,22 6,15 17,15' fill='" + c1 + "'/></svg>",
+    'hearts': "<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><path d='M20 34 C20 34 6 24 6 14 C6 8 10 4 15 6 C17 7 19 9 20 12 C21 9 23 7 25 6 C30 4 34 8 34 14 C34 24 20 34 20 34Z' fill='" + c1 + "'/></svg>",
+    'diamonds': "<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><polygon points='20,4 36,20 20,36 4,20' fill='" + c1 + "'/></svg>",
+    'circles': "<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='20' cy='20' r='8' fill='none' stroke='" + c1 + "' stroke-width='2'/><circle cx='20' cy='20' r='3' fill='" + c1 + "'/></svg>",
+    'clouds': "<svg xmlns='http://www.w3.org/2000/svg' width='50' height='30'><ellipse cx='25' cy='18' rx='12' ry='8' fill='" + c1 + "'/><ellipse cx='17' cy='16' rx='8' ry='6' fill='" + c1 + "'/><ellipse cx='33' cy='16' rx='8' ry='6' fill='" + c1 + "'/><ellipse cx='25' cy='13' rx='9' ry='7' fill='" + c1 + "'/></svg>",
+    'sparkles': "<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><path d='M20 6 L22 16 L32 18 L22 20 L20 30 L18 20 L8 18 L18 16Z' fill='" + c1 + "'/></svg>",
+    'music': "<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='14' cy='28' r='5' fill='" + c1 + "'/><line x1='19' y1='28' x2='19' y2='8' stroke='" + c1 + "' stroke-width='2'/><path d='M19 8 Q30 6 28 14 L19 16' fill='" + c1 + "'/></svg>",
+    'flowers': "<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='20' cy='12' r='5' fill='" + c1 + "'/><circle cx='12' cy='20' r='5' fill='" + c1 + "'/><circle cx='28' cy='20' r='5' fill='" + c1 + "'/><circle cx='15' cy='28' r='5' fill='" + c1 + "'/><circle cx='25' cy='28' r='5' fill='" + c1 + "'/><circle cx='20' cy='20' r='4' fill='" + c2 + "'/></svg>",
+    'bows': "<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><ellipse cx='12' cy='18' rx='8' ry='5' fill='" + c1 + "' transform='rotate(-20 12 18)'/><ellipse cx='28' cy='18' rx='8' ry='5' fill='" + c1 + "' transform='rotate(20 28 18)'/><circle cx='20' cy='20' r='3' fill='" + c2 + "'/></svg>"
+  };
+  var svg = patterns[motif] || patterns['stars'];
+  return 'url("data:image/svg+xml,' + encodeURIComponent(svg.replace(/\s+/g, ' ')) + '")';
+}
+
+function render(data) {
+  var root = document.getElementById('root');
+  root.innerHTML = '';
+
+  var theme = data.theme || {};
+  var chars = data.characters || [];
+  var motif = theme.pattern || 'stars';
+  var primary = theme.primary || '#FFB5C8';
+  var secondary = theme.secondary || '#FF8BA7';
+  var accent = theme.accent || '#FFF0F3';
+  var boxAccent = theme.boxAccent || primary;
+
+  var frontVariants = ['featured', 'collage', 'pattern', 'surprise'];
+  var variantLabels = ['Featured Character', 'Character Gallery', 'Collector Edition', 'Surprise Box'];
+
+  frontVariants.forEach(function(variant, boxIdx) {
+    var page = document.createElement('div');
+    page.className = 'page';
+
+    var net = document.createElement('div');
+    net.className = 'net-container';
+
+    // ==================== TOP PANEL ====================
+    var topPanel = createPanel('top', theme);
+    var topArt = document.createElement('div');
+    topArt.className = 'panel-art';
+
+    addPatternBg(topArt, motif, theme, 0.12);
+    addInnerFrame(topArt);
+    addSparkles(topArt, 'rgba(255,255,255,0.5)', 4);
+
+    var openText = document.createElement('div');
+    openText.className = 'top-open-text';
+    openText.textContent = 'OPEN ME!';
+    topArt.appendChild(openText);
+
+    var arrows = document.createElement('div');
+    arrows.className = 'top-arrows';
+    arrows.textContent = '\u25BC  \u25BC  \u25BC';
+    topArt.appendChild(arrows);
+
+    topPanel.appendChild(topArt);
+    addTab(topPanel, 'TAB 1', 'tab-top-left');
+    addTab(topPanel, 'TAB 2', 'tab-top-right');
+    addTab(topPanel, 'TAB 3', 'tab-top-top');
+    net.appendChild(topPanel);
+
+    // ==================== LEFT PANEL ====================
+    var leftPanel = createPanel('left', theme);
+    var leftArt = document.createElement('div');
+    leftArt.className = 'panel-art';
+
+    addPatternBg(leftArt, motif, theme, 0.18);
+    addInnerFrame(leftArt);
+
+    // Show 3 characters vertically
+    var leftChars = document.createElement('div');
+    leftChars.className = 'side-chars';
+    var leftSet = chars.slice(0, 3);
+    leftSet.forEach(function(ch) {
+      var wrap = document.createElement('div');
+      wrap.className = 'side-mini-char';
+      if (ch.imageDataUrl) {
+        var img = document.createElement('img');
+        img.src = ch.imageDataUrl;
+        img.alt = ch.name;
+        wrap.appendChild(img);
+      }
+      leftChars.appendChild(wrap);
+    });
+    leftArt.appendChild(leftChars);
+
+    var leftName = document.createElement('div');
+    leftName.className = 'side-pack-name side-name-left';
+    leftName.textContent = data.packName;
+    leftArt.appendChild(leftName);
+
+    leftPanel.appendChild(leftArt);
+    addTab(leftPanel, 'TAB 4', 'tab-left-top');
+    addTab(leftPanel, 'TAB 5', 'tab-left-bottom');
+    addTab(leftPanel, 'TAB 6', 'tab-left-left');
+    net.appendChild(leftPanel);
+
+    // ==================== FRONT PANEL ====================
+    var frontPanel = createPanel('front', theme);
+    var frontArt = document.createElement('div');
+    frontArt.className = 'panel-art';
+
+    addPatternBg(frontArt, motif, theme, 0.1);
+    addInnerFrame(frontArt);
+    addSparkles(frontArt, 'rgba(255,255,255,0.45)', 6);
+
+    if (variant === 'featured') {
+      // Pack name + featured character (legendary or first epic)
+      var nameEl = document.createElement('div');
+      nameEl.className = 'front-pack-name';
+      nameEl.textContent = data.packName;
+      frontArt.appendChild(nameEl);
+
+      var featuredChar = chars.find(function(c) { return c.rarity === 'legendary'; }) ||
+                         chars.find(function(c) { return c.rarity === 'epic'; }) ||
+                         chars[0];
+      if (featuredChar && featuredChar.imageDataUrl) {
+        var charWrap = document.createElement('div');
+        charWrap.className = 'front-character';
+        var charImg = document.createElement('img');
+        charImg.src = featuredChar.imageDataUrl;
+        charImg.alt = featuredChar.name;
+        charWrap.appendChild(charImg);
+        frontArt.appendChild(charWrap);
+      }
+
+      var sub = document.createElement('div');
+      sub.className = 'front-subtitle';
+      sub.textContent = 'BLIND BOX';
+      frontArt.appendChild(sub);
+
+    } else if (variant === 'collage') {
+      // 3x3 grid of characters
+      var nameEl2 = document.createElement('div');
+      nameEl2.className = 'front-pack-name';
+      nameEl2.style.fontSize = '13pt';
+      nameEl2.style.marginBottom = '0.04in';
+      nameEl2.textContent = data.packName;
+      frontArt.appendChild(nameEl2);
+
+      var grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:0.03in;width:1.9in;height:1.5in;z-index:3;position:relative;';
+      chars.slice(0, 9).forEach(function(ch) {
+        var cell = document.createElement('div');
+        cell.style.cssText = 'display:flex;align-items:center;justify-content:center;border-radius:0.03in;background:rgba(255,255,255,0.2);overflow:hidden;';
+        if (ch.imageDataUrl) {
+          var img = document.createElement('img');
+          img.src = ch.imageDataUrl;
+          img.alt = ch.name;
+          img.style.cssText = 'max-width:95%;max-height:95%;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.1));';
+          cell.appendChild(img);
+        }
+        grid.appendChild(cell);
+      });
+      frontArt.appendChild(grid);
+
+      var sub2 = document.createElement('div');
+      sub2.className = 'front-subtitle';
+      sub2.style.marginTop = '0.03in';
+      sub2.textContent = '12 CHARACTERS';
+      frontArt.appendChild(sub2);
+
+    } else if (variant === 'pattern') {
+      // Prominent pattern + pack name
+      var bigPat = document.createElement('div');
+      bigPat.className = 'panel-pattern';
+      bigPat.style.backgroundImage = getPatternSVG(motif, 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.3)');
+      bigPat.style.backgroundSize = '0.65in 0.65in';
+      bigPat.style.opacity = '0.4';
+      frontArt.appendChild(bigPat);
+
+      var nameEl3 = document.createElement('div');
+      nameEl3.className = 'front-pack-name';
+      nameEl3.style.fontSize = '16pt';
+      nameEl3.textContent = data.packName;
+      frontArt.appendChild(nameEl3);
+
+      // Show 2 characters flanking
+      if (chars.length >= 2) {
+        var flanks = document.createElement('div');
+        flanks.style.cssText = 'display:flex;gap:0.15in;z-index:3;position:relative;margin-top:0.06in;';
+        [chars[0], chars[chars.length - 1]].forEach(function(ch) {
+          var w = document.createElement('div');
+          w.style.cssText = 'width:0.8in;height:0.8in;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15));';
+          if (ch.imageDataUrl) {
+            var img = document.createElement('img');
+            img.src = ch.imageDataUrl;
+            img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
+            w.appendChild(img);
+          }
+          flanks.appendChild(w);
+        });
+        frontArt.appendChild(flanks);
+      }
+
+      var sub3 = document.createElement('div');
+      sub3.className = 'front-subtitle';
+      sub3.textContent = 'COLLECTOR EDITION';
+      frontArt.appendChild(sub3);
+
+    } else if (variant === 'surprise') {
+      // Mystery "?" with starburst
+      var burst = document.createElement('div');
+      burst.style.cssText = 'width:2in;height:2in;background:rgba(255,255,255,0.12);clip-path:polygon(50% 0%,61% 15%,78% 5%,72% 22%,95% 25%,82% 38%,100% 50%,82% 62%,95% 75%,72% 78%,78% 95%,61% 85%,50% 100%,39% 85%,22% 95%,28% 78%,5% 75%,18% 62%,0% 50%,18% 38%,5% 25%,28% 22%,22% 5%,39% 15%);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;';
+      frontArt.appendChild(burst);
+
+      var qMark = document.createElement('div');
+      qMark.style.cssText = 'font-family:"Fredoka One",sans-serif;font-size:80pt;color:white;text-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:3;position:relative;line-height:1;';
+      qMark.textContent = '?';
+      frontArt.appendChild(qMark);
+
+      var sub4 = document.createElement('div');
+      sub4.className = 'front-subtitle';
+      sub4.textContent = 'SURPRISE!';
+      frontArt.appendChild(sub4);
+    }
+
+    frontPanel.appendChild(frontArt);
+    net.appendChild(frontPanel);
+
+    // ==================== RIGHT PANEL ====================
+    var rightPanel = createPanel('right', theme);
+    var rightArt = document.createElement('div');
+    rightArt.className = 'panel-art';
+
+    addPatternBg(rightArt, motif, theme, 0.18);
+    addInnerFrame(rightArt);
+
+    // Show 3 different characters vertically
+    var rightChars = document.createElement('div');
+    rightChars.className = 'side-chars';
+    var rightSet = chars.slice(3, 6);
+    rightSet.forEach(function(ch) {
+      var wrap = document.createElement('div');
+      wrap.className = 'side-mini-char';
+      if (ch.imageDataUrl) {
+        var img = document.createElement('img');
+        img.src = ch.imageDataUrl;
+        img.alt = ch.name;
+        wrap.appendChild(img);
+      }
+      rightChars.appendChild(wrap);
+    });
+    rightArt.appendChild(rightChars);
+
+    var rightName = document.createElement('div');
+    rightName.className = 'side-pack-name side-name-right';
+    rightName.textContent = data.packName;
+    rightArt.appendChild(rightName);
+
+    rightPanel.appendChild(rightArt);
+    addTab(rightPanel, 'TAB 7', 'tab-right-top');
+    addTab(rightPanel, 'TAB 8', 'tab-right-bottom');
+    addTab(rightPanel, 'TAB 9', 'tab-right-right');
+    net.appendChild(rightPanel);
+
+    // ==================== BOTTOM PANEL ====================
+    var bottomPanel = createPanel('bottom', theme);
+    var bottomArt = document.createElement('div');
+    bottomArt.className = 'panel-art';
+
+    addPatternBg(bottomArt, motif, theme, 0.08);
+    addInnerFrame(bottomArt);
+
+    var bName = document.createElement('div');
+    bName.className = 'bottom-pack-name';
+    bName.textContent = data.packName;
+    bottomArt.appendChild(bName);
+
+    var bCol = document.createElement('div');
+    bCol.className = 'bottom-collection';
+    var colName = (data.collection || '').split('-').map(function(w) {
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    }).join(' ');
+    bCol.textContent = colName + ' Collection';
+    bottomArt.appendChild(bCol);
+
+    var bUrl = document.createElement('div');
+    bUrl.className = 'bottom-url';
+    bUrl.textContent = 'blindboxcreator.com';
+    bottomArt.appendChild(bUrl);
+
+    bottomPanel.appendChild(bottomArt);
+    net.appendChild(bottomPanel);
+
+    // ==================== BACK PANEL ====================
+    var backPanel = createPanel('back', theme);
+    var backArt = document.createElement('div');
+    backArt.className = 'panel-art';
+
+    addPatternBg(backArt, motif, theme, 0.1);
+    addInnerFrame(backArt);
+
+    var backLogo = document.createElement('div');
+    backLogo.className = 'back-logo';
+    backLogo.textContent = data.packName;
+    backArt.appendChild(backLogo);
+
+    // 4x3 grid of ALL 12 characters (full color!)
+    var backGrid = document.createElement('div');
+    backGrid.className = 'back-grid';
+    chars.slice(0, 12).forEach(function(ch) {
+      var mini = document.createElement('div');
+      mini.className = 'back-mini-char';
+      if (ch.imageDataUrl) {
+        var img = document.createElement('img');
+        img.src = ch.imageDataUrl;
+        img.alt = ch.name;
+        mini.appendChild(img);
+      }
+      backGrid.appendChild(mini);
+    });
+    backArt.appendChild(backGrid);
+
+    var collectText = document.createElement('div');
+    collectText.className = 'back-collect-text';
+    collectText.textContent = 'Collect all 12!';
+    backArt.appendChild(collectText);
+
+    backPanel.appendChild(backArt);
+    addTab(backPanel, 'TAB 10', 'tab-back-bottom');
+    net.appendChild(backPanel);
+
+    // ==================== GLUE TAB ====================
+    var gluePanel = document.createElement('div');
+    gluePanel.className = 'panel panel-glue';
+    gluePanel.style.background = 'linear-gradient(180deg, ' + accent + ', #F5F5F5)';
+
+    var glueLabel = document.createElement('div');
+    glueLabel.className = 'glue-tab-label';
+    glueLabel.textContent = 'GLUE HERE';
+    gluePanel.appendChild(glueLabel);
+    net.appendChild(gluePanel);
+
+    page.appendChild(net);
+
+    // Legend
+    var legendEl = document.createElement('div');
+    legendEl.className = 'legend';
+    legendEl.innerHTML =
+      '<div class="legend-item"><div class="legend-line-cut"></div> CUT</div>' +
+      '<div class="legend-item"><div class="legend-line-fold"></div> FOLD</div>' +
+      '<div style="font-size:4.5pt;color:#AAA;font-weight:600;">Box ' + (boxIdx + 1) + '/4: ' + variantLabels[boxIdx] + '</div>';
+    page.appendChild(legendEl);
+
+    root.appendChild(page);
+  });
+}
+
+function createPanel(type, theme) {
+  var panel = document.createElement('div');
+  panel.className = 'panel panel-' + type;
+
+  var primary = theme.primary || '#FFB5C8';
+  var secondary = theme.secondary || '#FF8BA7';
+  var boxAccent = theme.boxAccent || theme.primary || '#FFD1DC';
+
+  // Rich multi-stop gradients for depth
+  if (type === 'front') {
+    panel.style.background = 'linear-gradient(145deg, ' + primary + ' 0%, ' + secondary + ' 50%, ' + primary + ' 100%)';
+  } else if (type === 'back') {
+    panel.style.background = 'linear-gradient(145deg, ' + secondary + ' 0%, ' + primary + ' 50%, ' + secondary + ' 100%)';
+  } else if (type === 'top') {
+    panel.style.background = 'linear-gradient(180deg, ' + boxAccent + ' 0%, ' + primary + ' 60%, ' + secondary + ' 100%)';
+  } else if (type === 'bottom') {
+    panel.style.background = 'linear-gradient(0deg, ' + boxAccent + ' 0%, ' + primary + ' 60%, ' + secondary + ' 100%)';
+  } else if (type === 'left') {
+    panel.style.background = 'linear-gradient(135deg, ' + boxAccent + ' 0%, ' + primary + ' 50%, ' + secondary + ' 100%)';
+  } else if (type === 'right') {
+    panel.style.background = 'linear-gradient(225deg, ' + boxAccent + ' 0%, ' + primary + ' 50%, ' + secondary + ' 100%)';
+  }
+
+  return panel;
+}
+
+function addPatternBg(container, motif, theme, opacity) {
+  var pat = document.createElement('div');
+  pat.className = 'panel-pattern';
+  pat.style.backgroundImage = getPatternSVG(motif, 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.3)');
+  pat.style.backgroundSize = '0.45in 0.45in';
+  if (opacity !== undefined) pat.style.opacity = String(opacity);
+  container.appendChild(pat);
+}
+
+function addInnerFrame(container) {
+  var f1 = document.createElement('div');
+  f1.className = 'inner-frame';
+  container.appendChild(f1);
+  var f2 = document.createElement('div');
+  f2.className = 'inner-frame-double';
+  container.appendChild(f2);
+}
+
+function addSparkles(container, color, count) {
+  var positions = [
+    { top: '0.12in', left: '0.12in', size: '14px' },
+    { top: '0.1in', right: '0.15in', size: '10px' },
+    { bottom: '0.15in', left: '0.18in', size: '8px' },
+    { bottom: '0.12in', right: '0.12in', size: '12px' },
+    { top: '0.4in', right: '0.4in', size: '7px' },
+    { bottom: '0.4in', left: '0.35in', size: '9px' }
+  ];
+  for (var i = 0; i < Math.min(count, positions.length); i++) {
+    var p = positions[i];
+    var el = document.createElement('div');
+    el.className = 'sparkle-star';
+    el.innerHTML = miniSparkleSVG(p.size, color);
+    el.style.position = 'absolute';
+    if (p.top) el.style.top = p.top;
+    if (p.bottom) el.style.bottom = p.bottom;
+    if (p.left) el.style.left = p.left;
+    if (p.right) el.style.right = p.right;
+    container.appendChild(el);
+  }
+}
+
+function addTab(panel, label, className) {
+  var tab = document.createElement('div');
+  tab.className = 'tab ' + className;
+
+  var lbl = document.createElement('div');
+  lbl.className = 'tab-label';
+  lbl.textContent = label;
+
+  if (className.indexOf('-left') !== -1 && className.indexOf('tab-left-top') === -1 && className.indexOf('tab-left-bottom') === -1) {
+    lbl.style.transform = 'rotate(-90deg)';
+  } else if (className.indexOf('-right') !== -1 && className.indexOf('tab-right-top') === -1 && className.indexOf('tab-right-bottom') === -1) {
+    lbl.style.transform = 'rotate(90deg)';
+  }
+
+  tab.appendChild(lbl);
+  panel.appendChild(tab);
+}
+
+function esc(str) {
+  var d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  if (window.__PACK_DATA) render(window.__PACK_DATA);
+});
+</script>
+</body>
+</html>

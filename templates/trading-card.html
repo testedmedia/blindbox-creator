@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Cards - Premium Kawaii Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ========================================
+     TRADING CARD TEMPLATE - PREMIUM KAWAII EDITION
+     12 cards, 2 per US Letter page (6 pages)
+     Card size: 2.5" x 3.5" (standard)
+     300 DPI print-ready, sRGB
+     ======================================== */
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page {
+    size: letter;
+    margin: 0.25in;
+  }
+
+  html, body {
+    font-family: 'Quicksand', sans-serif;
+    color-profile: sRGB;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: white;
+  }
+
+  /* ---------- Page container ---------- */
+  .page {
+    width: 8in;
+    height: 10.5in;
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4in;
+    position: relative;
+    padding-top: 0.1in;
+  }
+  .page:last-child { page-break-after: avoid; }
+
+  /* ---------- Decorative page header ---------- */
+  .page-header {
+    font-family: 'Fredoka One', cursive;
+    font-size: 18pt;
+    letter-spacing: 3px;
+    text-align: center;
+    color: var(--header-color, #E91E8C);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.08), 0 2px 8px rgba(233,30,140,0.15);
+    position: relative;
+    padding: 0.05in 0.4in;
+  }
+  .page-header-border {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.12in;
+    margin-bottom: 0.08in;
+  }
+  .page-header-line {
+    width: 0.8in;
+    height: 2px;
+    border-radius: 1px;
+  }
+  .page-header-star {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+
+  /* ---------- Cut mark crosses ---------- */
+  .cut-mark {
+    position: absolute;
+    width: 0.2in;
+    height: 0.2in;
+  }
+  .cut-mark::before,
+  .cut-mark::after {
+    content: '';
+    position: absolute;
+    background: #666;
+  }
+  .cut-mark::before {
+    width: 1.5px;
+    height: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .cut-mark::after {
+    height: 1.5px;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* ---------- Card ---------- */
+  .card {
+    width: 2.5in;
+    height: 3.5in;
+    border-radius: 0.12in;
+    position: relative;
+    overflow: hidden;
+    background: white;
+  }
+
+  .card-wrapper {
+    position: relative;
+    width: 2.5in;
+    height: 3.5in;
+  }
+
+  /* Cut marks at each corner of a card */
+  .card-wrapper .cm-tl { top: -0.12in; left: -0.12in; }
+  .card-wrapper .cm-tr { top: -0.12in; right: -0.12in; }
+  .card-wrapper .cm-bl { bottom: -0.12in; left: -0.12in; }
+  .card-wrapper .cm-br { bottom: -0.12in; right: -0.12in; }
+
+  /* ---------- Card gradient background ---------- */
+  .card-gradient-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 0.12in;
+  }
+
+  /* ---------- Background pattern behind card content ---------- */
+  .card-bg-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    z-index: 1;
+    border-radius: 0.12in;
+  }
+
+  /* ---------- Rarity border with glow ---------- */
+  .card-border {
+    position: absolute;
+    inset: 0;
+    border-radius: 0.12in;
+    border: 3px solid var(--rarity-color, #9CA3AF);
+    z-index: 5;
+    pointer-events: none;
+  }
+  .rarity-common .card-border {
+    border-width: 3px;
+    box-shadow: inset 0 0 6px rgba(156,163,175,0.2);
+  }
+  .rarity-rare .card-border {
+    border-width: 4px;
+    box-shadow: inset 0 0 8px rgba(59,130,246,0.2), 0 0 4px rgba(59,130,246,0.15);
+  }
+  .rarity-epic .card-border {
+    border-width: 4px;
+    box-shadow: inset 0 0 10px rgba(139,92,246,0.25), 0 0 6px rgba(139,92,246,0.2);
+  }
+  .rarity-legendary .card-border {
+    border-width: 5px;
+    box-shadow: inset 0 0 12px rgba(245,158,11,0.3), 0 0 8px rgba(245,158,11,0.25), 0 0 16px rgba(245,158,11,0.1);
+  }
+
+  /* ---------- Inner decorative frame ---------- */
+  .card-inner-frame {
+    position: absolute;
+    inset: 5px;
+    border-radius: 0.08in;
+    border: 1.5px solid rgba(255,255,255,0.4);
+    z-index: 4;
+    pointer-events: none;
+  }
+  .rarity-rare .card-inner-frame {
+    border-color: rgba(59,130,246,0.15);
+  }
+  .rarity-epic .card-inner-frame {
+    border-color: rgba(139,92,246,0.15);
+  }
+  .rarity-legendary .card-inner-frame {
+    border-color: rgba(245,158,11,0.2);
+  }
+
+  /* ---------- Holographic shimmer overlay for legendary ---------- */
+  .card.legendary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 0.12in;
+    background: linear-gradient(
+      135deg,
+      transparent 10%,
+      rgba(255, 215, 0, 0.08) 18%,
+      rgba(255, 105, 180, 0.1) 25%,
+      rgba(100, 200, 255, 0.08) 32%,
+      transparent 40%,
+      transparent 50%,
+      rgba(255, 215, 0, 0.12) 55%,
+      rgba(200, 150, 255, 0.1) 62%,
+      rgba(100, 255, 200, 0.08) 70%,
+      rgba(255, 215, 0, 0.15) 78%,
+      rgba(255, 105, 180, 0.08) 85%,
+      transparent 95%
+    );
+    z-index: 6;
+    pointer-events: none;
+  }
+
+  /* ---------- Card inner layout ---------- */
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.08in;
+    z-index: 2;
+  }
+
+  /* ---------- Header row ---------- */
+  .card-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0.04in 0.06in;
+    min-height: 0.28in;
+  }
+
+  .pack-name-label {
+    font-family: 'Fredoka One', cursive;
+    font-size: 5.5pt;
+    color: var(--theme-text, #4A3333);
+    text-shadow: 0 0.5px 1px rgba(0,0,0,0.06);
+    max-width: 1.1in;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0.85;
+  }
+
+  .rarity-badge {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 5pt;
+    font-weight: 700;
+    color: white;
+    padding: 1.5px 7px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.15);
+  }
+  /* Rarity badge gradients */
+  .rarity-common .rarity-badge {
+    background: linear-gradient(135deg, #9CA3AF, #B0B8C4);
+  }
+  .rarity-rare .rarity-badge {
+    background: linear-gradient(135deg, #3B82F6, #60A5FA);
+  }
+  .rarity-epic .rarity-badge {
+    background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+  }
+  .rarity-legendary .rarity-badge {
+    background: linear-gradient(135deg, #F59E0B, #FBBF24, #F59E0B);
+    color: #78350F;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.3);
+  }
+
+  /* ---------- Character image area ---------- */
+  .card-image {
+    flex: 1;
+    width: 2.1in;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 0.08in;
+    position: relative;
+    margin: 0.02in 0;
+  }
+  .card-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    image-rendering: auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Decorative dots in image area */
+  .card-image::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.06;
+    background-image: radial-gradient(circle, var(--theme-secondary, #FF8BA7) 1px, transparent 1px);
+    background-size: 0.12in 0.12in;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ---------- Character name footer ---------- */
+  .card-name {
+    width: 100%;
+    text-align: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 10pt;
+    color: var(--theme-text, #4A3333);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    padding: 0.05in 0;
+    border-top: 2px solid var(--rarity-color, #9CA3AF);
+    margin-top: 0.02in;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .rarity-legendary .card-name {
+    text-shadow: 0 1px 3px rgba(245,158,11,0.3), 0 1px 1px rgba(0,0,0,0.06);
+  }
+
+  /* ---------- SVG sparkle stars for legendary ---------- */
+  .sparkle-star {
+    position: absolute;
+    z-index: 7;
+    pointer-events: none;
+  }
+
+  /* ---------- Rarity CSS class colors ---------- */
+  .rarity-common   { --rarity-color: #9CA3AF; }
+  .rarity-rare     { --rarity-color: #3B82F6; }
+  .rarity-epic     { --rarity-color: #8B5CF6; }
+  .rarity-legendary { --rarity-color: #F59E0B; }
+
+  /* ========================================
+     CARD BACK (print on reverse side)
+     ======================================== */
+  .page.card-backs {
+    /* Same layout as front pages */
+  }
+
+  .card-back {
+    width: 2.5in;
+    height: 3.5in;
+    border-radius: 0.12in;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card-back-gradient {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 0.12in;
+  }
+
+  .card-back-pattern {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.12;
+    border-radius: 0.12in;
+    overflow: hidden;
+  }
+
+  .card-back-border {
+    position: absolute;
+    inset: 0;
+    border-radius: 0.12in;
+    border: 4px solid rgba(255,255,255,0.35);
+    z-index: 3;
+    pointer-events: none;
+  }
+  .card-back-inner-border {
+    position: absolute;
+    inset: 8px;
+    border-radius: 0.08in;
+    border: 1.5px solid rgba(255,255,255,0.25);
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .card-back-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.08in;
+  }
+
+  .card-back-packname {
+    font-family: 'Fredoka One', cursive;
+    font-size: 14pt;
+    color: white;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15);
+    max-width: 2in;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .card-back-divider {
+    width: 0.8in;
+    height: 2px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 1px;
+  }
+
+  .card-back-url {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 6pt;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/**
+ * Render 12 trading cards from pack data.
+ * 2 cards per page, 6 pages total.
+ * Followed by card back pages for double-sided printing.
+ */
+function render(data) {
+  const root = document.getElementById('root');
+  root.innerHTML = '';
+
+  const rarityMap = {
+    common:    { color: '#9CA3AF', label: 'Common' },
+    rare:      { color: '#3B82F6', label: 'Rare' },
+    epic:      { color: '#8B5CF6', label: 'Epic' },
+    legendary: { color: '#F59E0B', label: 'Legendary' }
+  };
+
+  const characters = data.characters || [];
+  const pages = [];
+
+  // Split characters into pairs (2 per page)
+  for (let i = 0; i < characters.length; i += 2) {
+    pages.push(characters.slice(i, i + 2));
+  }
+
+  const theme = data.theme || {};
+  const primary = theme.primary || '#FF6B9D';
+  const secondary = theme.secondary || '#FF8BA7';
+  const accent = theme.accent || '#FFF0F3';
+  const themeText = theme.text || '#4A3333';
+  const themePattern = theme.pattern || 'stars';
+  const boxAccent = theme.boxAccent || primary;
+
+  // ---------- Helper: create SVG sparkle star ----------
+  function createSparkleStar(size, color, style) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', size);
+    svg.setAttribute('height', size);
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.classList.add('sparkle-star');
+    Object.assign(svg.style, style);
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    // 4-point star sparkle
+    path.setAttribute('d', 'M12 0L14.5 8.5L24 12L14.5 15.5L12 24L9.5 15.5L0 12L9.5 8.5Z');
+    path.setAttribute('fill', color);
+    path.setAttribute('opacity', '0.7');
+    svg.appendChild(path);
+    return svg;
+  }
+
+  // ---------- Helper: create decorative page header ----------
+  function createPageHeader() {
+    const container = document.createElement('div');
+    container.className = 'page-header-border';
+
+    // Left line
+    const leftLine = document.createElement('div');
+    leftLine.className = 'page-header-line';
+    leftLine.style.background = `linear-gradient(90deg, transparent, ${primary})`;
+
+    // Left star SVG
+    const leftStar = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    leftStar.setAttribute('width', '12');
+    leftStar.setAttribute('height', '12');
+    leftStar.setAttribute('viewBox', '0 0 24 24');
+    leftStar.classList.add('page-header-star');
+    const lp = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    lp.setAttribute('d', 'M12 0L14.5 8.5L24 12L14.5 15.5L12 24L9.5 15.5L0 12L9.5 8.5Z');
+    lp.setAttribute('fill', primary);
+    leftStar.appendChild(lp);
+
+    // Title
+    const title = document.createElement('div');
+    title.className = 'page-header';
+    title.style.setProperty('--header-color', primary);
+    title.textContent = 'TRADING CARDS';
+
+    // Right star SVG
+    const rightStar = leftStar.cloneNode(true);
+
+    // Right line
+    const rightLine = document.createElement('div');
+    rightLine.className = 'page-header-line';
+    rightLine.style.background = `linear-gradient(90deg, ${primary}, transparent)`;
+
+    container.appendChild(leftLine);
+    container.appendChild(leftStar);
+    container.appendChild(title);
+    container.appendChild(rightStar);
+    container.appendChild(rightLine);
+
+    return container;
+  }
+
+  // ---------- Helper: build card back pattern SVG ----------
+  function buildBackPatternSVG(patternType, color) {
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    svg.style.position = 'absolute';
+    svg.style.inset = '0';
+
+    const defs = document.createElementNS(svgNS, 'defs');
+    const pattern = document.createElementNS(svgNS, 'pattern');
+    pattern.setAttribute('id', 'backpat-' + Math.random().toString(36).substr(2, 6));
+    pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+
+    if (patternType === 'paws' || patternType === 'pawprints') {
+      pattern.setAttribute('width', '40');
+      pattern.setAttribute('height', '40');
+      // Paw print: main pad + 3 toes
+      const pad = document.createElementNS(svgNS, 'ellipse');
+      pad.setAttribute('cx', '20'); pad.setAttribute('cy', '24');
+      pad.setAttribute('rx', '6'); pad.setAttribute('ry', '5');
+      pad.setAttribute('fill', color);
+      pattern.appendChild(pad);
+      [[14,15,2.5],[20,13,2.5],[26,15,2.5]].forEach(([cx,cy,r]) => {
+        const toe = document.createElementNS(svgNS, 'circle');
+        toe.setAttribute('cx', cx); toe.setAttribute('cy', cy); toe.setAttribute('r', r);
+        toe.setAttribute('fill', color);
+        pattern.appendChild(toe);
+      });
+    } else if (patternType === 'hearts') {
+      pattern.setAttribute('width', '36');
+      pattern.setAttribute('height', '36');
+      const heart = document.createElementNS(svgNS, 'path');
+      heart.setAttribute('d', 'M18 28 C10 20 4 16 4 11 4 7 7 4 11 4 14 4 16 6 18 9 20 6 22 4 25 4 29 4 32 7 32 11 32 16 26 20 18 28Z');
+      heart.setAttribute('fill', color);
+      pattern.appendChild(heart);
+    } else {
+      // Default: stars
+      pattern.setAttribute('width', '32');
+      pattern.setAttribute('height', '32');
+      const star = document.createElementNS(svgNS, 'path');
+      star.setAttribute('d', 'M16 4L18.5 11.5L26 16L18.5 20.5L16 28L13.5 20.5L6 16L13.5 11.5Z');
+      star.setAttribute('fill', color);
+      pattern.appendChild(star);
+    }
+
+    defs.appendChild(pattern);
+    svg.appendChild(defs);
+
+    const rect = document.createElementNS(svgNS, 'rect');
+    rect.setAttribute('width', '100%');
+    rect.setAttribute('height', '100%');
+    rect.setAttribute('fill', `url(#${pattern.getAttribute('id')})`);
+    svg.appendChild(rect);
+
+    return svg;
+  }
+
+  // ---------- RENDER FRONT PAGES ----------
+  pages.forEach((pair, pageIdx) => {
+    const page = document.createElement('div');
+    page.className = 'page';
+
+    // Page header
+    page.appendChild(createPageHeader());
+
+    pair.forEach(char => {
+      const r = rarityMap[char.rarity] || rarityMap.common;
+      const isLegendary = char.rarity === 'legendary';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'card-wrapper';
+
+      // Cut marks at corners
+      ['tl', 'tr', 'bl', 'br'].forEach(pos => {
+        const cm = document.createElement('div');
+        cm.className = `cut-mark cm-${pos}`;
+        cm.style.position = 'absolute';
+        wrapper.appendChild(cm);
+      });
+
+      const card = document.createElement('div');
+      card.className = `card rarity-${char.rarity}` + (isLegendary ? ' legendary' : '');
+      card.style.setProperty('--rarity-color', r.color);
+      card.style.setProperty('--theme-text', themeText);
+      card.style.setProperty('--theme-accent', accent);
+      card.style.setProperty('--theme-secondary', secondary);
+
+      // Gradient background per card using theme colors
+      const gradBg = document.createElement('div');
+      gradBg.className = 'card-gradient-bg';
+      if (char.rarity === 'legendary') {
+        gradBg.style.background = `linear-gradient(170deg, #FFFDF0 0%, #FFF8E1 30%, #FFF3CD 60%, #FFFDF0 100%)`;
+      } else if (char.rarity === 'epic') {
+        gradBg.style.background = `linear-gradient(170deg, #FAFAFF 0%, #F3EDFF 40%, #EDE4FF 70%, #FAFAFF 100%)`;
+      } else if (char.rarity === 'rare') {
+        gradBg.style.background = `linear-gradient(170deg, #F8FBFF 0%, #EBF2FF 40%, #E0ECFF 70%, #F8FBFF 100%)`;
+      } else {
+        gradBg.style.background = `linear-gradient(170deg, #FFFFFF 0%, ${accent}66 40%, ${accent}44 70%, #FFFFFF 100%)`;
+      }
+      card.appendChild(gradBg);
+
+      // Background pattern
+      const bgPat = document.createElement('div');
+      bgPat.className = 'card-bg-pattern';
+      bgPat.style.background = `repeating-linear-gradient(45deg, ${primary}, ${primary} 4px, transparent 4px, transparent 12px)`;
+      card.appendChild(bgPat);
+
+      // Rarity border
+      const border = document.createElement('div');
+      border.className = 'card-border';
+      card.appendChild(border);
+
+      // Inner decorative frame
+      const innerFrame = document.createElement('div');
+      innerFrame.className = 'card-inner-frame';
+      card.appendChild(innerFrame);
+
+      // Card inner content
+      const inner = document.createElement('div');
+      inner.className = 'card-inner';
+
+      // Header
+      const header = document.createElement('div');
+      header.className = 'card-header';
+
+      const packLabel = document.createElement('span');
+      packLabel.className = 'pack-name-label';
+      packLabel.textContent = data.packName;
+
+      const rarityBadge = document.createElement('span');
+      rarityBadge.className = 'rarity-badge';
+      rarityBadge.textContent = r.label;
+
+      header.appendChild(packLabel);
+      header.appendChild(rarityBadge);
+      inner.appendChild(header);
+
+      // Image area with radial gradient background
+      const imgArea = document.createElement('div');
+      imgArea.className = 'card-image';
+      imgArea.style.background = `radial-gradient(ellipse at center, ${accent} 0%, ${accent}99 40%, ${secondary}33 100%)`;
+
+      if (char.imageDataUrl) {
+        const img = document.createElement('img');
+        img.src = char.imageDataUrl;
+        img.alt = char.name;
+        imgArea.appendChild(img);
+      }
+      inner.appendChild(imgArea);
+
+      // Name
+      const name = document.createElement('div');
+      name.className = 'card-name';
+      name.textContent = char.name;
+      inner.appendChild(name);
+
+      card.appendChild(inner);
+
+      // Legendary SVG sparkle stars
+      if (isLegendary) {
+        const sparklePositions = [
+          { top: '0.12in', left: '0.12in', size: '11' },
+          { top: '0.12in', right: '0.5in', size: '9' },
+          { bottom: '0.42in', right: '0.12in', size: '10' },
+          { bottom: '0.42in', left: '0.5in', size: '8' },
+          { top: '0.5in', right: '0.12in', size: '7' },
+          { bottom: '0.9in', left: '0.12in', size: '7' }
+        ];
+        sparklePositions.forEach(sp => {
+          const style = {};
+          if (sp.top) style.top = sp.top;
+          if (sp.bottom) style.bottom = sp.bottom;
+          if (sp.left) style.left = sp.left;
+          if (sp.right) style.right = sp.right;
+          const star = createSparkleStar(sp.size, '#F59E0B', style);
+          card.appendChild(star);
+        });
+      }
+
+      wrapper.appendChild(card);
+      page.appendChild(wrapper);
+    });
+
+    root.appendChild(page);
+  });
+
+  // ---------- RENDER CARD BACK PAGES ----------
+  pages.forEach((pair, pageIdx) => {
+    const page = document.createElement('div');
+    page.className = 'page card-backs';
+
+    // Page header for back pages
+    page.appendChild(createPageHeader());
+
+    // Reverse order for double-sided printing alignment
+    const reversedPair = [...pair].reverse();
+
+    reversedPair.forEach(char => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'card-wrapper';
+
+      // Cut marks
+      ['tl', 'tr', 'bl', 'br'].forEach(pos => {
+        const cm = document.createElement('div');
+        cm.className = `cut-mark cm-${pos}`;
+        cm.style.position = 'absolute';
+        wrapper.appendChild(cm);
+      });
+
+      const back = document.createElement('div');
+      back.className = 'card-back';
+
+      // Gradient background
+      const backGrad = document.createElement('div');
+      backGrad.className = 'card-back-gradient';
+      backGrad.style.background = `linear-gradient(145deg, ${primary}, ${secondary} 50%, ${boxAccent || primary})`;
+      back.appendChild(backGrad);
+
+      // Pattern overlay
+      const patternDiv = document.createElement('div');
+      patternDiv.className = 'card-back-pattern';
+      patternDiv.appendChild(buildBackPatternSVG(themePattern, 'rgba(255,255,255,0.9)'));
+      back.appendChild(patternDiv);
+
+      // Borders
+      const backBorder = document.createElement('div');
+      backBorder.className = 'card-back-border';
+      back.appendChild(backBorder);
+
+      const backInnerBorder = document.createElement('div');
+      backInnerBorder.className = 'card-back-inner-border';
+      back.appendChild(backInnerBorder);
+
+      // Center content
+      const content = document.createElement('div');
+      content.className = 'card-back-content';
+
+      const packName = document.createElement('div');
+      packName.className = 'card-back-packname';
+      packName.textContent = data.packName;
+
+      const divider = document.createElement('div');
+      divider.className = 'card-back-divider';
+
+      const url = document.createElement('div');
+      url.className = 'card-back-url';
+      url.textContent = 'blindboxcreator.com';
+
+      content.appendChild(packName);
+      content.appendChild(divider);
+      content.appendChild(url);
+      back.appendChild(content);
+
+      wrapper.appendChild(back);
+      page.appendChild(wrapper);
+    });
+
+    root.appendChild(page);
+  });
+}
+
+/* Auto-render when data is injected by Puppeteer */
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.__PACK_DATA) render(window.__PACK_DATA);
+});
+</script>
+</body>
+</html>

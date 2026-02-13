@@ -278,7 +278,7 @@ export default function SuppliesPage() {
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <a
-                href="https://amazon.com/dp/B0C2CJJ15W"
+                href="https://www.amazon.com/dp/B0C2CJJ15W"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="gradient-pink text-white px-6 py-3 rounded-full font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2"
@@ -286,7 +286,7 @@ export default function SuppliesPage() {
                 <Star className="w-4 h-4" /> Holographic Cardstock - $17.99
               </a>
               <a
-                href="https://amazon.com/dp/B0CSBB8LBG"
+                href="https://www.amazon.com/dp/B0CSBB8LBG"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white text-foreground px-6 py-3 rounded-full font-bold text-sm hover:bg-white/70 transition-colors border border-border flex items-center gap-2"

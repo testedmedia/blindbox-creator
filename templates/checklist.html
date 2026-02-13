@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collector's Checklist - Premium Kawaii Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ========================================
+     COLLECTOR'S CHECKLIST - PREMIUM KAWAII EDITION
+     1 page, US Letter, 300 DPI, sRGB
+     Checklist + Trading Log + Certificate
+     ======================================== */
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page {
+    size: letter;
+    margin: 0.25in;
+  }
+
+  html, body {
+    font-family: 'Quicksand', sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-profile: sRGB;
+    background: white;
+    font-size: 8pt;
+  }
+
+  .page {
+    width: 8in;
+    height: 10.5in;
+    display: flex;
+    flex-direction: column;
+    padding: 0.05in 0.15in;
+  }
+
+  /* ---------- Title Section ---------- */
+  .title-section {
+    text-align: center;
+    margin-bottom: 0.08in;
+    position: relative;
+    padding: 0.06in 0;
+  }
+  .title-section h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 17pt;
+    font-weight: 400;
+    color: var(--theme-text, #4A3333);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 0 8px var(--theme-accent, rgba(255,240,243,0.6));
+    background: linear-gradient(135deg, var(--theme-text, #4A3333), var(--theme-secondary, #FF8BA7));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    display: inline-block;
+  }
+  .title-section .subtitle {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 8pt;
+    color: var(--theme-secondary, #FF8BA7);
+    font-weight: 600;
+    margin-top: 0.02in;
+  }
+  .title-underline {
+    width: 2.5in;
+    height: 3px;
+    margin: 0.04in auto 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, var(--theme-primary, #FFB5C8), var(--theme-secondary, #FF8BA7), var(--theme-primary, #FFB5C8), transparent);
+  }
+  .title-star {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-60%);
+  }
+  .title-star-left { left: 0.4in; }
+  .title-star-right { right: 0.4in; }
+  .title-star svg {
+    width: 0.28in;
+    height: 0.28in;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+  }
+
+  /* ---------- Checklist Table ---------- */
+  .checklist {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0.1in;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.04));
+  }
+  .checklist thead th {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 6pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: white;
+    padding: 0.04in 0.06in;
+    text-align: left;
+    background: linear-gradient(135deg, var(--theme-secondary, #FF8BA7), var(--theme-primary, #FFB5C8));
+    border: none;
+  }
+  .checklist thead th:first-child {
+    border-radius: 4px 0 0 0;
+  }
+  .checklist thead th:last-child {
+    border-radius: 0 4px 0 0;
+  }
+  .checklist td {
+    padding: 0.025in 0.06in;
+    border-bottom: 0.5px solid rgba(0,0,0,0.04);
+    vertical-align: middle;
+  }
+  .checklist tbody tr:nth-child(odd) td {
+    background: rgba(255,255,255,0.9);
+  }
+  .checklist tbody tr:nth-child(even) td {
+    background: linear-gradient(90deg, var(--theme-accent, #FFF0F3), rgba(255,255,255,0.5));
+  }
+  .checklist tbody tr:last-child td:first-child {
+    border-radius: 0 0 0 4px;
+  }
+  .checklist tbody tr:last-child td:last-child {
+    border-radius: 0 0 4px 0;
+  }
+
+  .checkbox-cell {
+    width: 0.28in;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .checkbox-cell svg {
+    width: 0.16in;
+    height: 0.16in;
+  }
+
+  .char-thumb-cell {
+    width: 0.35in;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.015in 0.02in;
+  }
+  .char-thumb {
+    width: 0.3in;
+    height: 0.3in;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid var(--theme-primary, #FFB5C8);
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.08));
+    background: var(--theme-accent, #FFF0F3);
+  }
+  .char-thumb-placeholder {
+    width: 0.3in;
+    height: 0.3in;
+    border-radius: 4px;
+    border: 1px dashed var(--theme-primary, #FFB5C8);
+    background: var(--theme-accent, #FFF0F3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .char-thumb-placeholder svg {
+    width: 0.16in;
+    height: 0.16in;
+    opacity: 0.3;
+  }
+
+  .char-name-cell {
+    font-family: 'Fredoka One', cursive;
+    font-weight: 400;
+    font-size: 8pt;
+    color: var(--theme-text, #4A3333);
+  }
+
+  .rarity-pill {
+    display: inline-block;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 5pt;
+    font-weight: 700;
+    color: white;
+    padding: 1.5px 7px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+  }
+
+  .got-it-cell {
+    width: 0.9in;
+    border-bottom: 0.5px dotted #CCC !important;
+    font-size: 5pt;
+    color: #CCC;
+  }
+
+  /* ---------- Rarity Summary ---------- */
+  .rarity-summary {
+    text-align: center;
+    font-size: 6.5pt;
+    color: var(--theme-text, #4A3333);
+    margin-bottom: 0.08in;
+    padding: 0.05in 0.2in;
+    border-radius: 6px;
+    background: linear-gradient(90deg, transparent 2%, var(--theme-accent, #FFF0F3) 20%, var(--theme-accent, #FFF0F3) 80%, transparent 98%);
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.03));
+  }
+  .rarity-summary-item {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 0.12in;
+    gap: 3px;
+  }
+  .rarity-summary-dot {
+    display: inline-block;
+    width: 0.08in;
+    height: 0.08in;
+    border-radius: 50%;
+    vertical-align: middle;
+    filter: drop-shadow(0 0 3px currentColor);
+  }
+  .rarity-summary-count {
+    font-family: 'Fredoka One', cursive;
+    font-size: 7.5pt;
+    font-weight: 400;
+  }
+  .rarity-summary-label {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+  }
+
+  /* ---------- Section Headers ---------- */
+  .section-header {
+    font-family: 'Fredoka One', cursive;
+    font-size: 8.5pt;
+    font-weight: 400;
+    color: var(--theme-text, #4A3333);
+    margin-bottom: 0.04in;
+    padding-bottom: 0.02in;
+    border-bottom: 2px solid transparent;
+    border-image: linear-gradient(90deg, var(--theme-secondary, #FF8BA7), var(--theme-primary, #FFB5C8), transparent) 1;
+    display: flex;
+    align-items: center;
+    gap: 0.06in;
+  }
+  .section-icon {
+    display: inline-flex;
+    align-items: center;
+  }
+  .section-icon svg {
+    width: 0.14in;
+    height: 0.14in;
+  }
+
+  /* ---------- Trading Log ---------- */
+  .trading-log {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0.1in;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.03));
+  }
+  .trading-log th {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 5.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: white;
+    padding: 0.03in 0.04in;
+    text-align: left;
+    background: linear-gradient(135deg, var(--theme-secondary, #FF8BA7) 0%, var(--theme-primary, #FFB5C8) 100%);
+  }
+  .trading-log th:first-child {
+    border-radius: 4px 0 0 0;
+  }
+  .trading-log th:last-child {
+    border-radius: 0 4px 0 0;
+  }
+  .trading-log td {
+    padding: 0.05in 0.04in;
+    border-bottom: 1px solid var(--theme-accent, #FFF0F3);
+    height: 0.2in;
+  }
+  .trading-log tbody tr:nth-child(even) td {
+    background: linear-gradient(90deg, var(--theme-accent, #FFF0F3), rgba(255,255,255,0.3));
+  }
+
+  /* ---------- Progress Section ---------- */
+  .progress-section {
+    text-align: center;
+    margin-bottom: 0.08in;
+  }
+  .progress-label {
+    font-family: 'Fredoka One', cursive;
+    font-size: 7.5pt;
+    font-weight: 400;
+    color: var(--theme-text, #4A3333);
+    margin-bottom: 0.03in;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.05));
+  }
+  .progress-boxes {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .progress-box {
+    width: 0.2in;
+    height: 0.24in;
+    position: relative;
+  }
+  .progress-box svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.06));
+  }
+  .progress-count {
+    font-family: 'Fredoka One', cursive;
+    font-size: 7pt;
+    color: var(--theme-secondary, #FF8BA7);
+    margin-top: 0.02in;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.05));
+  }
+
+  /* ---------- Certificate ---------- */
+  .certificate {
+    border: 3px double var(--theme-secondary, #FF8BA7);
+    border-radius: 0.1in;
+    padding: 0.12in 0.25in;
+    text-align: center;
+    position: relative;
+    margin-top: auto;
+    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, var(--theme-accent, #FFF0F3) 100%);
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));
+    overflow: hidden;
+  }
+  /* Decorative inner border */
+  .certificate::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    border: 1px solid var(--theme-primary, #FFB5C8);
+    border-radius: 0.06in;
+    pointer-events: none;
+  }
+  /* Corner decorations */
+  .cert-corner {
+    position: absolute;
+    width: 0.22in;
+    height: 0.22in;
+  }
+  .cert-corner svg {
+    width: 100%;
+    height: 100%;
+  }
+  .cert-corner-tl { top: 0.06in; left: 0.08in; }
+  .cert-corner-tr { top: 0.06in; right: 0.08in; transform: scaleX(-1); }
+  .cert-corner-bl { bottom: 0.06in; left: 0.08in; transform: scaleY(-1); }
+  .cert-corner-br { bottom: 0.06in; right: 0.08in; transform: scale(-1); }
+
+  .cert-medal {
+    display: inline-block;
+    margin-bottom: 0.02in;
+  }
+  .cert-medal svg {
+    width: 0.35in;
+    height: 0.35in;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12));
+  }
+
+  .cert-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 10pt;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    background: linear-gradient(135deg, #D4A017, #F5D060, #D4A017);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.04in;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+  }
+  .cert-text {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 7pt;
+    color: var(--theme-text, #4A3333);
+    margin-bottom: 0.06in;
+    line-height: 1.6;
+  }
+  .cert-blank {
+    display: inline-block;
+    border-bottom: 1.5px solid var(--theme-text, #4A3333);
+    min-width: 1.3in;
+    margin: 0 0.04in;
+  }
+  .cert-lines {
+    display: flex;
+    justify-content: center;
+    gap: 0.8in;
+    margin-top: 0.1in;
+  }
+  .cert-line-item {
+    text-align: center;
+  }
+  .cert-line {
+    width: 1.5in;
+    border-bottom: 1.5px solid var(--theme-secondary, #FF8BA7);
+    margin-bottom: 0.03in;
+  }
+  .cert-line-label {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 5pt;
+    color: var(--theme-secondary, #FF8BA7);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/**
+ * Premium Kawaii Edition - Collector's Checklist
+ * Render collector's checklist with trading log and certificate.
+ */
+
+/* SVG helper functions */
+function svgStar(color, secondaryColor) {
+  return `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:${color}"/>
+      <stop offset="100%" style="stop-color:${secondaryColor}"/>
+    </linearGradient></defs>
+    <path d="M20 2 L25 14 L38 16 L28 26 L30 38 L20 32 L10 38 L12 26 L2 16 L15 14 Z" fill="url(#starGrad)" stroke="none"/>
+    <circle cx="10" cy="8" r="1.5" fill="${secondaryColor}" opacity="0.5"/>
+    <circle cx="32" cy="10" r="1" fill="${color}" opacity="0.4"/>
+    <circle cx="8" cy="30" r="1" fill="${secondaryColor}" opacity="0.3"/>
+  </svg>`;
+}
+
+function svgCheckbox(color) {
+  return `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="10" r="8" fill="none" stroke="${color}" stroke-width="1.2" stroke-dasharray="2.5 1.5" opacity="0.6"/>
+    <circle cx="10" cy="10" r="4" fill="none" stroke="${color}" stroke-width="0.5" opacity="0.2"/>
+  </svg>`;
+}
+
+function svgSwapIcon(color) {
+  return `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 7 L16 7 M13 4 L16 7 L13 10" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M16 13 L4 13 M7 10 L4 13 L7 16" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function svgBlindBox(primaryColor, accentColor) {
+  return `<svg viewBox="0 0 24 30" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="boxGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:${primaryColor};stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:${primaryColor};stop-opacity:0.1"/>
+    </linearGradient></defs>
+    <rect x="1" y="8" width="22" height="20" rx="2" fill="url(#boxGrad)" stroke="${primaryColor}" stroke-width="1.2"/>
+    <path d="M1 14 L23 14" stroke="${primaryColor}" stroke-width="0.8" opacity="0.4"/>
+    <rect x="9" y="8" width="6" height="6" rx="1" fill="${accentColor}" opacity="0.3"/>
+    <path d="M4 8 L12 2 L20 8" fill="none" stroke="${primaryColor}" stroke-width="1.2" stroke-linejoin="round"/>
+    <circle cx="12" cy="11" r="1" fill="${primaryColor}" opacity="0.5"/>
+    <text x="12" y="24" text-anchor="middle" font-family="Fredoka One, cursive" font-size="5" fill="${primaryColor}" opacity="0.5">?</text>
+  </svg>`;
+}
+
+function svgMedal(primaryColor, secondaryColor) {
+  return `<svg viewBox="0 0 50 60" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="medalGold" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#F5D060"/>
+        <stop offset="50%" style="stop-color:#D4A017"/>
+        <stop offset="100%" style="stop-color:#F5D060"/>
+      </linearGradient>
+      <linearGradient id="ribbon" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:${primaryColor}"/>
+        <stop offset="100%" style="stop-color:${secondaryColor}"/>
+      </linearGradient>
+    </defs>
+    <path d="M18 28 L10 55 L25 45 L18 28Z" fill="url(#ribbon)" opacity="0.8"/>
+    <path d="M32 28 L40 55 L25 45 L32 28Z" fill="url(#ribbon)" opacity="0.6"/>
+    <circle cx="25" cy="22" r="16" fill="url(#medalGold)" stroke="#C4960F" stroke-width="1.5"/>
+    <circle cx="25" cy="22" r="12" fill="none" stroke="#C4960F" stroke-width="0.8" opacity="0.5"/>
+    <path d="M25 12 L27.5 17 L33 18 L29 22 L30 28 L25 25 L20 28 L21 22 L17 18 L22.5 17 Z" fill="#C4960F" opacity="0.4"/>
+  </svg>`;
+}
+
+function svgCornerDeco(color) {
+  return `<svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+    <path d="M2 28 L2 8 Q2 2 8 2 L28 2" fill="none" stroke="${color}" stroke-width="1.5" opacity="0.5"/>
+    <circle cx="5" cy="5" r="2" fill="${color}" opacity="0.4"/>
+    <path d="M2 20 Q2 14 8 14" fill="none" stroke="${color}" stroke-width="0.8" opacity="0.3"/>
+  </svg>`;
+}
+
+function svgPlaceholderChar(color) {
+  return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="9" r="5" fill="${color}" opacity="0.2"/>
+    <path d="M4 22 Q4 15 12 15 Q20 15 20 22" fill="${color}" opacity="0.15"/>
+  </svg>`;
+}
+
+function render(data) {
+  const root = document.getElementById('root');
+  root.innerHTML = '';
+
+  const rarityMap = {
+    common:    { color: '#9CA3AF', gradient: 'linear-gradient(135deg, #B0B8C4, #8892A0)', label: 'Common' },
+    rare:      { color: '#3B82F6', gradient: 'linear-gradient(135deg, #60A5FA, #2563EB)', label: 'Rare' },
+    epic:      { color: '#8B5CF6', gradient: 'linear-gradient(135deg, #A78BFA, #7C3AED)', label: 'Epic' },
+    legendary: { color: '#F59E0B', gradient: 'linear-gradient(135deg, #FBBF24, #D97706)', label: 'Legendary' }
+  };
+
+  const theme = data.theme || {};
+  const primary = theme.primary || '#FFB5C8';
+  const secondary = theme.secondary || '#FF8BA7';
+  const accent = theme.accent || '#FFF0F3';
+  const text = theme.text || '#4A3333';
+
+  const page = document.createElement('div');
+  page.className = 'page';
+  page.style.setProperty('--theme-text', text);
+  page.style.setProperty('--theme-primary', primary);
+  page.style.setProperty('--theme-secondary', secondary);
+  page.style.setProperty('--theme-accent', accent);
+
+  // ---- Title Section ----
+  const titleSec = document.createElement('div');
+  titleSec.className = 'title-section';
+  titleSec.innerHTML = `
+    <span class="title-star title-star-left">${svgStar(primary, secondary)}</span>
+    <h1>${esc(data.packName)}</h1>
+    <div class="subtitle">Collector's Checklist \u00B7 Collect all 12 characters!</div>
+    <div class="title-underline"></div>
+    <span class="title-star title-star-right">${svgStar(primary, secondary)}</span>
+  `;
+  page.appendChild(titleSec);
+
+  // ---- Checklist Table ----
+  const table = document.createElement('table');
+  table.className = 'checklist';
+
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr><th style="width:0.28in"></th><th style="width:0.35in"></th><th>Character</th><th>Rarity</th><th>Got it!</th></tr>';
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  (data.characters || []).slice(0, 12).forEach(function(char) {
+    const r = rarityMap[char.rarity] || rarityMap.common;
+    const tr = document.createElement('tr');
+
+    // Checkbox cell
+    const tdCheck = document.createElement('td');
+    tdCheck.className = 'checkbox-cell';
+    tdCheck.innerHTML = svgCheckbox(secondary);
+
+    // Thumbnail cell
+    const tdThumb = document.createElement('td');
+    tdThumb.className = 'char-thumb-cell';
+    if (char.imageDataUrl) {
+      tdThumb.innerHTML = '<img class="char-thumb" src="' + char.imageDataUrl + '" alt="' + esc(char.name) + '">';
+    } else {
+      tdThumb.innerHTML = '<div class="char-thumb-placeholder">' + svgPlaceholderChar(primary) + '</div>';
+    }
+
+    // Name cell
+    const tdName = document.createElement('td');
+    tdName.className = 'char-name-cell';
+    tdName.textContent = char.name || '';
+
+    // Rarity cell
+    const tdRarity = document.createElement('td');
+    tdRarity.innerHTML = '<span class="rarity-pill" style="background:' + r.gradient + '">' + r.label + '</span>';
+
+    // Got it cell
+    const tdGot = document.createElement('td');
+    tdGot.className = 'got-it-cell';
+
+    tr.appendChild(tdCheck);
+    tr.appendChild(tdThumb);
+    tr.appendChild(tdName);
+    tr.appendChild(tdRarity);
+    tr.appendChild(tdGot);
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  page.appendChild(table);
+
+  // ---- Rarity Summary ----
+  const counts = { common: 0, rare: 0, epic: 0, legendary: 0 };
+  (data.characters || []).forEach(function(c) { if (counts[c.rarity] !== undefined) counts[c.rarity]++; });
+
+  const summary = document.createElement('div');
+  summary.className = 'rarity-summary';
+  summary.innerHTML = Object.entries(rarityMap).map(function(entry) {
+    var key = entry[0], r = entry[1];
+    return '<span class="rarity-summary-item">' +
+      '<span class="rarity-summary-dot" style="background:' + r.color + ';color:' + r.color + '"></span>' +
+      '<span class="rarity-summary-count">' + counts[key] + '</span> ' +
+      '<span class="rarity-summary-label">' + r.label + '</span>' +
+      '</span>';
+  }).join('');
+  page.appendChild(summary);
+
+  // ---- Trading Log ----
+  const tradingHeader = document.createElement('div');
+  tradingHeader.className = 'section-header';
+  tradingHeader.innerHTML = '<span class="section-icon">' + svgSwapIcon(secondary) + '</span> Trading Log';
+  page.appendChild(tradingHeader);
+
+  const tradeTable = document.createElement('table');
+  tradeTable.className = 'trading-log';
+  tradeTable.innerHTML = '<thead><tr><th>Traded Away</th><th>Received</th><th>Traded With</th><th>Date</th></tr></thead>';
+
+  const tBody2 = document.createElement('tbody');
+  for (var i = 0; i < 5; i++) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td></td><td></td><td></td><td></td>';
+    tBody2.appendChild(tr);
+  }
+  tradeTable.appendChild(tBody2);
+  page.appendChild(tradeTable);
+
+  // ---- Collection Progress ----
+  const progressSec = document.createElement('div');
+  progressSec.className = 'progress-section';
+
+  const pLabel = document.createElement('div');
+  pLabel.className = 'progress-label';
+  pLabel.textContent = 'Collection Progress';
+  progressSec.appendChild(pLabel);
+
+  const pBoxes = document.createElement('div');
+  pBoxes.className = 'progress-boxes';
+  var charCount = Math.min((data.characters || []).length, 12);
+  for (var j = 0; j < 12; j++) {
+    const box = document.createElement('div');
+    box.className = 'progress-box';
+    box.innerHTML = svgBlindBox(primary, accent);
+    pBoxes.appendChild(box);
+  }
+  progressSec.appendChild(pBoxes);
+
+  const pCount = document.createElement('div');
+  pCount.className = 'progress-count';
+  pCount.textContent = '__ of ' + charCount;
+  progressSec.appendChild(pCount);
+
+  page.appendChild(progressSec);
+
+  // ---- Certificate ----
+  const cert = document.createElement('div');
+  cert.className = 'certificate';
+  cert.innerHTML = `
+    <span class="cert-corner cert-corner-tl">${svgCornerDeco(secondary)}</span>
+    <span class="cert-corner cert-corner-tr">${svgCornerDeco(secondary)}</span>
+    <span class="cert-corner cert-corner-bl">${svgCornerDeco(secondary)}</span>
+    <span class="cert-corner cert-corner-br">${svgCornerDeco(secondary)}</span>
+    <div class="cert-medal">${svgMedal(primary, secondary)}</div>
+    <div class="cert-title">Certificate of Completion</div>
+    <div class="cert-text">
+      This certifies that <span class="cert-blank">&nbsp;</span> has successfully collected<br>
+      all 12 <strong>${esc(data.packName)}</strong> characters!
+    </div>
+    <div class="cert-lines">
+      <div class="cert-line-item">
+        <div class="cert-line"></div>
+        <div class="cert-line-label">Date</div>
+      </div>
+      <div class="cert-line-item">
+        <div class="cert-line"></div>
+        <div class="cert-line-label">Signature</div>
+      </div>
+    </div>
+  `;
+  page.appendChild(cert);
+
+  root.appendChild(page);
+}
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  if (window.__PACK_DATA) render(window.__PACK_DATA);
+});
+</script>
+</body>
+</html>

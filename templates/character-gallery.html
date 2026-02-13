@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200, height=1200">
+  <title>Character Gallery</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700;800&family=Fredoka+One&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 1200px;
+      height: 1200px;
+      overflow: hidden;
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    .gallery {
+      width: 1200px;
+      height: 1200px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Background gradient (injected via JS) ── */
+    .gallery-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    /* ── Floating decorations ── */
+    .deco {
+      position: absolute;
+      z-index: 1;
+      opacity: 0.3;
+      font-size: 32px;
+    }
+
+    /* ── Logo / Title ── */
+    .logo-area {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      margin-bottom: 16px;
+      margin-top: 20px;
+    }
+
+    .pack-title {
+      font-family: 'Fredoka One', 'Quicksand', sans-serif;
+      font-size: 64px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      -webkit-text-stroke: 3px rgba(0,0,0,0.15);
+      text-shadow: 0 4px 12px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.08);
+      line-height: 1.1;
+    }
+
+    .pack-count {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 4px;
+      opacity: 0.8;
+    }
+
+    .pack-count span {
+      display: inline-block;
+      background: rgba(255,255,255,0.6);
+      border-radius: 20px;
+      padding: 2px 14px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ── Character Grid ── */
+    .chars-wrap {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 0;
+      width: 1100px;
+      padding: 0 10px;
+    }
+
+    .char-cell {
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 8px 8px;
+    }
+
+    .char-img-wrap {
+      width: 200px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+    }
+
+    .char-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .char-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      margin-top: 2px;
+      text-align: center;
+    }
+
+    .char-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 1px 10px;
+      border-radius: 10px;
+      color: #fff;
+      margin-top: 1px;
+    }
+    .char-badge.common    { background: rgba(156,163,175,0.7); }
+    .char-badge.rare      { background: rgba(59,130,246,0.8); }
+    .char-badge.epic      { background: rgba(139,92,246,0.8); }
+    .char-badge.legendary { background: linear-gradient(135deg, #F59E0B, #FBBF24); }
+
+    /* ── Rarity border glow ── */
+    .char-cell.rarity-rare .char-img-wrap {
+      filter: drop-shadow(0 4px 12px rgba(59,130,246,0.3));
+    }
+    .char-cell.rarity-epic .char-img-wrap {
+      filter: drop-shadow(0 4px 12px rgba(139,92,246,0.3));
+    }
+    .char-cell.rarity-legendary .char-img-wrap {
+      filter: drop-shadow(0 4px 16px rgba(245,158,11,0.5));
+    }
+
+    /* ── Footer ── */
+    .gallery-footer {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      margin-top: 8px;
+      margin-bottom: 16px;
+    }
+
+    .footer-label {
+      font-size: 16px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="gallery" id="gallery">
+    <!-- Content injected by render() -->
+  </div>
+
+  <script>
+    function render(data) {
+      const el = document.getElementById('gallery');
+      if (!el) return;
+
+      const chars = data.characters || [];
+      const theme = data.theme || {};
+      const primary = theme.primary || '#FFB5C8';
+      const secondary = theme.secondary || '#FF8BA7';
+      const accent = theme.accent || '#FFF0F3';
+
+      // Background gradient
+      let html = `
+        <div class="gallery-bg" style="background: linear-gradient(145deg, ${primary}, ${secondary} 60%, ${accent})"></div>
+      `;
+
+      // Floating decorations (sparkles, stars, hearts)
+      const decos = ['✨','⭐','💖','🌟','✨','💫','⭐','💖','🌸','✨','💫','🌟'];
+      for (let i = 0; i < decos.length; i++) {
+        const x = 30 + Math.random() * 1140;
+        const y = 30 + Math.random() * 1140;
+        const size = 20 + Math.random() * 30;
+        const rot = Math.random() * 360;
+        html += \`<div class="deco" style="left:\${x}px;top:\${y}px;font-size:\${size}px;transform:rotate(\${rot}deg)">\${decos[i]}</div>\`;
+      }
+
+      // Logo
+      html += \`
+        <div class="logo-area">
+          <div class="pack-title" style="color: #fff">\${esc(data.packName || 'Character Pack')}</div>
+          <div class="pack-count" style="color: #fff"><span>✨ \${chars.length} Kawaii Characters Included ✨</span></div>
+        </div>
+      \`;
+
+      // Characters - 4 cols x 3 rows
+      html += '<div class="chars-wrap">';
+      for (const c of chars) {
+        const r = c.rarity || 'common';
+        const hasImg = c.imageDataUrl && c.imageDataUrl.startsWith('data:');
+        html += \`
+          <div class="char-cell rarity-\${r}">
+            <div class="char-img-wrap">
+              \${hasImg ? \`<img class="char-img" src="\${c.imageDataUrl}" alt="\${esc(c.name)}" />\` : '<div style="font-size:64px">?</div>'}
+            </div>
+            <div class="char-name">\${esc(c.name)}</div>
+            <div class="char-badge \${r}">\${r}</div>
+          </div>
+        \`;
+      }
+      html += '</div>';
+
+      // Footer
+      const coll = (data.collection || '').split('-').map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
+      html += \`
+        <div class="gallery-footer">
+          <div class="footer-label">\${esc(coll)} Collection</div>
+        </div>
+      \`;
+
+      el.innerHTML = html;
+      document.body.classList.add('rendered');
+    }
+
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s || '';
+      return d.innerHTML;
+    }
+
+    if (window.__PACK_DATA) render(window.__PACK_DATA);
+  </script>
+</body>
+</html>

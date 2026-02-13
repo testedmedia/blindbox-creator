@@ -1,0 +1,86 @@
+{
+  "timestamp": "2026-02-13T06:05:27.939Z",
+  "models": [
+    {
+      "id": "gemini-flash",
+      "name": "Gemini 2.5 Flash Image",
+      "model": "google/gemini-2.5-flash-image",
+      "provider": "openrouter",
+      "costPerImage": 0.02
+    },
+    {
+      "id": "gemini-pro",
+      "name": "Gemini 3 Pro Image",
+      "model": "google/gemini-3-pro-image-preview",
+      "provider": "openrouter",
+      "costPerImage": 0.07
+    },
+    {
+      "id": "flux-pro",
+      "name": "Flux 1.1 Pro",
+      "model": "fal-ai/flux-pro/v1.1",
+      "provider": "fal",
+      "costPerImage": 0.04
+    }
+  ],
+  "prompts": {
+    "common": "Kawaii chibi tabby cat character, sitting pose, orange and brown stripes, big sparkly green eyes, wearing a tiny bell collar, Japanese blind box collectible figure style, soft pastel color palette, adorable big sparkly eyes, simple clean bold outlines, pure white background, high quality cute illustration, print-ready for cardstock, high contrast vibrant colors, thick outlines for easy cutting, solid color fills, centered composition, full body character standing on small base",
+    "rare": "Kawaii chibi Persian cat character, standing pose, fluffy white fur with pink bow, big sparkly blue eyes, holding a tiny fish toy, Japanese blind box collectible figure style, soft pastel color palette, adorable big sparkly eyes, simple clean bold outlines, pure white background, high quality cute illustration, print-ready for cardstock, high contrast vibrant colors, thick outlines for easy cutting, solid color fills, centered composition, full body character standing on small base",
+    "legendary": "Kawaii chibi galaxy cat character, magical floating pose, cosmic purple and starry fur with golden sparkles, big sparkly rainbow eyes, tiny crown and cape, pastel colors with gold accents, Japanese blind box collectible figure style, soft pastel color palette, adorable big sparkly eyes, simple clean bold outlines, pure white background, high quality cute illustration, print-ready for cardstock, high contrast vibrant colors, thick outlines for easy cutting, solid color fills, centered composition, full body character standing on small base"
+  },
+  "results": {
+    "common": {
+      "gemini-flash": {
+        "success": true,
+        "size": 922867,
+        "timeMs": 6365
+      },
+      "gemini-pro": {
+        "success": true,
+        "size": 1038333,
+        "timeMs": 31217
+      },
+      "flux-pro": {
+        "success": false,
+        "size": 0,
+        "timeMs": 0
+      }
+    },
+    "rare": {
+      "gemini-flash": {
+        "success": true,
+        "size": 1036858,
+        "timeMs": 5829
+      },
+      "gemini-pro": {
+        "success": true,
+        "size": 973492,
+        "timeMs": 34463
+      },
+      "flux-pro": {
+        "success": false,
+        "size": 0,
+        "timeMs": 0
+      }
+    },
+    "legendary": {
+      "gemini-flash": {
+        "success": true,
+        "size": 911975,
+        "timeMs": 9281
+      },
+      "gemini-pro": {
+        "success": true,
+        "size": 750281,
+        "timeMs": 26005
+      },
+      "flux-pro": {
+        "success": false,
+        "size": 0,
+        "timeMs": 0
+      }
+    }
+  },
+  "totalCost": 0.27,
+  "successCount": 6
+}

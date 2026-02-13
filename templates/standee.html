@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Character Standees</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ========================================
+     STANDEE TEMPLATE v2 - IDIOT-PROOF EDITION
+     2 pages of standees + 1 page instructions
+     Each standee: foldable paper character
+     Step-by-step visual fold guide included
+     ======================================== */
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page {
+    size: letter;
+    margin: 0.25in;
+  }
+
+  html, body {
+    font-family: 'Quicksand', sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: white;
+  }
+
+  .page {
+    width: 8in;
+    height: 10.5in;
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 0.15in;
+  }
+  .page:last-child { page-break-after: avoid; }
+
+  /* ---------- Page Title ---------- */
+  .page-title {
+    font-family: 'Fredoka One', 'Quicksand', sans-serif;
+    font-size: 14pt;
+    color: var(--theme-text, #4A3333);
+    margin-bottom: 0.08in;
+    text-align: center;
+  }
+  .page-subtitle {
+    font-size: 8pt;
+    font-weight: 600;
+    color: var(--theme-secondary, #FF8BA7);
+    margin-bottom: 0.15in;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  /* ---------- Standee Grid ---------- */
+  .standee-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 0.35in;
+    width: 7in;
+    justify-items: center;
+    align-items: start;
+  }
+
+  /* ---------- Individual Standee ---------- */
+  .standee {
+    width: 1.5in;
+    position: relative;
+  }
+
+  /* Character body area */
+  .standee-body {
+    width: 1.5in;
+    height: 2in;
+    border: 2.5px solid var(--rarity-color, #9CA3AF);
+    border-bottom: none;
+    border-radius: 0.1in 0.1in 0 0;
+    position: relative;
+    overflow: hidden;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  .standee-body-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .standee-body img {
+    max-width: 1.3in;
+    max-height: 1.8in;
+    object-fit: contain;
+    z-index: 1;
+    position: relative;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  }
+
+  /* Rarity badge (top-right corner) */
+  .standee-rarity-badge {
+    position: absolute;
+    top: 0.04in;
+    right: 0.04in;
+    font-size: 4.5pt;
+    font-weight: 700;
+    color: white;
+    background: var(--rarity-color, #9CA3AF);
+    padding: 1px 5px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    z-index: 3;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+
+  /* ---------- Fold Line ---------- */
+  .standee-fold-area {
+    width: 1.5in;
+    position: relative;
+    height: 0.18in;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .standee-fold-line {
+    width: 100%;
+    border: none;
+    border-top: 2px dashed var(--theme-secondary, #FF8BA7);
+    margin: 0;
+  }
+  .fold-label {
+    position: absolute;
+    right: -0.55in;
+    font-size: 5.5pt;
+    font-weight: 700;
+    color: var(--theme-secondary, #FF8BA7);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .fold-arrow-svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* ---------- Base Tab ---------- */
+  .standee-base {
+    width: 1.5in;
+    height: 0.65in;
+    border: 2.5px solid var(--rarity-color, #9CA3AF);
+    border-top: none;
+    border-radius: 0 0 0.06in 0.06in;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .standee-base-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  .standee-base-name {
+    font-family: 'Fredoka One', 'Quicksand', sans-serif;
+    font-size: 6.5pt;
+    color: var(--theme-text, #4A3333);
+    text-align: center;
+    max-width: 1.3in;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    z-index: 1;
+    position: relative;
+  }
+  .standee-base-pack {
+    font-size: 4pt;
+    font-weight: 600;
+    color: var(--theme-secondary, #FF8BA7);
+    z-index: 1;
+    position: relative;
+    margin-top: 1px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ---------- Scissors icon ---------- */
+  .scissors-icon {
+    position: absolute;
+    top: -0.12in;
+    left: -0.12in;
+    font-size: 8pt;
+    color: #999;
+    z-index: 5;
+    transform: rotate(-45deg);
+  }
+
+  /* ======================================
+     INSTRUCTION PAGE - STEP BY STEP
+     ====================================== */
+
+  .instruction-page {
+    width: 8in;
+    height: 10.5in;
+    display: flex;
+    flex-direction: column;
+    padding: 0.2in 0.3in;
+    page-break-after: always;
+  }
+
+  .instr-title {
+    font-family: 'Fredoka One', 'Quicksand', sans-serif;
+    font-size: 22pt;
+    text-align: center;
+    margin-bottom: 0.08in;
+  }
+  .instr-subtitle {
+    font-size: 10pt;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.25in;
+    letter-spacing: 1px;
+  }
+
+  /* Step cards */
+  .steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15in;
+    flex: 1;
+  }
+
+  .step-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0.2in;
+    border: 2px solid var(--theme-primary, #FFB5C8);
+    border-radius: 0.12in;
+    padding: 0.15in;
+    background: white;
+    position: relative;
+  }
+  .step-row::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 0.12in;
+    background: var(--theme-accent, #FFF0F3);
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .step-number-circle {
+    width: 0.45in;
+    height: 0.45in;
+    border-radius: 50%;
+    background: var(--theme-secondary, #FF8BA7);
+    color: white;
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 18pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+    position: relative;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  }
+
+  .step-visual {
+    width: 1.4in;
+    height: 1.1in;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    position: relative;
+  }
+
+  .step-text {
+    flex: 1;
+    z-index: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .step-title {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 13pt;
+    color: var(--theme-text, #4A3333);
+    margin-bottom: 0.03in;
+  }
+  .step-desc {
+    font-size: 8.5pt;
+    color: #555;
+    line-height: 1.5;
+  }
+  .step-tip {
+    font-size: 7pt;
+    color: var(--theme-secondary, #FF8BA7);
+    font-weight: 700;
+    margin-top: 0.04in;
+  }
+
+  /* Visual diagrams (SVG inline) */
+  .diagram-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Arrow between steps */
+  .step-arrow {
+    text-align: center;
+    font-size: 16pt;
+    color: var(--theme-primary, #FFB5C8);
+    line-height: 1;
+  }
+
+  .instr-footer {
+    text-align: center;
+    padding-top: 0.1in;
+    border-top: 2px solid var(--theme-primary, #FFB5C8);
+    font-size: 8pt;
+    font-weight: 600;
+    color: var(--theme-secondary, #FF8BA7);
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+function render(data) {
+  var root = document.getElementById('root');
+  root.innerHTML = '';
+
+  var rarityMap = {
+    common: '#9CA3AF',
+    rare: '#3B82F6',
+    epic: '#8B5CF6',
+    legendary: '#F59E0B'
+  };
+
+  var rarityLabels = {
+    common: 'Common',
+    rare: 'Rare',
+    epic: 'Epic',
+    legendary: 'Legendary'
+  };
+
+  var characters = data.characters || [];
+  var pages = [];
+  for (var i = 0; i < characters.length; i += 6) {
+    pages.push(characters.slice(i, i + 6));
+  }
+
+  // ========== INSTRUCTION PAGE FIRST ==========
+  var instrPage = document.createElement('div');
+  instrPage.className = 'instruction-page';
+  setThemeVars(instrPage, data.theme);
+
+  var instrTitle = document.createElement('div');
+  instrTitle.className = 'instr-title';
+  instrTitle.style.color = data.theme.text;
+  instrTitle.textContent = 'How to Fold Your Standees';
+  instrPage.appendChild(instrTitle);
+
+  var instrSub = document.createElement('div');
+  instrSub.className = 'instr-subtitle';
+  instrSub.style.color = data.theme.secondary;
+  instrSub.textContent = '4 EASY STEPS - FOLLOW ALONG!';
+  instrPage.appendChild(instrSub);
+
+  var stepsContainer = document.createElement('div');
+  stepsContainer.className = 'steps-container';
+
+  var steps = [
+    {
+      num: '1',
+      title: 'CUT IT OUT',
+      desc: 'Use scissors to carefully cut around the outside edge of the standee. Cut along the solid colored border. Take your time!',
+      tip: 'TIP: Kid-safe scissors work great! Parents can help with tricky corners.',
+      diagram: cutDiagramSVG(data.theme)
+    },
+    {
+      num: '2',
+      title: 'FOLD ON THE LINE',
+      desc: 'Find the dashed line between the character and the base tab. Fold the base tab backwards (away from the character picture) along this line.',
+      tip: 'TIP: Use a ruler to make a perfectly straight fold.',
+      diagram: foldDiagramSVG(data.theme)
+    },
+    {
+      num: '3',
+      title: 'STAND IT UP',
+      desc: 'Hold the character upright. Bend the base tab flat on the table so it sticks out behind the character. The character should stand up on its own!',
+      tip: 'TIP: If wobbly, add a small piece of tape under the base.',
+      diagram: standDiagramSVG(data.theme)
+    },
+    {
+      num: '4',
+      title: 'PUT IN THE BOX',
+      desc: 'Place the standee face-down inside a blind box before sealing it. When someone opens the box, they will find a surprise character inside!',
+      tip: 'TIP: Fold the standee flat to fit inside. It pops up when taken out!',
+      diagram: boxDiagramSVG(data.theme)
+    }
+  ];
+
+  steps.forEach(function(step, idx) {
+    var row = document.createElement('div');
+    row.className = 'step-row';
+
+    var numCircle = document.createElement('div');
+    numCircle.className = 'step-number-circle';
+    numCircle.textContent = step.num;
+    row.appendChild(numCircle);
+
+    var visual = document.createElement('div');
+    visual.className = 'step-visual';
+    visual.innerHTML = step.diagram;
+    row.appendChild(visual);
+
+    var textDiv = document.createElement('div');
+    textDiv.className = 'step-text';
+
+    var titleEl = document.createElement('div');
+    titleEl.className = 'step-title';
+    titleEl.textContent = step.title;
+    textDiv.appendChild(titleEl);
+
+    var descEl = document.createElement('div');
+    descEl.className = 'step-desc';
+    descEl.textContent = step.desc;
+    textDiv.appendChild(descEl);
+
+    var tipEl = document.createElement('div');
+    tipEl.className = 'step-tip';
+    tipEl.textContent = step.tip;
+    textDiv.appendChild(tipEl);
+
+    row.appendChild(textDiv);
+    stepsContainer.appendChild(row);
+
+    // Arrow between steps (except after last)
+    if (idx < steps.length - 1) {
+      var arrow = document.createElement('div');
+      arrow.className = 'step-arrow';
+      arrow.textContent = '\u25BC';
+      stepsContainer.appendChild(arrow);
+    }
+  });
+
+  instrPage.appendChild(stepsContainer);
+
+  var instrFooter = document.createElement('div');
+  instrFooter.className = 'instr-footer';
+  instrFooter.textContent = esc(data.packName) + ' \u00B7 Cut out each standee from the next pages!';
+  instrPage.appendChild(instrFooter);
+
+  root.appendChild(instrPage);
+
+  // ========== STANDEE PAGES ==========
+  pages.forEach(function(group, pageIdx) {
+    var page = document.createElement('div');
+    page.className = 'page';
+    setThemeVars(page, data.theme);
+
+    var titleEl = document.createElement('div');
+    titleEl.className = 'page-title';
+    titleEl.textContent = esc(data.packName) + ' Standees';
+    page.appendChild(titleEl);
+
+    var subtitleEl = document.createElement('div');
+    subtitleEl.className = 'page-subtitle';
+    subtitleEl.textContent = 'Page ' + (pageIdx + 1) + ' of ' + pages.length + ' \u00B7 Cut along border, fold on dashed line';
+    page.appendChild(subtitleEl);
+
+    var grid = document.createElement('div');
+    grid.className = 'standee-grid';
+
+    group.forEach(function(char) {
+      var rc = rarityMap[char.rarity] || rarityMap.common;
+      var rl = rarityLabels[char.rarity] || 'Common';
+
+      var standee = document.createElement('div');
+      standee.className = 'standee';
+      standee.style.setProperty('--rarity-color', rc);
+      standee.style.setProperty('--theme-text', data.theme.text);
+      standee.style.setProperty('--theme-accent', data.theme.accent);
+      standee.style.setProperty('--theme-primary', data.theme.primary);
+      standee.style.setProperty('--theme-secondary', data.theme.secondary);
+
+      // Scissors icon
+      var scissors = document.createElement('div');
+      scissors.className = 'scissors-icon';
+      scissors.textContent = '\u2702';
+      standee.appendChild(scissors);
+
+      // Character body
+      var body = document.createElement('div');
+      body.className = 'standee-body';
+
+      var bodyBg = document.createElement('div');
+      bodyBg.className = 'standee-body-bg';
+      bodyBg.style.background = 'radial-gradient(circle at center, ' + data.theme.accent + ', transparent)';
+      body.appendChild(bodyBg);
+
+      // Rarity badge
+      var badge = document.createElement('div');
+      badge.className = 'standee-rarity-badge';
+      badge.textContent = rl;
+      body.appendChild(badge);
+
+      // Character image
+      if (char.imageDataUrl) {
+        var img = document.createElement('img');
+        img.src = char.imageDataUrl;
+        img.alt = char.name;
+        body.appendChild(img);
+      }
+
+      standee.appendChild(body);
+
+      // Fold area with label
+      var foldArea = document.createElement('div');
+      foldArea.className = 'standee-fold-area';
+
+      var foldLine = document.createElement('hr');
+      foldLine.className = 'standee-fold-line';
+      foldArea.appendChild(foldLine);
+
+      var foldLabel = document.createElement('div');
+      foldLabel.className = 'fold-label';
+      foldLabel.innerHTML = '<svg class="fold-arrow-svg" viewBox="0 0 12 12"><path d="M6 2 L6 10 M3 7 L6 10 L9 7" stroke="' + data.theme.secondary + '" stroke-width="1.5" fill="none"/></svg> FOLD';
+      foldArea.appendChild(foldLabel);
+
+      standee.appendChild(foldArea);
+
+      // Base tab
+      var base = document.createElement('div');
+      base.className = 'standee-base';
+
+      var baseBg = document.createElement('div');
+      baseBg.className = 'standee-base-bg';
+      baseBg.style.background = 'linear-gradient(135deg, ' + data.theme.primary + ', ' + data.theme.accent + ')';
+      base.appendChild(baseBg);
+
+      var baseName = document.createElement('div');
+      baseName.className = 'standee-base-name';
+      baseName.textContent = char.name;
+      base.appendChild(baseName);
+
+      var basePack = document.createElement('div');
+      basePack.className = 'standee-base-pack';
+      basePack.textContent = data.packName;
+      base.appendChild(basePack);
+
+      standee.appendChild(base);
+
+      grid.appendChild(standee);
+    });
+
+    page.appendChild(grid);
+    root.appendChild(page);
+  });
+}
+
+// ========== DIAGRAM SVGs ==========
+
+function cutDiagramSVG(theme) {
+  var p = theme.primary || '#FFB5C8';
+  var s = theme.secondary || '#FF8BA7';
+  return '<svg viewBox="0 0 140 110" class="diagram-svg" xmlns="http://www.w3.org/2000/svg">' +
+    '<rect x="30" y="5" width="70" height="90" rx="6" fill="' + theme.accent + '" stroke="' + p + '" stroke-width="2.5"/>' +
+    '<rect x="30" y="70" width="70" height="28" fill="' + p + '" opacity="0.3" rx="0 0 6 6"/>' +
+    '<line x1="30" y1="70" x2="100" y2="70" stroke="' + s + '" stroke-width="1.5" stroke-dasharray="4,3"/>' +
+    '<text x="65" y="45" font-family="sans-serif" font-size="24" text-anchor="middle" fill="' + s + '">?</text>' +
+    '<!-- Scissors -->' +
+    '<text x="15" y="15" font-size="16" transform="rotate(-30 15 15)">\u2702</text>' +
+    '<!-- Dotted cut line around -->' +
+    '<rect x="26" y="1" width="78" height="98" rx="8" fill="none" stroke="#999" stroke-width="1" stroke-dasharray="3,2"/>' +
+    '<text x="65" y="108" font-family="sans-serif" font-size="7" text-anchor="middle" fill="#999" font-weight="600">Cut around the border</text>' +
+    '</svg>';
+}
+
+function foldDiagramSVG(theme) {
+  var p = theme.primary || '#FFB5C8';
+  var s = theme.secondary || '#FF8BA7';
+  return '<svg viewBox="0 0 140 110" class="diagram-svg" xmlns="http://www.w3.org/2000/svg">' +
+    '<!-- Character body -->' +
+    '<rect x="35" y="5" width="60" height="55" rx="6" fill="' + theme.accent + '" stroke="' + p + '" stroke-width="2"/>' +
+    '<text x="65" y="38" font-family="sans-serif" font-size="20" text-anchor="middle" fill="' + s + '">?</text>' +
+    '<!-- Fold line -->' +
+    '<line x1="30" y1="62" x2="100" y2="62" stroke="' + s + '" stroke-width="2" stroke-dasharray="5,3"/>' +
+    '<!-- Base tab being folded (rotated) -->' +
+    '<g transform="rotate(-30, 65, 62)">' +
+    '<rect x="35" y="62" width="60" height="25" fill="' + p + '" opacity="0.4" rx="0 0 4 4"/>' +
+    '<text x="65" y="78" font-family="sans-serif" font-size="6" text-anchor="middle" fill="white" font-weight="700">BASE</text>' +
+    '</g>' +
+    '<!-- Curved arrow showing fold direction -->' +
+    '<path d="M105 55 Q115 75 95 85" fill="none" stroke="' + s + '" stroke-width="1.5"/>' +
+    '<polygon points="93,82 98,87 93,88" fill="' + s + '"/>' +
+    '<text x="115" y="72" font-family="sans-serif" font-size="7" fill="' + s + '" font-weight="700">fold</text>' +
+    '<text x="65" y="108" font-family="sans-serif" font-size="7" text-anchor="middle" fill="#999" font-weight="600">Fold base tab backwards</text>' +
+    '</svg>';
+}
+
+function standDiagramSVG(theme) {
+  var p = theme.primary || '#FFB5C8';
+  var s = theme.secondary || '#FF8BA7';
+  return '<svg viewBox="0 0 140 110" class="diagram-svg" xmlns="http://www.w3.org/2000/svg">' +
+    '<!-- Table surface -->' +
+    '<line x1="10" y1="90" x2="130" y2="90" stroke="#DDD" stroke-width="2"/>' +
+    '<!-- Character standing up -->' +
+    '<rect x="45" y="20" width="50" height="70" rx="6" fill="' + theme.accent + '" stroke="' + p + '" stroke-width="2"/>' +
+    '<text x="70" y="60" font-family="sans-serif" font-size="22" text-anchor="middle" fill="' + s + '">?</text>' +
+    '<!-- Base flat on table -->' +
+    '<rect x="45" y="90" width="50" height="15" fill="' + p + '" opacity="0.4" rx="2"/>' +
+    '<text x="70" y="100" font-family="sans-serif" font-size="5" text-anchor="middle" fill="white" font-weight="700">BASE ON TABLE</text>' +
+    '<!-- Stand indicator -->' +
+    '<text x="70" y="15" font-family="sans-serif" font-size="8" text-anchor="middle" fill="' + s + '" font-weight="700">Standing up!</text>' +
+    '<text x="70" y="108" font-family="sans-serif" font-size="7" text-anchor="middle" fill="#999" font-weight="600">Base flat, character upright</text>' +
+    '</svg>';
+}
+
+function boxDiagramSVG(theme) {
+  var p = theme.primary || '#FFB5C8';
+  var s = theme.secondary || '#FF8BA7';
+  return '<svg viewBox="0 0 140 110" class="diagram-svg" xmlns="http://www.w3.org/2000/svg">' +
+    '<!-- Open box -->' +
+    '<rect x="30" y="40" width="70" height="55" rx="4" fill="' + p + '" opacity="0.3" stroke="' + p + '" stroke-width="2"/>' +
+    '<!-- Box lid open -->' +
+    '<path d="M30 40 L45 15 L115 15 L100 40" fill="' + theme.accent + '" stroke="' + p + '" stroke-width="2"/>' +
+    '<!-- Character going in (arrow) -->' +
+    '<rect x="55" y="22" width="25" height="35" rx="3" fill="white" stroke="' + s + '" stroke-width="1.5"/>' +
+    '<text x="67" y="43" font-family="sans-serif" font-size="12" text-anchor="middle" fill="' + s + '">?</text>' +
+    '<!-- Arrow pointing down into box -->' +
+    '<line x1="67" y1="58" x2="67" y2="75" stroke="' + s + '" stroke-width="2"/>' +
+    '<polygon points="62,73 67,80 72,73" fill="' + s + '"/>' +
+    '<text x="70" y="10" font-family="sans-serif" font-size="8" text-anchor="middle" fill="' + s + '" font-weight="700">Place inside!</text>' +
+    '<text x="70" y="108" font-family="sans-serif" font-size="7" text-anchor="middle" fill="#999" font-weight="600">Surprise when opened!</text>' +
+    '</svg>';
+}
+
+function setThemeVars(el, t) {
+  el.style.setProperty('--theme-text', t.text || '#4A3333');
+  el.style.setProperty('--theme-primary', t.primary || '#FFB5C8');
+  el.style.setProperty('--theme-secondary', t.secondary || '#FF8BA7');
+  el.style.setProperty('--theme-accent', t.accent || '#FFF0F3');
+}
+
+function esc(str) {
+  var d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  if (window.__PACK_DATA) render(window.__PACK_DATA);
+});
+</script>
+</body>
+</html>

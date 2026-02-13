@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sticker Sheet - Premium Kawaii Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ========================================
+     STICKER SHEET TEMPLATE - PREMIUM KAWAII EDITION
+     1 page, US Letter, 300 DPI, sRGB
+     12 character stickers + 4 rarity badges + 1 logo
+     ======================================== */
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page {
+    size: letter;
+    margin: 0.25in;
+  }
+
+  html, body {
+    font-family: 'Quicksand', sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-profile: sRGB;
+    background: white;
+  }
+
+  .page {
+    width: 8in;
+    height: 10.5in;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.1in 0;
+  }
+
+  /* ---------- SVG Defs (hidden) ---------- */
+  .svg-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  /* ---------- Title Section ---------- */
+  .sheet-title {
+    text-align: center;
+    margin-bottom: 0.12in;
+  }
+  .sheet-title-deco {
+    display: flex;
+    align-items: center;
+    gap: 0.12in;
+    justify-content: center;
+    margin-bottom: 0.04in;
+  }
+  .title-star-svg {
+    width: 0.22in;
+    height: 0.22in;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+  }
+  .sheet-title h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 17pt;
+    font-weight: 400;
+    color: var(--theme-text, #4A3333);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 0 8px var(--theme-primary-alpha, rgba(255,181,200,0.3));
+    letter-spacing: 0.5px;
+  }
+  .sheet-title .subtitle {
+    font-family: 'Fredoka One', cursive;
+    font-size: 9pt;
+    font-weight: 400;
+    color: var(--theme-secondary, #FF8BA7);
+    letter-spacing: 2px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+
+  /* ---------- Gradient Divider ---------- */
+  .gradient-divider {
+    width: 5in;
+    height: 0.18in;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.08in;
+    margin: 0.04in 0 0.1in 0;
+  }
+  .gradient-divider-line {
+    flex: 1;
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(90deg, transparent, var(--theme-primary, #FFB5C8), var(--theme-secondary, #FF8BA7), transparent);
+    opacity: 0.6;
+  }
+  .divider-star-svg {
+    width: 0.12in;
+    height: 0.12in;
+    flex-shrink: 0;
+  }
+
+  /* ---------- Sticker Grid ---------- */
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.18in;
+    width: 7in;
+    justify-items: center;
+  }
+
+  /* ---------- Character Sticker (Scalloped/Flower Border) ---------- */
+  .sticker {
+    width: 1.3in;
+    height: 1.3in;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: visible;
+    background: transparent;
+  }
+
+  .sticker-scallop-border {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .sticker-body {
+    position: absolute;
+    inset: 0.06in;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    /* Rarity glow applied via JS */
+  }
+
+  .sticker-gradient-bg {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    opacity: 0.18;
+    pointer-events: none;
+  }
+
+  .sticker-image {
+    width: 0.85in;
+    height: 0.85in;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    margin-top: -0.01in;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.12));
+  }
+  .sticker-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .sticker-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: 5pt;
+    font-weight: 400;
+    color: var(--theme-text, #4A3333);
+    text-align: center;
+    z-index: 2;
+    max-width: 1in;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 0.02in;
+    text-shadow: 0 0.5px 1px rgba(0,0,0,0.08);
+  }
+
+  /* ---------- Section Divider ---------- */
+  .section-divider {
+    width: 6.5in;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1in;
+    margin: 0.12in 0;
+  }
+  .section-divider-line {
+    flex: 1;
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(90deg, transparent, var(--theme-primary, #FFB5C8), var(--theme-accent, #FFD699), transparent);
+    opacity: 0.5;
+  }
+  .section-divider-star {
+    width: 0.11in;
+    height: 0.11in;
+    flex-shrink: 0;
+  }
+  .section-divider-text {
+    font-family: 'Fredoka One', cursive;
+    font-size: 7pt;
+    font-weight: 400;
+    color: var(--theme-secondary, #FF8BA7);
+    letter-spacing: 1.5px;
+    white-space: nowrap;
+    text-shadow: 0 0.5px 1px rgba(0,0,0,0.06);
+  }
+
+  /* ---------- Rarity Badge Sticker ---------- */
+  .rarity-sticker {
+    width: 1.3in;
+    height: 1.3in;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: visible;
+  }
+
+  .rarity-scallop-border {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .rarity-body {
+    position: absolute;
+    inset: 0.06in;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    background: white;
+  }
+
+  .rarity-gradient-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    opacity: 0.18;
+  }
+
+  .rarity-sticker-icon {
+    z-index: 2;
+    margin-bottom: 0.03in;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.15));
+  }
+  .rarity-sticker-icon svg {
+    width: 0.32in;
+    height: 0.32in;
+  }
+
+  .rarity-sticker-label {
+    font-family: 'Fredoka One', cursive;
+    font-size: 7pt;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 2;
+    text-shadow: 0 0.5px 1px rgba(0,0,0,0.08);
+  }
+
+  /* ---------- Logo Sticker ---------- */
+  .logo-sticker {
+    width: 1.3in;
+    height: 1.3in;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: visible;
+  }
+
+  .logo-scallop-border {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .logo-body {
+    position: absolute;
+    inset: 0.06in;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    background: white;
+  }
+
+  .logo-gradient-bg {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    opacity: 0.15;
+  }
+
+  .logo-icon-svg {
+    z-index: 2;
+    margin-bottom: 0.05in;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.12));
+  }
+  .logo-icon-svg svg {
+    width: 0.35in;
+    height: 0.35in;
+  }
+
+  .logo-sticker-text {
+    font-family: 'Fredoka One', cursive;
+    font-size: 7pt;
+    font-weight: 400;
+    z-index: 2;
+    text-align: center;
+    line-height: 1.3;
+    text-shadow: 0 0.5px 1px rgba(0,0,0,0.08);
+  }
+  .logo-sticker-url {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 4pt;
+    font-weight: 600;
+    opacity: 0.5;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/**
+ * PREMIUM KAWAII EDITION - Sticker Sheet Renderer
+ * 12 character stickers + 4 rarity badges + 1 logo
+ */
+
+/* ---- SVG Generators ---- */
+
+function svgStar(fill, size) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2L14.9 8.6L22 9.3L16.8 14L18.2 21L12 17.4L5.8 21L7.2 14L2 9.3L9.1 8.6L12 2Z" fill="${fill}" stroke="${fill}" stroke-width="0.5" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function svgDiamond(fill, size) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2L4 9L12 22L20 9L12 2Z" fill="${fill}"/>
+    <path d="M4 9H20" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+    <path d="M12 2L9 9L12 22L15 9L12 2Z" fill="rgba(255,255,255,0.15)"/>
+  </svg>`;
+}
+
+function svgCircleDot(fill, size) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="10" fill="${fill}" opacity="0.3"/>
+    <circle cx="12" cy="12" r="7" fill="${fill}" opacity="0.5"/>
+    <circle cx="12" cy="12" r="4" fill="${fill}"/>
+  </svg>`;
+}
+
+function svgSparkle(fill, size) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 1C12 1 13.5 8.5 12 12C10.5 8.5 12 1 12 1Z" fill="${fill}"/>
+    <path d="M12 23C12 23 10.5 15.5 12 12C13.5 15.5 12 23 12 23Z" fill="${fill}"/>
+    <path d="M1 12C1 12 8.5 10.5 12 12C8.5 13.5 1 12 1 12Z" fill="${fill}"/>
+    <path d="M23 12C23 12 15.5 13.5 12 12C15.5 10.5 23 12 23 12Z" fill="${fill}"/>
+    <path d="M4.2 4.2C4.2 4.2 9.5 9 12 12C9 9.5 4.2 4.2 4.2 4.2Z" fill="${fill}" opacity="0.7"/>
+    <path d="M19.8 19.8C19.8 19.8 14.5 15 12 12C15 14.5 19.8 19.8 19.8 19.8Z" fill="${fill}" opacity="0.7"/>
+    <path d="M19.8 4.2C19.8 4.2 15 9.5 12 12C14.5 9 19.8 4.2 19.8 4.2Z" fill="${fill}" opacity="0.7"/>
+    <path d="M4.2 19.8C4.2 19.8 9 14.5 12 12C9.5 15 4.2 19.8 4.2 19.8Z" fill="${fill}" opacity="0.7"/>
+    <circle cx="12" cy="12" r="2" fill="${fill}"/>
+  </svg>`;
+}
+
+function svgTitleStar(fill) {
+  return `<svg class="title-star-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 2L19.7 11.2L29.5 12L22 18.7L24.2 28.3L16 23.2L7.8 28.3L10 18.7L2.5 12L12.3 11.2L16 2Z" fill="${fill}" opacity="0.9"/>
+    <path d="M16 6L18.5 12.8L25.8 13.5L20.2 18.4L21.8 25.5L16 22L10.2 25.5L11.8 18.4L6.2 13.5L13.5 12.8L16 6Z" fill="white" opacity="0.3"/>
+  </svg>`;
+}
+
+function svgSmallStar(fill) {
+  return `<svg class="section-divider-star" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 1L9.8 5.9L15 6.4L11.1 9.9L12.2 15L8 12.4L3.8 15L4.9 9.9L1 6.4L6.2 5.9L8 1Z" fill="${fill}"/>
+  </svg>`;
+}
+
+function svgDividerStar(fill) {
+  return `<svg class="divider-star-svg" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 1L9.8 5.9L15 6.4L11.1 9.9L12.2 15L8 12.4L3.8 15L4.9 9.9L1 6.4L6.2 5.9L8 1Z" fill="${fill}" opacity="0.6"/>
+  </svg>`;
+}
+
+function svgLogoHeart(fill1, fill2) {
+  return `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="heartGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${fill1}"/>
+        <stop offset="100%" stop-color="${fill2}"/>
+      </linearGradient>
+    </defs>
+    <path d="M16 28C16 28 3 20 3 11C3 6.5 6.5 3 10.5 3C13 3 15 4.5 16 6.5C17 4.5 19 3 21.5 3C25.5 3 29 6.5 29 11C29 20 16 28 16 28Z" fill="url(#heartGrad)"/>
+    <path d="M10.5 6C8 6 6 8 6 10.5C6 11 6.5 11 6.5 11C6.5 11 7 8 10.5 7C11 7 11 6 10.5 6Z" fill="white" opacity="0.5"/>
+  </svg>`;
+}
+
+/**
+ * Generate a scalloped/flower-petal circle SVG border
+ * @param {number} size - SVG viewBox size
+ * @param {string} fill - fill color
+ * @param {string} stroke - stroke color
+ * @param {number} petals - number of scallop petals (12-16 looks great)
+ * @param {string} glowColor - optional glow color for rarity
+ */
+function svgScallopBorder(size, fill, stroke, petals, glowColor) {
+  const cx = size / 2;
+  const cy = size / 2;
+  const outerR = size / 2 - 2;
+  const petalDepth = size * 0.055;
+  const points = [];
+  const steps = petals * 2;
+
+  for (let i = 0; i < steps; i++) {
+    const angle = (i / steps) * Math.PI * 2 - Math.PI / 2;
+    const isOuter = i % 2 === 0;
+    const r = isOuter ? outerR : outerR - petalDepth;
+    const x = cx + Math.cos(angle) * r;
+    const y = cy + Math.sin(angle) * r;
+    points.push({ x, y, isOuter });
+  }
+
+  // Build smooth scallop path using quadratic bezier curves
+  let path = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 0; i < points.length; i++) {
+    const next = points[(i + 1) % points.length];
+    const midX = (points[i].x + next.x) / 2;
+    const midY = (points[i].y + next.y) / 2;
+    if (points[i].isOuter) {
+      // Curve outward from peak to valley
+      const cpR = outerR + petalDepth * 0.3;
+      const cpAngle = ((i + 0.5) / steps) * Math.PI * 2 - Math.PI / 2;
+      const cpX = cx + Math.cos(cpAngle) * cpR;
+      const cpY = cy + Math.sin(cpAngle) * cpR;
+      path += ` Q ${cpX} ${cpY} ${next.x} ${next.y}`;
+    } else {
+      // Curve inward from valley to peak
+      const cpR = outerR - petalDepth * 1.2;
+      const cpAngle = ((i + 0.5) / steps) * Math.PI * 2 - Math.PI / 2;
+      const cpX = cx + Math.cos(cpAngle) * cpR;
+      const cpY = cy + Math.sin(cpAngle) * cpR;
+      path += ` Q ${cpX} ${cpY} ${next.x} ${next.y}`;
+    }
+  }
+  path += ' Z';
+
+  const filterDef = glowColor ? `
+    <defs>
+      <filter id="glow_${glowColor.replace('#','')}" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="2.5" result="blur"/>
+        <feFlood flood-color="${glowColor}" flood-opacity="0.4" result="color"/>
+        <feComposite in="color" in2="blur" operator="in" result="glowColor"/>
+        <feMerge>
+          <feMergeNode in="glowColor"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>` : '';
+
+  const filterAttr = glowColor ? ` filter="url(#glow_${glowColor.replace('#','')})"`  : '';
+
+  return `<svg viewBox="0 0 ${size} ${size}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+    ${filterDef}
+    <path d="${path}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"${filterAttr}/>
+  </svg>`;
+}
+
+
+/* ---- Main Render ---- */
+
+function render(data) {
+  const root = document.getElementById('root');
+  root.innerHTML = '';
+
+  const rarityMap = {
+    common:    { color: '#9CA3AF', colorEnd: '#D1D5DB', label: 'Common',    iconFn: svgCircleDot,  glowAlpha: '0.25' },
+    rare:      { color: '#3B82F6', colorEnd: '#93C5FD', label: 'Rare',      iconFn: svgDiamond,    glowAlpha: '0.35' },
+    epic:      { color: '#8B5CF6', colorEnd: '#C4B5FD', label: 'Epic',      iconFn: svgStar,       glowAlpha: '0.4'  },
+    legendary: { color: '#F59E0B', colorEnd: '#FDE68A', label: 'Legendary', iconFn: svgSparkle,    glowAlpha: '0.5'  }
+  };
+
+  const th = data.theme || {};
+  const primary   = th.primary   || '#FFB5C8';
+  const secondary = th.secondary || '#FF8BA7';
+  const accent    = th.accent    || '#FFD699';
+  const text      = th.text      || '#4A3333';
+
+  const page = document.createElement('div');
+  page.className = 'page';
+  page.style.setProperty('--theme-text', text);
+  page.style.setProperty('--theme-primary', primary);
+  page.style.setProperty('--theme-secondary', secondary);
+  page.style.setProperty('--theme-accent', accent);
+  page.style.setProperty('--theme-primary-alpha', hexToRGBA(primary, 0.3));
+
+  // ===== TITLE SECTION =====
+  const title = document.createElement('div');
+  title.className = 'sheet-title';
+  title.innerHTML = `
+    <div class="sheet-title-deco">
+      ${svgTitleStar(accent)}
+      <h1>${esc(data.packName)}</h1>
+      ${svgTitleStar(accent)}
+    </div>
+    <div class="subtitle">STICKER SHEET</div>
+    <div class="gradient-divider">
+      <div class="gradient-divider-line"></div>
+      ${svgDividerStar(primary)}
+      ${svgDividerStar(secondary)}
+      ${svgDividerStar(accent)}
+      <div class="gradient-divider-line"></div>
+    </div>
+  `;
+  page.appendChild(title);
+
+  // ===== CHARACTER STICKER GRID (rows 1-3) =====
+  const charGrid = document.createElement('div');
+  charGrid.className = 'sticker-grid';
+
+  (data.characters || []).slice(0, 12).forEach(char => {
+    const r = rarityMap[char.rarity] || rarityMap.common;
+
+    const sticker = document.createElement('div');
+    sticker.className = 'sticker';
+
+    // Scalloped border with rarity glow
+    const borderWrap = document.createElement('div');
+    borderWrap.className = 'sticker-scallop-border';
+    borderWrap.innerHTML = svgScallopBorder(130, 'white', r.color, 14, r.color);
+    sticker.appendChild(borderWrap);
+
+    // Inner body
+    const body = document.createElement('div');
+    body.className = 'sticker-body';
+    body.style.boxShadow = `inset 0 0 12px ${hexToRGBA(r.color, 0.1)}, 0 2px 6px rgba(0,0,0,0.08)`;
+
+    // Pastel gradient bg
+    const gradBg = document.createElement('div');
+    gradBg.className = 'sticker-gradient-bg';
+    gradBg.style.background = `radial-gradient(circle at 40% 35%, ${hexToRGBA(primary, 0.5)}, ${hexToRGBA(secondary, 0.2)} 60%, ${hexToRGBA(accent, 0.1)})`;
+    body.appendChild(gradBg);
+
+    // Image
+    const imgWrap = document.createElement('div');
+    imgWrap.className = 'sticker-image';
+    if (char.imageDataUrl) {
+      const img = document.createElement('img');
+      img.src = char.imageDataUrl;
+      img.alt = char.name;
+      imgWrap.appendChild(img);
+    }
+    body.appendChild(imgWrap);
+
+    // Name in Fredoka One
+    const name = document.createElement('div');
+    name.className = 'sticker-name';
+    name.textContent = char.name;
+    body.appendChild(name);
+
+    sticker.appendChild(body);
+    charGrid.appendChild(sticker);
+  });
+
+  page.appendChild(charGrid);
+
+  // ===== SECTION DIVIDER =====
+  const divider = document.createElement('div');
+  divider.className = 'section-divider';
+  divider.innerHTML = `
+    <div class="section-divider-line"></div>
+    ${svgSmallStar(primary)}
+    ${svgSmallStar(secondary)}
+    <span class="section-divider-text">RARITY BADGES</span>
+    ${svgSmallStar(secondary)}
+    ${svgSmallStar(primary)}
+    <div class="section-divider-line"></div>
+  `;
+  page.appendChild(divider);
+
+  // ===== RARITY BADGE GRID =====
+  const badgeGrid = document.createElement('div');
+  badgeGrid.className = 'sticker-grid';
+  badgeGrid.style.width = '7in';
+
+  Object.entries(rarityMap).forEach(([key, r]) => {
+    const badge = document.createElement('div');
+    badge.className = 'rarity-sticker';
+
+    // Scalloped border
+    const borderWrap = document.createElement('div');
+    borderWrap.className = 'rarity-scallop-border';
+    borderWrap.innerHTML = svgScallopBorder(130, 'white', r.color, 14, r.color);
+    badge.appendChild(borderWrap);
+
+    // Body
+    const body = document.createElement('div');
+    body.className = 'rarity-body';
+    body.style.boxShadow = `inset 0 0 10px ${hexToRGBA(r.color, 0.08)}, 0 2px 6px rgba(0,0,0,0.08)`;
+
+    // Gradient fill
+    const fill = document.createElement('div');
+    fill.className = 'rarity-gradient-fill';
+    fill.style.background = `radial-gradient(circle at 40% 35%, ${r.colorEnd}, ${r.color} 80%)`;
+    body.appendChild(fill);
+
+    // SVG icon
+    const iconWrap = document.createElement('div');
+    iconWrap.className = 'rarity-sticker-icon';
+    iconWrap.innerHTML = r.iconFn(r.color, '100%');
+    body.appendChild(iconWrap);
+
+    // Label
+    const label = document.createElement('div');
+    label.className = 'rarity-sticker-label';
+    label.style.color = r.color;
+    label.textContent = r.label;
+    body.appendChild(label);
+
+    badge.appendChild(body);
+    badgeGrid.appendChild(badge);
+  });
+
+  page.appendChild(badgeGrid);
+
+  // ===== LOGO STICKER =====
+  const logoRow = document.createElement('div');
+  logoRow.style.cssText = 'display:flex;justify-content:center;margin-top:0.15in;';
+
+  const logo = document.createElement('div');
+  logo.className = 'logo-sticker';
+
+  // Scalloped border with theme gradient stroke
+  const logoBorderWrap = document.createElement('div');
+  logoBorderWrap.className = 'logo-scallop-border';
+  logoBorderWrap.innerHTML = svgScallopBorder(130, 'white', primary, 14, secondary);
+  logo.appendChild(logoBorderWrap);
+
+  // Body
+  const logoBody = document.createElement('div');
+  logoBody.className = 'logo-body';
+  logoBody.style.boxShadow = `inset 0 0 10px ${hexToRGBA(primary, 0.1)}, 0 2px 8px rgba(0,0,0,0.1)`;
+
+  // Gradient bg
+  const logoBg = document.createElement('div');
+  logoBg.className = 'logo-gradient-bg';
+  logoBg.style.background = `linear-gradient(135deg, ${primary}, ${secondary}, ${accent})`;
+  logoBody.appendChild(logoBg);
+
+  // SVG heart icon
+  const logoIconWrap = document.createElement('div');
+  logoIconWrap.className = 'logo-icon-svg';
+  logoIconWrap.innerHTML = svgLogoHeart(primary, secondary);
+  logoBody.appendChild(logoIconWrap);
+
+  // Text
+  const logoText = document.createElement('div');
+  logoText.className = 'logo-sticker-text';
+  logoText.style.color = text;
+  logoText.innerHTML = `${esc(data.packName)}<br><span class="logo-sticker-url">blindboxcreator.com</span>`;
+  logoBody.appendChild(logoText);
+
+  logo.appendChild(logoBody);
+  logoRow.appendChild(logo);
+  page.appendChild(logoRow);
+
+  root.appendChild(page);
+}
+
+
+/* ---- Utilities ---- */
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+function hexToRGBA(hex, alpha) {
+  if (!hex) return `rgba(0,0,0,${alpha})`;
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  const r = parseInt(hex.substring(0,2), 16);
+  const g = parseInt(hex.substring(2,4), 16);
+  const b = parseInt(hex.substring(4,6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.__PACK_DATA) render(window.__PACK_DATA);
+});
+</script>
+</body>
+</html>

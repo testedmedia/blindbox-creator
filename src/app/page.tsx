@@ -11,43 +11,45 @@ import {
   SUBSCRIPTION_TIERS,
   formatPrice,
 } from "@/lib/constants";
+import { useTranslation } from "@/lib/i18n";
 
 const floatingEmojis = [
-  { emoji: "🌸", top: "10%", left: "5%", delay: "0s" },
-  { emoji: "🐱", top: "20%", right: "8%", delay: "0.5s" },
-  { emoji: "✨", top: "60%", left: "3%", delay: "1s" },
-  { emoji: "🍡", top: "70%", right: "5%", delay: "1.5s" },
-  { emoji: "🦄", top: "40%", left: "7%", delay: "0.8s" },
-  { emoji: "🍰", top: "50%", right: "4%", delay: "1.2s" },
-];
-
-const howItWorks = [
-  {
-    icon: Palette,
-    title: "1. Pick Your Pack",
-    description: "Choose from dozens of adorable themes. Animals, unicorns, magical girls, and more. Each pack has 12 characters inside.",
-    color: "bg-brand-blue",
-  },
-  {
-    icon: Scissors,
-    title: "2. Print, Cut & Fold",
-    description: "Hit print on any home printer. Cut along the lines, fold on the dots, and glue the tabs. That's it. Done!",
-    color: "bg-brand-pink",
-  },
-  {
-    icon: Gift,
-    title: "3. Surprise & Trade!",
-    description: "Put the characters in the box, close it up, and open it like a real blind box. Trade with siblings and friends!",
-    color: "bg-brand-purple",
-  },
+  { emoji: "\u{1F338}", top: "10%", left: "5%", delay: "0s" },
+  { emoji: "\u{1F431}", top: "20%", right: "8%", delay: "0.5s" },
+  { emoji: "\u2728", top: "60%", left: "3%", delay: "1s" },
+  { emoji: "\u{1F361}", top: "70%", right: "5%", delay: "1.5s" },
+  { emoji: "\u{1F984}", top: "40%", left: "7%", delay: "0.8s" },
+  { emoji: "\u{1F370}", top: "50%", right: "4%", delay: "1.2s" },
 ];
 
 export default function Home() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const foundingTier = SUBSCRIPTION_TIERS.find((t) => t.id === "founding_creator")!;
+  const howItWorks = [
+    {
+      icon: Palette,
+      title: t("home.step1Title"),
+      description: t("home.step1Desc"),
+      color: "bg-brand-blue",
+    },
+    {
+      icon: Scissors,
+      title: t("home.step2Title"),
+      description: t("home.step2Desc"),
+      color: "bg-brand-pink",
+    },
+    {
+      icon: Gift,
+      title: t("home.step3Title"),
+      description: t("home.step3Desc"),
+      color: "bg-brand-purple",
+    },
+  ];
+
+  const foundingTier = SUBSCRIPTION_TIERS.find((tier) => tier.id === "founding_creator")!;
   const featuredTemplates = TEMPLATE_PACKS.slice(0, 6);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
@@ -98,13 +100,12 @@ export default function Home() {
               </div>
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
-                Build Memories
+                {t("home.title1")}
                 <br />
-                <span className="text-gradient">With Your Kids</span>
+                <span className="text-gradient">{t("home.title2")}</span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-xl mb-8">
-                Print. Cut. Fold. Surprise! Adorable kawaii characters your whole family can make together.
-                No glue gun, no mess, no experience needed. Just a printer and 10 minutes of family fun.
+                {t("home.heroSubtitle")}
               </p>
 
               <div className="flex flex-col sm:flex-row items-center gap-4 lg:justify-start justify-center">
@@ -112,26 +113,27 @@ export default function Home() {
                   href="/shop"
                   className="gradient-pink text-white px-8 py-4 rounded-full text-lg font-bold hover:opacity-90 transition-opacity shadow-pink flex items-center gap-2 w-full sm:w-auto justify-center"
                 >
-                  Shop Templates
+                  {t("home.shopTemplates")}
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
-                  href="/pricing"
-                  className="bg-white border-2 border-brand-purple text-brand-purple px-8 py-4 rounded-full text-lg font-bold hover:bg-brand-purple/5 transition-colors w-full sm:w-auto text-center"
+                  href="/create"
+                  className="bg-white border-2 border-brand-purple text-brand-purple px-8 py-4 rounded-full text-lg font-bold hover:bg-brand-purple/5 transition-colors w-full sm:w-auto text-center flex items-center justify-center gap-2"
                 >
-                  Try AI Generator Free
+                  <Sparkles className="w-5 h-5" />
+                  {t("home.tryAI")}
                 </Link>
               </div>
 
               <div className="flex flex-wrap items-center gap-5 mt-8 text-sm text-muted-foreground lg:justify-start justify-center">
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle className="w-4 h-4 text-brand-green" /> Download & print in 2 min
+                  <CheckCircle className="w-4 h-4 text-brand-green" /> {t("home.download2min")}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle className="w-4 h-4 text-brand-green" /> No craft skills needed
+                  <CheckCircle className="w-4 h-4 text-brand-green" /> {t("home.noCraft")}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle className="w-4 h-4 text-brand-green" /> Perfect for ages 4-12
+                  <CheckCircle className="w-4 h-4 text-brand-green" /> {t("home.perfectAges")}
                 </span>
               </div>
             </div>
@@ -185,10 +187,10 @@ export default function Home() {
       <section className="bg-gradient-to-b from-pink-50/50 to-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-3">
-            Family Craft Time <span className="text-gradient">Made Easy</span>
+            {t("home.familyCraft")} <span className="text-gradient">{t("home.familyCraftHighlight")}</span>
           </h2>
           <p className="text-muted-foreground text-center mb-10 max-w-lg mx-auto">
-            Parents and kids love making these together. No mess, no stress, just quality time.
+            {t("home.familyCraftSubtitle")}
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
             {[
@@ -213,10 +215,10 @@ export default function Home() {
       <section className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4">
-            So Easy, Anyone Can Do It
+            {t("home.soEasy")}
           </h2>
           <p className="text-muted-foreground text-center mb-12 max-w-lg mx-auto">
-            If your kid can use scissors, they can make a blind box. Seriously. Three steps, ten minutes, endless fun.
+            {t("home.soEasySubtitle")}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -252,17 +254,17 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4">
             <div>
               <h2 className="text-3xl md:text-4xl font-extrabold mb-2">
-                Featured Templates
+                {t("home.featuredTemplates")}
               </h2>
               <p className="text-muted-foreground">
-                Each pack includes 12 unique characters, box designs, and assembly guide
+                {t("home.featuredSubtitle")}
               </p>
             </div>
             <Link
               href="/templates"
               className="text-brand-blue font-bold hover:underline flex items-center gap-1 shrink-0"
             >
-              View All Templates <ArrowRight className="w-4 h-4" />
+              {t("home.viewAll")} <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -279,7 +281,7 @@ export default function Home() {
                     {pack.image?.startsWith("/products/packs/") ? (
                       <Image src={pack.image} alt={pack.name} width={400} height={400} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                     ) : (
-                      <span className="text-6xl drop-shadow-sm group-hover:scale-110 transition-transform">{pack.emoji || "🎨"}</span>
+                      <span className="text-6xl drop-shadow-sm group-hover:scale-110 transition-transform">{pack.emoji || "\u{1F3A8}"}</span>
                     )}
                     {pack.badge && (
                       <span className="absolute top-2 right-2 bg-brand-pink text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10">
@@ -301,7 +303,7 @@ export default function Home() {
                         {formatPrice(pack.price)}
                       </span>
                       <span className="text-sm font-semibold text-brand-blue group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                        View Pack <ArrowRight className="w-3.5 h-3.5" />
+                        {t("home.viewPack")} <ArrowRight className="w-3.5 h-3.5" />
                       </span>
                     </div>
                   </div>
@@ -316,7 +318,7 @@ export default function Home() {
       <section className="bg-muted py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-12">
-            Beyond Templates
+            {t("home.beyondTemplates")}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -327,27 +329,27 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-r from-brand-orange/90 to-brand-pink/80" />
               </div>
               <div className="relative p-8 md:p-10">
-              <span className="text-4xl mb-4 block">🎉</span>
-              <h3 className="text-2xl font-extrabold mb-3">Birthday Party Kits</h3>
+              <span className="text-4xl mb-4 block">{"\u{1F389}"}</span>
+              <h3 className="text-2xl font-extrabold mb-3">{t("home.partyKits")}</h3>
               <p className="mb-6 text-white/90">
-                The easiest birthday party activity ever. Print the templates, hand them out, and watch 12 kids go wild making their own blind boxes. Zero prep stress.
+                {t("home.partyDesc")}
               </p>
               <ul className="space-y-2 mb-8">
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 shrink-0" /> Multiple theme packs included
+                  <CheckCircle className="w-4 h-4 shrink-0" /> {t("home.partyFeature1")}
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 shrink-0" /> Printable invitations & thank yous
+                  <CheckCircle className="w-4 h-4 shrink-0" /> {t("home.partyFeature2")}
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 shrink-0" /> Step-by-step party guide
+                  <CheckCircle className="w-4 h-4 shrink-0" /> {t("home.partyFeature3")}
                 </li>
               </ul>
               <Link
                 href="/party-kits"
                 className="inline-flex items-center gap-2 bg-white text-brand-orange font-bold px-6 py-3 rounded-full hover:bg-white/90 transition-colors"
               >
-                Explore Party Kits <ArrowRight className="w-4 h-4" />
+                {t("home.exploreParty")} <ArrowRight className="w-4 h-4" />
               </Link>
               </div>
             </div>
@@ -359,27 +361,27 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-r from-brand-purple/90 to-brand-blue/80" />
               </div>
               <div className="relative p-8 md:p-10">
-              <span className="text-4xl mb-4 block">🏫</span>
-              <h3 className="text-2xl font-extrabold mb-3">Classroom Bundles</h3>
+              <span className="text-4xl mb-4 block">{"\u{1F3EB}"}</span>
+              <h3 className="text-2xl font-extrabold mb-3">{t("home.classroomBundles")}</h3>
               <p className="mb-6 text-white/90">
-                Teachers love this. Print enough for the whole class. Kids learn cutting, folding, and following instructions while having the time of their lives.
+                {t("home.classroomDesc")}
               </p>
               <ul className="space-y-2 mb-8">
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 shrink-0" /> Sets for 10 or 30 students
+                  <CheckCircle className="w-4 h-4 shrink-0" /> {t("home.classroomFeature1")}
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 shrink-0" /> Lesson plan integration guide
+                  <CheckCircle className="w-4 h-4 shrink-0" /> {t("home.classroomFeature2")}
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 shrink-0" /> STEAM activity sheets included
+                  <CheckCircle className="w-4 h-4 shrink-0" /> {t("home.classroomFeature3")}
                 </li>
               </ul>
               <Link
                 href="/classroom"
                 className="inline-flex items-center gap-2 bg-white text-brand-purple font-bold px-6 py-3 rounded-full hover:bg-white/90 transition-colors"
               >
-                Explore Classroom Bundles <ArrowRight className="w-4 h-4" />
+                {t("home.exploreClassroom")} <ArrowRight className="w-4 h-4" />
               </Link>
               </div>
             </div>
@@ -397,19 +399,18 @@ export default function Home() {
             </div>
 
             <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
-              Join as a Founding Member
+              {t("home.foundingMember")}
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto mb-8 text-lg">
-              Lock in <span className="font-bold text-brand-purple">50% off forever</span>.
-              Create unlimited custom characters with AI. Pick any theme, any style.
-              This price disappears when we leave beta.
+              {t("home.foundingDesc")} <span className="font-bold text-brand-purple">{t("home.foundingDescHighlight")}</span>.{" "}
+              {t("home.foundingDescEnd")}
             </p>
 
             <div className="flex items-center justify-center gap-3 mb-8">
               <span className="text-3xl md:text-4xl font-extrabold text-brand-purple">
                 {formatPrice(foundingTier.price)}
               </span>
-              <span className="text-lg text-muted-foreground">/year</span>
+              <span className="text-lg text-muted-foreground">{t("home.perYear")}</span>
               {foundingTier.originalPrice && (
                 <span className="text-lg text-muted-foreground line-through ml-1">
                   {formatPrice(foundingTier.originalPrice)}
@@ -442,16 +443,16 @@ export default function Home() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Mail className="w-12 h-12 text-white/80 mx-auto mb-6" />
           <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
-            Try It Free - 3 Characters on Us
+            {t("home.emailTitle")}
           </h2>
           <p className="text-white/80 mb-8 text-lg">
-            Not sure yet? We'll send you 3 free printable characters right now. Print them with your kids tonight. You'll be hooked.
+            {t("home.emailSubtitle")}
           </p>
 
           {submitted ? (
             <div className="bg-white/20 backdrop-blur rounded-2xl p-6 inline-flex items-center gap-3">
               <CheckCircle className="w-6 h-6 text-brand-yellow" />
-              <span className="text-white font-bold text-lg">Check your inbox! Free templates are on the way.</span>
+              <span className="text-white font-bold text-lg">{t("home.emailSuccess")}</span>
             </div>
           ) : (
             <form onSubmit={handleEmailSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
@@ -459,7 +460,7 @@ export default function Home() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
+                placeholder={t("home.emailPlaceholder")}
                 required
                 className="flex-1 px-5 py-4 rounded-full text-foreground font-semibold placeholder:text-muted-foreground focus:outline-none focus:ring-4 focus:ring-white/30"
               />
@@ -468,7 +469,7 @@ export default function Home() {
                 disabled={loading}
                 className="bg-brand-yellow text-foreground px-8 py-4 rounded-full font-bold hover:bg-brand-yellow/90 transition-colors disabled:opacity-60"
               >
-                {loading ? "Sending..." : "Send My Free Templates"}
+                {loading ? t("home.emailSending") : t("home.emailButton")}
               </button>
             </form>
           )}
