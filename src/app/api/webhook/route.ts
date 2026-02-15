@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createOrder, createSubscription } from "@/lib/supabase";
+import { sendOrderConfirmation } from "@/lib/resend";
 import type Stripe from "stripe";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
@@ -66,6 +67,17 @@ export async function POST(request: NextRequest) {
           });
 
           console.log("[webhook] Order recorded for:", email);
+
+          // Send order confirmation email (non-blocking, graceful fail)
+          sendOrderConfirmation({
+            email,
+            products: lineItems.data.map((item) => ({
+              name: item.description || "Unknown Product",
+              qty: item.quantity || 1,
+              price: item.amount_total || 0,
+            })),
+            totalCents: session.amount_total || 0,
+          }).catch((err) => console.error("[webhook] Email send error:", err));
         }
 
         break;

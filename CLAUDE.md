@@ -4,7 +4,7 @@
 Blind box product creator app. Generate and customize blind box collectible products with AI.
 
 ## Version
-3.4.0
+4.0.0
 
 ## Stack
 | Layer | Technology |

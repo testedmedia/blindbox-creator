@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SUBSCRIPTION_TIERS, formatPrice, SITE_NAME } from "@/lib/constants";
 import { Check, Sparkles, Zap, Crown, HelpCircle } from "lucide-react";
+import { GuaranteeBadge, TrustBadges } from "@/components/trust-badges";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -90,6 +91,17 @@ export default function PricingPage() {
             prices go up. Every plan includes access to our growing library of
             themes.
           </p>
+        </div>
+      </section>
+
+      {/* Urgency Banner */}
+      <section className="px-4 pb-8">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-4 text-center">
+            <p className="text-sm font-bold text-amber-800">
+              ⏰ Founding member pricing won&apos;t last forever — lock in 50% off before we leave beta
+            </p>
+          </div>
         </div>
       </section>
 
@@ -190,6 +202,14 @@ export default function PricingPage() {
           </Link>
           .
         </p>
+      </section>
+
+      {/* Guarantee & Trust */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <GuaranteeBadge />
+          <TrustBadges />
+        </div>
       </section>
 
       {/* FAQ */}

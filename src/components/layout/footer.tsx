@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { VERSION } from "@/lib/constants";
@@ -7,6 +8,24 @@ import { useTranslation } from "@/lib/i18n";
 
 export function Footer() {
   const { t } = useTranslation();
+  const [nlEmail, setNlEmail] = useState("");
+  const [nlStatus, setNlStatus] = useState<"idle" | "loading" | "success">("idle");
+
+  const handleNewsletter = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nlEmail) return;
+    setNlStatus("loading");
+    try {
+      await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: nlEmail, role: "newsletter" }),
+      });
+      setNlStatus("success");
+    } catch {
+      setNlStatus("idle");
+    }
+  };
 
   const shopLinks = [
     { href: "/shop", label: t("footer.allProducts") },
@@ -20,6 +39,7 @@ export function Footer() {
     { href: "/about", label: t("footer.about") },
     { href: "/features", label: t("footer.aiGenerator") },
     { href: "/blog", label: t("footer.blog") },
+    { href: "/affiliate", label: "💰 Earn 50% Commission", highlight: true },
     { href: "/contact", label: t("footer.contact") },
     { href: "/changelog", label: t("footer.changelog") },
   ];
@@ -42,6 +62,28 @@ export function Footer() {
             <p className="text-sm text-gray-400 mb-4">
               {t("footer.tagline")}
             </p>
+            {/* Newsletter signup */}
+            {nlStatus === "success" ? (
+              <p className="text-sm text-brand-green font-semibold">{t("footer.nlSuccess")}</p>
+            ) : (
+              <form onSubmit={handleNewsletter} className="flex gap-2 mb-4">
+                <input
+                  type="email"
+                  value={nlEmail}
+                  onChange={(e) => setNlEmail(e.target.value)}
+                  placeholder={t("footer.nlPlaceholder")}
+                  required
+                  className="flex-1 px-3 py-2 rounded-lg text-sm text-foreground bg-gray-800 border border-gray-700 placeholder:text-gray-500 focus:outline-none focus:border-brand-pink"
+                />
+                <button
+                  type="submit"
+                  disabled={nlStatus === "loading"}
+                  className="bg-brand-pink text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-brand-pink/90 transition-colors disabled:opacity-60 whitespace-nowrap"
+                >
+                  {nlStatus === "loading" ? "..." : t("footer.nlButton")}
+                </button>
+              </form>
+            )}
             <p className="text-xs text-gray-500">{VERSION}</p>
           </div>
 
@@ -65,7 +107,14 @@ export function Footer() {
             <ul className="space-y-2">
               {companyLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-gray-300 hover:text-white transition-colors">
+                  <Link
+                    href={link.href}
+                    className={`text-sm transition-colors ${
+                      link.highlight
+                        ? "text-brand-pink font-bold hover:text-brand-pink/80"
+                        : "text-gray-300 hover:text-white"
+                    }`}
+                  >
                     {link.label}
                   </Link>
                 </li>

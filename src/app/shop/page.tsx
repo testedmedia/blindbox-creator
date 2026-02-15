@@ -37,7 +37,13 @@ function ProductCard({ product }: { product: Product }) {
           <span className="text-7xl drop-shadow-sm">{product.emoji || "🎨"}</span>
         )}
         {product.badge && (
-          <span className="absolute top-3 right-3 bg-brand-pink text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10">
+          <span className={`absolute top-3 right-3 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10 ${
+            product.badge === "Best Seller" ? "bg-gradient-to-r from-orange-500 to-red-500" :
+            product.badge === "Popular" ? "bg-gradient-to-r from-brand-blue to-brand-purple" :
+            product.badge === "New" ? "bg-gradient-to-r from-brand-green to-emerald-500" :
+            "bg-brand-pink"
+          }`}>
+            {product.badge === "Best Seller" ? "🔥 " : product.badge === "Popular" ? "⭐ " : product.badge === "New" ? "✨ " : ""}
             {product.badge}
           </span>
         )}
