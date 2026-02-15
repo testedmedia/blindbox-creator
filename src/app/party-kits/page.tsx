@@ -19,11 +19,6 @@ export const metadata: Metadata = {
     "Host an unforgettable blind box birthday party or craft night! Digital party kits with templates, invitations, and planning guides.",
 };
 
-const EMOJI_MAP: Record<string, string> = {
-  "birthday-party-kit": "🎂",
-  "craft-night-kit": "🎨",
-};
-
 const PARTY_STEPS = [
   {
     icon: ClipboardList,
@@ -188,7 +183,7 @@ export default function PartyKitsPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <span className="text-4xl block mb-4">✂️</span>
           <h2 className="text-2xl md:text-3xl font-extrabold mb-4">
-            Supplies You'll Need
+            Supplies You&apos;ll Need
           </h2>
           <p className="text-muted-foreground mb-8 text-lg">
             Cardstock, scissors, and glue are all it takes. We put together a curated list of our favorite supplies

@@ -61,7 +61,7 @@ function getQuota(): number {
   return Math.max(0, MAX_FREE - parseInt(localStorage.getItem(QUOTA_KEY) || "0", 10));
 }
 
-function useQuota() {
+function consumeQuota() {
   const today = new Date().toISOString().slice(0, 10);
   localStorage.setItem(QUOTA_DATE_KEY, today);
   localStorage.setItem(QUOTA_KEY, String(parseInt(localStorage.getItem(QUOTA_KEY) || "0", 10) + 1));
@@ -145,7 +145,7 @@ export default function CreatePage() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Generation failed"); return; }
-      useQuota();
+      consumeQuota();
       setRemaining(getQuota());
       setResult(data);
     } catch {

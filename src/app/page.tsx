@@ -6,7 +6,6 @@ import { useState } from "react";
 import { Palette, Scissors, Gift, Sparkles, Star, ArrowRight, CheckCircle, Mail } from "lucide-react";
 import {
   TEMPLATE_PACKS,
-  TEMPLATE_COLLECTIONS,
   COLLECTION_GRADIENTS,
   SUBSCRIPTION_TIERS,
   formatPrice,

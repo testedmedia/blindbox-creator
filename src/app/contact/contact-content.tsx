@@ -101,12 +101,12 @@ export function ContactContent() {
             Get in Touch
           </span>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-6">
-            We'd Love to{" "}
+            We&apos;d Love to{" "}
             <span className="text-gradient">Hear From You</span>
           </h1>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Questions about templates, AI generator, bulk orders, or just want
-            to say hi? We're here to help.
+            to say hi? We&apos;re here to help.
           </p>
         </div>
       </section>

@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     try {
       await addToWaitlist(email, role);
-    } catch (dbError) {
+    } catch (_dbError) {
       // Supabase not configured yet - still accept the signup gracefully
       console.log("[waitlist] DB not available, email captured in logs:", email);
     }

@@ -22,6 +22,21 @@ if [ -f "$CODEX_SCRIPT" ]; then
   bash "$CODEX_SCRIPT" "$(pwd)" || { echo "Codex review BLOCKED deploy. Fix issues first."; exit 1; }
 fi
 
+
+# Step 1.75: Changelog verification
+echo ""
+echo "Changelog verification..."
+CHANGELOG_FILE="$(pwd)/CHANGELOG.md"
+if [ ! -f "$CHANGELOG_FILE" ]; then
+  echo "❌ CHANGELOG.md not found in project root. Create it before deploying."
+  exit 1
+fi
+if ! grep -q "v${VERSION}" "$CHANGELOG_FILE"; then
+  echo "❌ Version v${VERSION} not found in CHANGELOG.md. Update the changelog before deploying."
+  exit 1
+fi
+echo "   ✅ CHANGELOG.md contains v${VERSION}"
+
 # Step 2: Deploy to Vercel
 echo ""
 echo "Step 2: Deploying BlindBox Creator v$VERSION to Vercel..."

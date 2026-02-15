@@ -40,3 +40,16 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+.env.*
+.env.local
+.env.production
+.env.stripe
+.env.check
+credentials/
+*.key
+*.secret
+*.p12
+*.pfx
+build/
+*.msgpack
+*.xcbuilddata

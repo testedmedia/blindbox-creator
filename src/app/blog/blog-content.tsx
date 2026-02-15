@@ -162,7 +162,7 @@ export function BlogContent() {
                 More articles coming soon!
               </p>
               <p className="text-sm text-muted-foreground">
-                We're working on crafting tips, tutorials, and creative
+                We&apos;re working on crafting tips, tutorials, and creative
                 inspiration. Subscribe below to get notified.
               </p>
             </div>
@@ -228,7 +228,7 @@ export function BlogContent() {
       <section className="py-16 px-4">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-2xl font-extrabold mb-4">
-            Can't Wait for Blog Posts?
+            Can&apos;t Wait for Blog Posts?
           </h2>
           <p className="text-muted-foreground mb-6">
             Jump right into creating. Browse our template packs and start

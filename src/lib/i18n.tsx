@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 
 type Lang = "en" | "es";
 
@@ -192,19 +192,16 @@ const I18nContext = createContext<I18nContextType>({
 
 const LANG_KEY = "blindbox_lang";
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("en");
+function getInitialLang(): Lang {
+  if (typeof window === "undefined") return "en";
+  const saved = localStorage.getItem(LANG_KEY) as Lang | null;
+  if (saved && (saved === "en" || saved === "es")) return saved;
+  const browserLang = navigator.language.slice(0, 2);
+  return browserLang === "es" ? "es" : "en";
+}
 
-  useEffect(() => {
-    const saved = localStorage.getItem(LANG_KEY) as Lang | null;
-    if (saved && (saved === "en" || saved === "es")) {
-      setLangState(saved);
-    } else {
-      // Auto-detect from browser
-      const browserLang = navigator.language.slice(0, 2);
-      if (browserLang === "es") setLangState("es");
-    }
-  }, []);
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [lang, setLangState] = useState<Lang>(getInitialLang);
 
   const setLang = (newLang: Lang) => {
     setLangState(newLang);

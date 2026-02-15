@@ -22,11 +22,6 @@ export const metadata: Metadata = {
     "STEAM-powered blind box activities for classrooms. Bundles for 10 or 30 students with lesson plans, activity sheets, and assessment rubrics.",
 };
 
-const EMOJI_MAP: Record<string, string> = {
-  "classroom-30": "🏫",
-  "classroom-starter": "📚",
-};
-
 const STEAM_BENEFITS = [
   {
     icon: Brain,
@@ -272,7 +267,7 @@ export default function ClassroomPage() {
           </h2>
           <p className="text-muted-foreground mb-8 text-lg">
             Have more than 30 students? Need specific themes? Want district-level licensing?
-            Let's build a custom package that fits your needs perfectly.
+            Let&apos;s build a custom package that fits your needs perfectly.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
