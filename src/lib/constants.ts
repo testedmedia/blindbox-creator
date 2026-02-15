@@ -478,11 +478,11 @@ export const SUPPLY_LINKS = [
 ];
 
 export const NAV_LINKS = [
-  { href: "/create", label: "Create", highlight: true },
+  { href: "/create", label: "Create" },
   { href: "/shop", label: "Shop" },
   { href: "/templates", label: "Templates" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/affiliate", label: "Earn 50%" },
+  { href: "/affiliate", label: "💰 Earn 50%", highlight: true },
   { href: "/supplies", label: "Supplies" },
 ];
 

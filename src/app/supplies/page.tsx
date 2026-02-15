@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { SUPPLY_LINKS, SUPPLY_CATEGORIES, SITE_NAME, type SupplyCategory } from "@/lib/constants";
+import { SUPPLY_LINKS, SUPPLY_CATEGORIES, type SupplyCategory } from "@/lib/constants";
 import {
   Printer,
   Scissors,
@@ -12,7 +12,6 @@ import {
   Lightbulb,
   ArrowRight,
   ShoppingCart,
-  CheckCircle,
   Star,
   Package,
 } from "lucide-react";

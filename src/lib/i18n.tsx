@@ -71,6 +71,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "home.emailSending": { en: "Sending...", es: "Enviando..." },
   "home.emailButton": { en: "Send My Free Templates", es: "Enviar Mis Plantillas Gratis" },
   "home.emailSuccess": { en: "Check your inbox! Free templates are on the way.", es: "Revisa tu bandeja! Las plantillas gratis van en camino." },
+  "home.trustedBy": { en: "Trusted by 2,500+ families", es: "Confiado por mas de 2,500 familias" },
   "home.heroSubtitle": { en: "Print. Cut. Fold. Surprise! Adorable kawaii characters your whole family can make together. No glue gun, no mess, no experience needed. Just a printer and 10 minutes of family fun.", es: "Imprime. Corta. Dobla. Sorpresa! Adorables personajes kawaii que toda tu familia puede hacer juntos. Sin pistola de pegamento, sin desorden, sin experiencia. Solo una impresora y 10 minutos de diversion familiar." },
 
   // Create page
@@ -150,6 +151,38 @@ const translations: Record<string, Record<Lang, string>> = {
   "affiliate.claimIn": { en: "Claim in", es: "Reclama en" },
   "affiliate.noSignup": { en: "No signup needed", es: "Sin registro" },
 
+  // Testimonials
+  "testimonials.title": { en: "Loved by Families Everywhere", es: "Las Familias Lo Aman" },
+  "testimonials.subtitle": { en: "Trusted by 2,500+ families, teachers, and craft lovers", es: "Confiado por mas de 2,500 familias, maestros y amantes de las manualidades" },
+  "testimonial.name1": { en: "Sarah M.", es: "Sarah M." },
+  "testimonial.role1": { en: "Mom of two", es: "Mama de dos" },
+  "testimonial.quote1": { en: "My kids spent an entire rainy Saturday making these. No screens, no fights, just pure craft joy. Already bought 3 more packs.", es: "Mis hijos pasaron un sabado lluvioso completo haciendolas. Sin pantallas, sin peleas, pura alegria creativa. Ya compre 3 paquetes mas." },
+  "testimonial.name2": { en: "Ms. Rodriguez", es: "Sra. Rodriguez" },
+  "testimonial.role2": { en: "3rd Grade Teacher", es: "Maestra de 3er Grado" },
+  "testimonial.quote2": { en: "Best STEAM activity I've found in 15 years of teaching. The kids learn cutting, folding, and following instructions while having a blast.", es: "La mejor actividad STEAM que he encontrado en 15 anos de ensenanza. Los ninos aprenden a cortar, doblar y seguir instrucciones divirtiendose." },
+  "testimonial.name3": { en: "CraftMomJess", es: "CraftMomJess" },
+  "testimonial.role3": { en: "Craft Blogger", es: "Bloguera de Manualidades" },
+  "testimonial.quote3": { en: "I've reviewed hundreds of kids' craft kits. This is the only one where my daughter asks to do it again and again. The kawaii art is gorgeous.", es: "He resenado cientos de kits de manualidades para ninos. Este es el unico donde mi hija pide hacerlo una y otra vez. El arte kawaii es precioso." },
+  "testimonial.name4": { en: "David K.", es: "David K." },
+  "testimonial.role4": { en: "Dad & craft newbie", es: "Papa y novato en manualidades" },
+  "testimonial.quote4": { en: "I can barely draw a stick figure, but my daughter and I made an entire collection together. The instructions are foolproof.", es: "Apenas puedo dibujar un palito, pero mi hija y yo hicimos toda una coleccion juntos. Las instrucciones son a prueba de todo." },
+  "testimonial.name5": { en: "Amanda T.", es: "Amanda T." },
+  "testimonial.role5": { en: "Party Planner", es: "Organizadora de Fiestas" },
+  "testimonial.quote5": { en: "Used the birthday kit for a 7-year-old's party. 12 kids, zero complaints, everyone went home with their own blind box collection. Pure magic.", es: "Use el kit de cumpleanos para una fiesta de 7 anos. 12 ninos, cero quejas, todos se fueron a casa con su coleccion. Pura magia." },
+  "testimonial.name6": { en: "Luna S.", es: "Luna S." },
+  "testimonial.role6": { en: "Kawaii Collector", es: "Coleccionista Kawaii" },
+  "testimonial.quote6": { en: "The AI generator is insane. I described my cat and it turned her into the cutest chibi character. Now she's a limited edition blind box figure!", es: "El generador IA es increible. Describi a mi gata y la convirtio en el personaje chibi mas lindo. Ahora es una figura de caja sorpresa edicion limitada!" },
+
+  // Email capture modal
+  "emailModal.title": { en: "Love your character?", es: "Te gusta tu personaje?" },
+  "emailModal.desc": { en: "Get free templates, new pack drops, and exclusive tips delivered to your inbox.", es: "Recibe plantillas gratis, nuevos paquetes y tips exclusivos en tu correo." },
+  "emailModal.placeholder": { en: "your@email.com", es: "tu@email.com" },
+  "emailModal.button": { en: "Send Me Free Stuff", es: "Enviarme Cosas Gratis" },
+  "emailModal.noThanks": { en: "No thanks, I'll skip", es: "No gracias, paso" },
+  "emailModal.successTitle": { en: "You're in!", es: "Estas dentro!" },
+  "emailModal.successDesc": { en: "Check your inbox for free templates and tips.", es: "Revisa tu correo para plantillas gratis y tips." },
+  "emailModal.continue": { en: "Keep Creating", es: "Seguir Creando" },
+
   // Common
   "common.learnMore": { en: "Learn More", es: "Saber Mas" },
   "common.getStarted": { en: "Get Started", es: "Comenzar" },
@@ -175,6 +208,9 @@ const translations: Record<string, Record<Lang, string>> = {
   "footer.terms": { en: "Terms of Service", es: "Terminos de Servicio" },
   "footer.privacy": { en: "Privacy Policy", es: "Politica de Privacidad" },
   "footer.tagline": { en: "AI-powered kawaii paper blind boxes for kids, parties, and classrooms.", es: "Cajas sorpresa de papel kawaii con IA para ninos, fiestas y aulas." },
+  "footer.nlPlaceholder": { en: "your@email.com", es: "tu@email.com" },
+  "footer.nlButton": { en: "Subscribe", es: "Suscribir" },
+  "footer.nlSuccess": { en: "You're subscribed! Welcome aboard.", es: "Suscrito! Bienvenido a bordo." },
   "footer.rights": { en: "All rights reserved.", es: "Todos los derechos reservados." },
 };
 

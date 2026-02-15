@@ -8,7 +8,6 @@ import {
   TrendingUp,
   Mail,
   ExternalLink,
-  Copy,
   CheckCircle,
   Sparkles,
   Heart,
@@ -16,10 +15,9 @@ import {
   Star,
   Video,
   FileText,
-  Image as ImageIcon,
   Palette,
-  Globe,
 } from "lucide-react";
+import { CopyButton } from "@/components/copy-button";
 
 export const metadata: Metadata = {
   title: "Press Kit",
@@ -237,7 +235,7 @@ export default function PressPage() {
               <strong className="text-foreground">family-focused</strong>,{" "}
               <strong className="text-foreground">eco-friendly</strong> (zero
               plastic), and <strong className="text-foreground">accessible</strong>{" "}
-              (starting at $0). We're helping{" "}
+              (starting at $0). We&apos;re helping{" "}
               <strong className="text-foreground">2,500+ families</strong> build
               memories together, one paper craft at a time.
             </p>
@@ -430,8 +428,8 @@ export default function PressPage() {
               Interested in Partnering?
             </h3>
             <p className="text-white/80 mb-6 max-w-xl mx-auto">
-              We'd love to work with you! Email us with your media kit, audience
-              demographics, and partnership tier you're interested in.
+              We&apos;d love to work with you! Email us with your media kit, audience
+              demographics, and partnership tier you&apos;re interested in.
             </p>
             <a
               href="mailto:press@blindbox-creator.com?subject=Influencer%20Partnership%20Inquiry"
@@ -470,15 +468,7 @@ export default function PressPage() {
                       {sample.platform}
                     </h3>
                   </div>
-                  <button
-                    onClick={() =>
-                      navigator.clipboard.writeText(sample.script)
-                    }
-                    className="text-brand-blue hover:text-brand-blue/80 text-sm font-bold flex items-center gap-1"
-                  >
-                    <Copy className="w-4 h-4" />
-                    Copy
-                  </button>
+                  <CopyButton text={sample.script} />
                 </div>
                 <pre className="whitespace-pre-wrap text-sm text-muted-foreground font-sans bg-white p-4 rounded-xl border border-border">
                   {sample.script}

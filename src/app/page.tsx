@@ -11,6 +11,7 @@ import {
   formatPrice,
 } from "@/lib/constants";
 import { useTranslation } from "@/lib/i18n";
+import { Testimonials } from "@/components/testimonials";
 
 const floatingEmojis = [
   { emoji: "\u{1F338}", top: "10%", left: "5%", delay: "0s" },
@@ -134,6 +135,15 @@ export default function Home() {
                 <span className="flex items-center gap-1.5">
                   <CheckCircle className="w-4 h-4 text-brand-green" /> {t("home.perfectAges")}
                 </span>
+              </div>
+
+              <div className="mt-6 flex items-center gap-3 lg:justify-start justify-center">
+                <div className="flex -space-x-2">
+                  {["👩‍👧", "👨‍👧‍👦", "👩‍🏫", "🎨", "🎉"].map((e, i) => (
+                    <span key={i} className="w-8 h-8 rounded-full bg-brand-pink/10 flex items-center justify-center text-sm border-2 border-white">{e}</span>
+                  ))}
+                </div>
+                <span className="text-sm font-bold text-muted-foreground">{t("home.trustedBy")}</span>
               </div>
             </div>
 
@@ -312,6 +322,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ====== TESTIMONIALS ====== */}
+      <Testimonials />
 
       {/* ====== PARTY & CLASSROOM ====== */}
       <section className="bg-muted py-20">
