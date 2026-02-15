@@ -2,6 +2,16 @@
 
 All notable changes to Blind Box Creator will be documented in this file.
 
+## 2026-02-15 — v4.1.1 "Button Polish"
+
+**Deployed:** February 15, 2026
+**Lines:** +1 / -1 | **Files:** 1
+
+### Improved
+- **Email capture button** — redesigned from yellow to clean white with blue text, shadow, and scale hover animation for better visual appeal on blue gradient background
+
+---
+
 ## 2026-02-15 — v4.1.0 "Conversion Optimization"
 
 **Deployed:** February 15, 2026
