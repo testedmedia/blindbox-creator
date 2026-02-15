@@ -479,7 +479,7 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-brand-yellow text-foreground px-8 py-4 rounded-full font-bold hover:bg-brand-yellow/90 transition-colors disabled:opacity-60"
+                className="bg-white text-brand-blue px-8 py-4 rounded-full font-bold hover:bg-white/95 transition-all hover:scale-105 disabled:opacity-60 disabled:hover:scale-100 shadow-lg"
               >
                 {loading ? t("home.emailSending") : t("home.emailButton")}
               </button>
