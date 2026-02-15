@@ -310,17 +310,8 @@ export default function CreatePage() {
           {t("create.button")}
         </button>
 
-        {/* Quota dots */}
-        {remaining > 0 ? (
-          <div className="flex items-center gap-2 mb-6">
-            <div className="flex gap-1">
-              {Array.from({ length: MAX_FREE }).map((_, i) => (
-                <div key={i} className={`w-2.5 h-2.5 rounded-full ${i < remaining ? "bg-brand-green" : "bg-gray-200"}`} />
-              ))}
-            </div>
-            <span className="text-xs text-muted-foreground">{remaining} {t("create.freeLeft")}</span>
-          </div>
-        ) : (
+        {/* Quota limit reached */}
+        {remaining <= 0 && (
           <div className="bg-gradient-to-r from-brand-purple/10 to-brand-pink/10 rounded-2xl p-5 text-center border border-brand-purple/20 mb-6 max-w-lg w-full">
             <Crown className="w-6 h-6 text-brand-purple mx-auto mb-2" />
             <p className="font-bold mb-1">{t("create.dailyLimit")}</p>

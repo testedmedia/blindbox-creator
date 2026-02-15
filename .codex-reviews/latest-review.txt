@@ -1,0 +1,5 @@
+VERDICT: PASS
+ISSUES: 0
+CRITICAL: 0
+---
+No issues found. The diff only adds configuration and dependency metadata; no application logic, secrets, or schema changes are present.

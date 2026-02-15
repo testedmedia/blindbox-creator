@@ -1,0 +1,43 @@
+# .greptile.yml - Blind Box Creator (AI Product Generator)
+# Automated PR review configuration for Greptile
+
+# Review focus areas
+focus:
+  - security
+  - correctness
+  - performance
+
+# Files to always review carefully
+critical_paths:
+  - "app/api/**"
+  - "lib/auth*"
+  - "lib/ai*"
+  - "middleware*"
+
+# Files to skip in review
+ignore:
+  - "*.test.ts"
+  - "*.spec.ts"
+  - "__fixtures__/**"
+  - "public/**"
+  - "node_modules/**"
+  - ".next/**"
+
+# Custom rules
+rules:
+  - name: "No exposed secrets"
+    pattern: "(sk-|ghp_|Bearer |AKIA|password\\s*=|OPENAI_API|ANTHROPIC_API)"
+    severity: critical
+    message: "Potential secret detected in code"
+
+  - name: "No direct DB queries in components"
+    pattern: "supabase\\.(from|rpc)\\("
+    paths: "components/**"
+    severity: warning
+    message: "Database queries should be in lib/ or API routes, not components"
+
+  - name: "No console.log in production"
+    pattern: "console\\.log\\("
+    paths: "app/**"
+    severity: info
+    message: "Remove console.log before deploy"
