@@ -80,7 +80,7 @@ export default function AboutPage() {
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             We watched our kids obsess over blind boxes at the store, and we
             thought: what if they could create their own? What if the surprise
-            wasn't what you buy, but what you imagine?
+            wasn&apos;t what you buy, but what you imagine?
           </p>
         </div>
       </section>
@@ -110,11 +110,11 @@ export default function AboutPage() {
                 <p>
                   We thought: what if we could make this easier for every
                   family? What if AI could help kids design characters they
-                  couldn't draw themselves? What if a printer and some cardstock
+                  couldn&apos;t draw themselves? What if a printer and some cardstock
                   was all you needed?
                 </p>
                 <p className="font-semibold text-foreground">
-                  That's how Blind Box Generator was born. No plastic, no
+                  That&apos;s how Blind Box Generator was born. No plastic, no
                   shipping, no waste. Just paper, imagination, and the thrill of
                   the unbox.
                 </p>

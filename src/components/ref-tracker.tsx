@@ -4,13 +4,37 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Gift, X, Clock } from "lucide-react";
 
+function getInitialRefState(): { showBanner: boolean; hoursLeft: number } {
+  if (typeof window === "undefined") return { showBanner: false, hoursLeft: 24 };
+
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get("ref");
+
+  if (ref && ref.length >= 4) {
+    return { showBanner: true, hoursLeft: 24 };
+  }
+
+  const creditTs = localStorage.getItem("blindbox_credit_ts");
+  const creditDismissed = localStorage.getItem("blindbox_credit_dismissed");
+  if (creditTs && !creditDismissed) {
+    const elapsed = Date.now() - parseInt(creditTs, 10);
+    const remaining = 24 * 60 * 60 * 1000 - elapsed;
+    if (remaining > 0) {
+      return { showBanner: true, hoursLeft: Math.ceil(remaining / (60 * 60 * 1000)) };
+    }
+  }
+
+  return { showBanner: false, hoursLeft: 24 };
+}
+
 export function RefTracker() {
-  const [showBanner, setShowBanner] = useState(false);
+  const [initialState] = useState(getInitialRefState);
+  const [showBanner, setShowBanner] = useState(initialState.showBanner);
   const [dismissed, setDismissed] = useState(false);
-  const [hoursLeft, setHoursLeft] = useState(24);
+  const [hoursLeft, setHoursLeft] = useState(initialState.hoursLeft);
 
   useEffect(() => {
-    // Check for ?ref= in URL
+    // Check for ?ref= in URL and handle side effects (fetch, localStorage, URL cleanup)
     const params = new URLSearchParams(window.location.search);
     const ref = params.get("ref");
 
@@ -26,25 +50,10 @@ export function RefTracker() {
       localStorage.setItem("blindbox_ref", ref);
       localStorage.setItem("blindbox_credit_ts", Date.now().toString());
 
-      // Show credit banner
-      setShowBanner(true);
-
       // Clean URL without reload
       const url = new URL(window.location.href);
       url.searchParams.delete("ref");
       window.history.replaceState({}, "", url.pathname + url.search);
-    } else {
-      // Check if there's an existing credit that hasn't expired
-      const creditTs = localStorage.getItem("blindbox_credit_ts");
-      const creditDismissed = localStorage.getItem("blindbox_credit_dismissed");
-      if (creditTs && !creditDismissed) {
-        const elapsed = Date.now() - parseInt(creditTs, 10);
-        const remaining = 24 * 60 * 60 * 1000 - elapsed;
-        if (remaining > 0) {
-          setHoursLeft(Math.ceil(remaining / (60 * 60 * 1000)));
-          setShowBanner(true);
-        }
-      }
     }
   }, []);
 

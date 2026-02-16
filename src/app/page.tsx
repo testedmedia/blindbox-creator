@@ -6,12 +6,12 @@ import { useState } from "react";
 import { Palette, Scissors, Gift, Sparkles, Star, ArrowRight, CheckCircle, Mail } from "lucide-react";
 import {
   TEMPLATE_PACKS,
-  TEMPLATE_COLLECTIONS,
   COLLECTION_GRADIENTS,
   SUBSCRIPTION_TIERS,
   formatPrice,
 } from "@/lib/constants";
 import { useTranslation } from "@/lib/i18n";
+import { Testimonials } from "@/components/testimonials";
 
 const floatingEmojis = [
   { emoji: "\u{1F338}", top: "10%", left: "5%", delay: "0s" },
@@ -135,6 +135,15 @@ export default function Home() {
                 <span className="flex items-center gap-1.5">
                   <CheckCircle className="w-4 h-4 text-brand-green" /> {t("home.perfectAges")}
                 </span>
+              </div>
+
+              <div className="mt-6 flex items-center gap-3 lg:justify-start justify-center">
+                <div className="flex -space-x-2">
+                  {["👩‍👧", "👨‍👧‍👦", "👩‍🏫", "🎨", "🎉"].map((e, i) => (
+                    <span key={i} className="w-8 h-8 rounded-full bg-brand-pink/10 flex items-center justify-center text-sm border-2 border-white">{e}</span>
+                  ))}
+                </div>
+                <span className="text-sm font-bold text-muted-foreground">{t("home.trustedBy")}</span>
               </div>
             </div>
 
@@ -314,6 +323,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ====== TESTIMONIALS ====== */}
+      <Testimonials />
+
       {/* ====== PARTY & CLASSROOM ====== */}
       <section className="bg-muted py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -467,7 +479,7 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-brand-yellow text-foreground px-8 py-4 rounded-full font-bold hover:bg-brand-yellow/90 transition-colors disabled:opacity-60"
+                className="bg-white text-brand-blue px-8 py-4 rounded-full font-bold hover:bg-white/95 transition-all hover:scale-105 disabled:opacity-60 disabled:hover:scale-100 shadow-lg"
               >
                 {loading ? t("home.emailSending") : t("home.emailButton")}
               </button>

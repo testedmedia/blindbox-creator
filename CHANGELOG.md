@@ -2,6 +2,78 @@
 
 All notable changes to Blind Box Creator will be documented in this file.
 
+## 2026-02-15 — v4.1.1 "Button Polish"
+
+**Deployed:** February 15, 2026
+**Lines:** +1 / -1 | **Files:** 1
+
+### Improved
+- **Email capture button** — redesigned from yellow to clean white with blue text, shadow, and scale hover animation for better visual appeal on blue gradient background
+
+---
+
+## 2026-02-15 — v4.1.0 "Conversion Optimization"
+
+**Deployed:** February 15, 2026
+**Lines:** +1,266 / -355 | **Files:** 30
+
+### Added
+- **Exit-intent popup** — captures abandoning visitors with free template pack offer, shows on mouse leave from top
+- **Trust badges component** — 4-badge component (30-day guarantee, instant download, 2.5k families, print unlimited)
+- **Guarantee badge** — prominent 30-day money-back guarantee on pricing page
+- **CopyButton client component** — extracted from press page for client-side clipboard functionality
+- **Affiliate program promotion** — "💰 Earn 50%" highlighted in navbar (pink) and footer
+
+### Fixed
+- **Press page server component error** — onClick handler moved to CopyButton client component
+- **All ESLint errors** — unescaped quotes (`'` → `&apos;`, `"` → `&quot;`)
+- **TypeScript build error** — share-buttons.tsx rarity parameter handling (`...(rarity && { rarity })`)
+- **Unused imports** — removed Image, ImageIcon, Globe, CheckCircle, Heart, SITE_NAME, _dbError
+
+### Improved
+- **Pricing page conversion** — added guarantee badge + 4 trust badges below pricing tiers
+- **Affiliate visibility** — navbar shows "💰 Earn 50%" instead of "Earn 50%", pink highlight
+- **Footer links** — "💰 Earn 50% Commission" highlighted in company section
+- **Email capture strategy** — exit-intent targeting with instant gratification (free pack)
+
+### Environment
+- No new environment variables
+
+---
+
+## 2026-02-15 — v4.0 "Growth Engine"
+
+**Deployed:** February 15, 2026
+**Lines:** +1,200 / -100 | **Files:** 20
+
+### Added
+- **Dynamic sitemap** (`/sitemap.xml`) — all 81 products, 16 static pages, 4 blog posts auto-indexed
+- **Google Analytics 4** — gtag script + `trackEvent()` helper for custom events (generate, share, signup, checkout)
+- **Product page SEO** — `generateMetadata()` with dynamic title/description/OG per product + `generateStaticParams()` for all 81 products
+- **JSON-LD structured data** — Product schema on every product page for Google rich snippets
+- **OG images** — root metadata + per-product pack cover images as OpenGraph/Twitter cards
+- **Social share buttons** — Twitter/X, Pinterest, WhatsApp, Facebook on AI generator result page
+- **Email capture modal** — shows 2s after first AI generation, posts to waitlist, one-time per browser
+- **Post-purchase confirmation email** — Resend HTML email with order summary, print instructions, supplies upsell, affiliate CTA
+- **Testimonials section** — 6 testimonials (parents, teachers, bloggers, planners) on home page with i18n
+- **"Trusted by 2,500+ families"** social proof counter in hero section
+- **Newsletter signup in footer** — email form posts to `/api/waitlist` with `role: "newsletter"`
+- **Urgency banner** on pricing page ("Founding member pricing won't last forever")
+- **Color-coded badges** on shop page (🔥 Best Seller=red, ⭐ Popular=blue, ✨ New=green)
+- **Social proof counters** on product detail pages ("X families chose this pack")
+- **SEO metadata** for 6 pages that were missing it (`/shop`, `/templates`, `/create`, `/supplies`, `/affiliate`, `/print`)
+- 30+ new i18n keys (EN/ES) for testimonials, newsletter, email modal
+
+### Changed
+- Product detail page refactored from single client component to server (metadata/JSON-LD) + client (UI) split
+- Webhook now sends order confirmation email after `checkout.session.completed`
+
+### Environment
+- `NEXT_PUBLIC_GA_ID` — Google Analytics 4 measurement ID (placeholder until configured)
+- `RESEND_API_KEY` — Resend email API key (for post-purchase emails)
+
+---
+
 ## 2026-02-12 — v3.4 "Paper Craft"
 
 **Deployed:** February 12, 2026 - 8:00 PM CT

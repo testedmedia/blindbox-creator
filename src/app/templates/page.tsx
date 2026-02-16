@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { CheckCircle, ArrowRight, Package, Printer, FileText, BookOpen, ShoppingCart, Heart } from "lucide-react";
+import { CheckCircle, ArrowRight, Package, Printer, FileText, BookOpen, ShoppingCart } from "lucide-react";
 import { TEMPLATE_PACKS, TEMPLATE_COLLECTIONS, COLLECTION_GRADIENTS, formatPrice } from "@/lib/constants";
 
 const INCLUDED = [

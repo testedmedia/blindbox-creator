@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState } from "react";
 import { Printer, Scissors, ArrowLeft, Package } from "lucide-react";
 import Link from "next/link";
 import { TEMPLATE_PACKS } from "@/lib/constants";
@@ -18,15 +18,16 @@ function PrintTemplate() {
   const packId = params.get("pack") || "";
 
   // Resolve image URL: from query param or sessionStorage (for base64 images)
-  const [imageUrl, setImageUrl] = useState(imgParam);
-  useEffect(() => {
-    if (!imgParam && storageKey) {
+  const [imageUrl] = useState(() => {
+    if (imgParam) return imgParam;
+    if (storageKey) {
       try {
         const stored = sessionStorage.getItem(storageKey);
-        if (stored) setImageUrl(stored);
+        if (stored) return stored;
       } catch { /* no-op */ }
     }
-  }, [imgParam, storageKey]);
+    return "";
+  });
 
   // If pack is specified, use the pack's product image
   const pack = packId ? PACK_MAP.get(packId) : null;

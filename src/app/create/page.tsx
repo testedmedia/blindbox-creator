@@ -16,6 +16,8 @@ import {
   Scissors,
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
+import { ShareButtons } from "@/components/share-buttons";
+import { EmailCaptureModal } from "@/components/email-capture-modal";
 
 const EXAMPLES = [
   "A cute girl picnicking with her stuffed animals",
@@ -61,7 +63,7 @@ function getQuota(): number {
   return Math.max(0, MAX_FREE - parseInt(localStorage.getItem(QUOTA_KEY) || "0", 10));
 }
 
-function useQuota() {
+function consumeQuota() {
   const today = new Date().toISOString().slice(0, 10);
   localStorage.setItem(QUOTA_DATE_KEY, today);
   localStorage.setItem(QUOTA_KEY, String(parseInt(localStorage.getItem(QUOTA_KEY) || "0", 10) + 1));
@@ -145,7 +147,7 @@ export default function CreatePage() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Generation failed"); return; }
-      useQuota();
+      consumeQuota();
       setRemaining(getQuota());
       setResult(data);
     } catch {
@@ -239,6 +241,10 @@ export default function CreatePage() {
           >
             <Scissors className="w-4 h-4" /> {t("create.getPrintable")}
           </Link>
+          {/* Share buttons */}
+          <div className="flex justify-center mb-3">
+            <ShareButtons />
+          </div>
           <div className="bg-brand-blue/5 rounded-xl p-3 text-center">
             <p className="text-sm font-semibold text-brand-blue">
               {t("create.printTip")}{" "}
@@ -246,6 +252,7 @@ export default function CreatePage() {
             </p>
           </div>
         </div>
+        <EmailCaptureModal show={true} />
       </div>
     );
   }
