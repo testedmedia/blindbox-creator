@@ -1,7 +1,7 @@
 export const SITE_NAME = "Blind Box Generator";
 export const SITE_DESCRIPTION = "Create kawaii paper blind boxes with AI-generated Japanese-style characters. Print, fold, and surprise!";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://blindbox-creator.vercel.app";
-export const VERSION = "v4.0";
+export const VERSION = "v4.1.1";
 
 export const BRAND = {
   blue: "#4A90D9",

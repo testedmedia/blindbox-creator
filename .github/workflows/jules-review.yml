@@ -1,20 +1,138 @@
-name: Jules PR Review
+name: Jules PR Review (Gemini 2.5 Flash)
+
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
-  label:
+  jules-review:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
     steps:
-      - uses: actions/github-script@v7
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get PR diff
+        id: diff
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+          else
+            PR_NUMBER=$(gh pr list --head "${{ github.ref_name }}" --json number -q '.[0].number')
+          fi
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No PR found for this branch."
+            echo "has_diff=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
+          DIFF=$(gh pr diff "$PR_NUMBER" --repo "${{ github.repository }}" 2>/dev/null || echo "")
+
+          if [ -z "$DIFF" ]; then
+            echo "has_diff=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "has_diff=true" >> "$GITHUB_OUTPUT"
+
+          # Truncate diff to 12000 chars to stay within Gemini token limits
+          DIFF_TRUNCATED=$(echo "$DIFF" | head -c 12000)
+          echo "$DIFF_TRUNCATED" > /tmp/pr_diff.txt
+
+      - name: Call Gemini 2.5 Flash for review
+        if: steps.diff.outputs.has_diff == 'true'
+        id: gemini
+        env:
+          JULES_API_KEY: ${{ secrets.JULES_API_KEY }}
+        run: |
+          DIFF_CONTENT=$(cat /tmp/pr_diff.txt | jq -Rsa .)
+
+          PROMPT="You are Jules, an expert code reviewer. Review this pull request diff and provide:\n\n1. **Summary** — What this PR does in 2-3 sentences\n2. **Issues** — Any bugs, security concerns, or logic errors (label severity: CRITICAL / WARNING / INFO)\n3. **Suggestions** — Concrete improvements with code examples where helpful\n4. **Verdict** — APPROVE, REQUEST_CHANGES, or COMMENT\n\nBe concise and actionable. Focus on real problems, not style nits.\n\nDiff:\n${DIFF_CONTENT}"
+
+          PAYLOAD=$(jq -n \
+            --arg prompt "$PROMPT" \
+            '{
+              "contents": [{"parts": [{"text": $prompt}]}],
+              "generationConfig": {
+                "temperature": 0.3,
+                "maxOutputTokens": 2048
+              }
+            }')
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${JULES_API_KEY}" \
+            -d "$PAYLOAD" \
+            --max-time 60)
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "Gemini API returned HTTP $HTTP_CODE"
+            echo "$BODY" | head -20
+            echo "review_text=Jules review failed: Gemini API returned HTTP $HTTP_CODE. Check that JULES_API_KEY secret is configured." >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Extract text from Gemini response
+          REVIEW=$(echo "$BODY" | jq -r '.candidates[0].content.parts[0].text // "No review generated."')
+
+          # Write to file to avoid shell escaping issues
+          echo "$REVIEW" > /tmp/review.txt
+          echo "review_success=true" >> "$GITHUB_OUTPUT"
+
+      - name: Post review comment on PR
+        if: steps.diff.outputs.has_diff == 'true'
+        uses: actions/github-script@v7
         with:
           script: |
+            const fs = require('fs');
+            const prNumber = parseInt('${{ steps.diff.outputs.pr_number }}');
+
+            let reviewText;
+            const success = '${{ steps.gemini.outputs.review_success }}' === 'true';
+
+            if (success && fs.existsSync('/tmp/review.txt')) {
+              reviewText = fs.readFileSync('/tmp/review.txt', 'utf8');
+            } else {
+              reviewText = '${{ steps.gemini.outputs.review_text }}' || 'Review could not be generated.';
+            }
+
+            const body = `## 🤖 Jules Review (Gemini)\n\n${reviewText}\n\n---\n*Automated review by Jules (Gemini 2.5 Flash) — Debug Quad Layer 3*`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: body
+            });
+
+      - name: Add jules label
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = '${{ steps.diff.outputs.pr_number }}';
+            if (!prNumber) return;
+
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
+              issue_number: parseInt(prNumber),
               labels: ['jules']
             });
