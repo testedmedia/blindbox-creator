@@ -212,6 +212,54 @@ const translations: Record<string, Record<Lang, string>> = {
   "footer.nlButton": { en: "Subscribe", es: "Suscribir" },
   "footer.nlSuccess": { en: "You're subscribed! Welcome aboard.", es: "Suscrito! Bienvenido a bordo." },
   "footer.rights": { en: "All rights reserved.", es: "Todos los derechos reservados." },
+
+  // Exit-intent popup
+  "exitPopup.title": { en: "Wait! Get a Free Template Pack", es: "Espera! Obtene un Paquete Gratis" },
+  "exitPopup.subtitle": {
+    en: "Join 2,500+ families crafting kawaii blind boxes. Get a free starter pack + 15% off your first order!",
+    es: "Unite a mas de 2,500 familias creando cajas sorpresa kawaii. Obtene un paquete gratis + 15% de descuento en tu primera compra!",
+  },
+  "exitPopup.useCode": { en: "Use code", es: "Usa el codigo" },
+  "exitPopup.emailPlaceholder": { en: "your@email.com", es: "tu@email.com" },
+  "exitPopup.cta": { en: "Claim My 15% Off + Free Pack", es: "Reclamar Mi 15% + Paquete Gratis" },
+  "exitPopup.sending": { en: "Sending...", es: "Enviando..." },
+  "exitPopup.noThanks": { en: "No thanks, I'll pay full price", es: "No gracias, prefiero pagar precio completo" },
+  "exitPopup.socialProof": { en: "2,500+ families trust Blind Box Creator", es: "Mas de 2,500 familias confian en Blind Box Creator" },
+  "exitPopup.successTitle": { en: "You're In!", es: "Estas Dentro!" },
+  "exitPopup.successDesc": {
+    en: "Check your inbox for your free template pack and discount code!",
+    es: "Revisa tu correo para tu paquete gratis y codigo de descuento!",
+  },
+  "exitPopup.continue": { en: "Keep Exploring", es: "Seguir Explorando" },
+  "exitPopup.close": { en: "Close", es: "Cerrar" },
+
+  // Social proof banner
+  "socialProof.purchase1": { en: "Sarah from Texas just purchased Chibi Animals Pack!", es: "Sarah de Texas acaba de comprar el Paquete Chibi Animals!" },
+  "socialProof.purchase2": { en: "Emily from Florida got the Birthday Party Kit!", es: "Emily de Florida compro el Kit de Fiesta de Cumpleanos!" },
+  "socialProof.purchase3": { en: "Ms. Chen ordered Classroom Bundle for 30 students!", es: "Sra. Chen pidio el Paquete Escolar para 30 estudiantes!" },
+  "socialProof.purchase4": { en: "David from California just got Magical Girls Pack!", es: "David de California acaba de comprar el Paquete Magical Girls!" },
+  "socialProof.purchase5": { en: "Luna from New York got the Kawaii Desserts Pack!", es: "Luna de Nueva York compro el Paquete Kawaii Desserts!" },
+  "socialProof.purchase6": { en: "Mr. Lee ordered Classroom Bundle for his 3rd graders!", es: "Sr. Lee pidio el Paquete Escolar para sus alumnos de 3er grado!" },
+  "socialProof.stat1": { en: "47 creators made blind boxes today!", es: "47 creadores hicieron cajas sorpresa hoy!" },
+  "socialProof.stat2": { en: "1,200+ templates printed this week!", es: "Mas de 1,200 plantillas impresas esta semana!" },
+  "socialProof.stat3": { en: "15 teachers signed up this week!", es: "15 maestros se registraron esta semana!" },
+  "socialProof.stat4": { en: "Trending: Chibi Kitty Club is the #1 pack this week!", es: "Tendencia: Chibi Kitty Club es el paquete #1 esta semana!" },
+  "socialProof.justNow": { en: "just now", es: "ahora" },
+  "socialProof.close": { en: "Dismiss", es: "Cerrar" },
+
+  // Referral tiers
+  "referral.yourProgress": { en: "Your Referral Progress", es: "Tu Progreso de Referidos" },
+  "referral.currentTier": { en: "Current Tier", es: "Nivel Actual" },
+  "referral.nextReward": { en: "Next Reward", es: "Siguiente Recompensa" },
+  "referral.referralsToNext": { en: "referrals to next tier", es: "referidos para el siguiente nivel" },
+  "referral.referrals": { en: "referrals", es: "referidos" },
+  "referral.unlocked": { en: "Unlocked", es: "Desbloqueado" },
+  "referral.locked": { en: "Locked", es: "Bloqueado" },
+  "referral.current": { en: "You are here", es: "Estas aqui" },
+  "referral.rewardTiers": { en: "Reward Tiers", es: "Niveles de Recompensa" },
+  "referral.rewardTiersDesc": { en: "Share your link and unlock rewards as you go", es: "Comparte tu enlace y desbloquea recompensas" },
+  "referral.maxTier": { en: "You reached the top!", es: "Llegaste a la cima!" },
+  "referral.conversions": { en: "conversions", es: "conversiones" },
 };
 
 interface I18nContextType {

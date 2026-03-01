@@ -12,6 +12,116 @@ export const BRAND = {
   orange: "#FF8C42",
 } as const;
 
+// ═══════════════════════════════════════════════
+// REFERRAL TIER SYSTEM
+// ═══════════════════════════════════════════════
+
+export interface ReferralTier {
+  id: string;
+  name: string;
+  nameEs: string;
+  emoji: string;
+  referralsRequired: number;
+  rewardType: "credit" | "pack" | "pro_year" | "cash" | "custom_pack";
+  rewardLabel: string;
+  rewardLabelEs: string;
+  rewardValueCents: number;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+}
+
+export const REFERRAL_TIERS: ReferralTier[] = [
+  {
+    id: "seedling",
+    name: "Seedling",
+    nameEs: "Semilla",
+    emoji: "\uD83C\uDF31",
+    referralsRequired: 1,
+    rewardType: "credit",
+    rewardLabel: "$5 credit",
+    rewardLabelEs: "$5 de credito",
+    rewardValueCents: 500,
+    color: "text-emerald-400",
+    bgColor: "bg-emerald-500/10",
+    borderColor: "border-emerald-500/30",
+  },
+  {
+    id: "blossom",
+    name: "Blossom",
+    nameEs: "Flor",
+    emoji: "\uD83C\uDF38",
+    referralsRequired: 3,
+    rewardType: "pack",
+    rewardLabel: "Free pack ($4.99)",
+    rewardLabelEs: "Paquete gratis ($4.99)",
+    rewardValueCents: 499,
+    color: "text-pink-400",
+    bgColor: "bg-pink-500/10",
+    borderColor: "border-pink-500/30",
+  },
+  {
+    id: "star",
+    name: "Rising Star",
+    nameEs: "Estrella",
+    emoji: "\u2B50",
+    referralsRequired: 10,
+    rewardType: "pro_year",
+    rewardLabel: "Founding Pro (1 year)",
+    rewardLabelEs: "Pro Fundador (1 ano)",
+    rewardValueCents: 30000,
+    color: "text-amber-400",
+    bgColor: "bg-amber-500/10",
+    borderColor: "border-amber-500/30",
+  },
+  {
+    id: "legend",
+    name: "Legend",
+    nameEs: "Leyenda",
+    emoji: "\uD83D\uDC51",
+    referralsRequired: 50,
+    rewardType: "cash",
+    rewardLabel: "$500 cash payout",
+    rewardLabelEs: "$500 en efectivo",
+    rewardValueCents: 50000,
+    color: "text-orange-400",
+    bgColor: "bg-orange-500/10",
+    borderColor: "border-orange-500/30",
+  },
+  {
+    id: "diamond",
+    name: "Diamond",
+    nameEs: "Diamante",
+    emoji: "\uD83D\uDC8E",
+    referralsRequired: 100,
+    rewardType: "custom_pack",
+    rewardLabel: "Custom co-branded pack",
+    rewardLabelEs: "Paquete personalizado co-branded",
+    rewardValueCents: 0,
+    color: "text-cyan-400",
+    bgColor: "bg-cyan-500/10",
+    borderColor: "border-cyan-500/30",
+  },
+];
+
+export function getCurrentTier(conversions: number): ReferralTier {
+  for (let i = REFERRAL_TIERS.length - 1; i >= 0; i--) {
+    if (conversions >= REFERRAL_TIERS[i].referralsRequired) {
+      return REFERRAL_TIERS[i];
+    }
+  }
+  return REFERRAL_TIERS[0];
+}
+
+export function getNextTier(conversions: number): ReferralTier | null {
+  for (const tier of REFERRAL_TIERS) {
+    if (conversions < tier.referralsRequired) {
+      return tier;
+    }
+  }
+  return null;
+}
+
 export interface Product {
   id: string;
   name: string;

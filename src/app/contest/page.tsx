@@ -1,14 +1,53 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Trophy, Gift, Star, Upload, Instagram, CheckCircle, Clock } from "lucide-react";
+import { SITE_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Win $500 + Featured Pack | UGC Contest",
   description:
-    "Show us your blind box creation and win $500 cash plus your own featured template pack! Contest ends soon.",
+    "Show us your blind box creation and win $500 cash plus your own featured template pack! Contest ends Feb 29, 2026.",
+  alternates: {
+    canonical: "/contest",
+  },
   openGraph: {
     title: "Win $500 + Featured Pack | Blind Box Creator Contest",
     description: "Show us your best blind box creation for a chance to win big!",
+    images: [{ url: `${SITE_URL}/og-default.png`, width: 1200, height: 630, alt: "Blind Box Creator UGC Contest" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Win $500 + Featured Pack | Blind Box Creator Contest",
+    description: "Show us your best blind box creation for a chance to win big!",
+    images: [`${SITE_URL}/og-default.png`],
+  },
+};
+
+const contestJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Event",
+  name: "Blind Box Creator UGC Contest - Win $500 + Featured Pack",
+  description:
+    "Show us your best blind box creation for a chance to win $500 cash plus your character designs turned into an official template pack.",
+  startDate: "2026-02-01",
+  endDate: "2026-02-29T23:59:00-08:00",
+  eventStatus: "https://schema.org/EventScheduled",
+  eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+  location: {
+    "@type": "VirtualLocation",
+    url: `${SITE_URL}/contest`,
+  },
+  organizer: {
+    "@type": "Organization",
+    name: "Blind Box Creator",
+    url: SITE_URL,
+  },
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+    availability: "https://schema.org/InStock",
+    url: `${SITE_URL}/contest`,
   },
 };
 
@@ -68,6 +107,11 @@ const judgingCriteria = [
 
 export default function ContestPage() {
   return (
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(contestJsonLd) }}
+    />
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="bg-gradient-to-b from-pink-50 to-white py-16 px-4">
@@ -334,5 +378,6 @@ export default function ContestPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

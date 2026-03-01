@@ -17,6 +17,7 @@ import {
   Wallet,
   Lock,
 } from "lucide-react";
+import { ReferralTiers } from "@/components/referral-tiers";
 
 const SHARE_PLATFORMS = [
   { id: "twitter", label: "Twitter/X", icon: "\u{1D54F}", color: "bg-black text-white" },
@@ -407,6 +408,11 @@ export default function AffiliatePage() {
               <p className="text-xs text-muted-foreground">{stat.label}</p>
             </div>
           ))}
+        </div>
+
+        {/* Referral Tier Progress */}
+        <div className="mb-6">
+          <ReferralTiers conversions={Math.floor(clicks * 0.02)} />
         </div>
 
         {/* Your Link */}

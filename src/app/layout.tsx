@@ -15,6 +15,10 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://blindbox-creator.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
   title: {
     default: "Blind Box Generator - Create Magical Paper Blind Boxes with AI",
     template: "%s | Blind Box Generator",
@@ -45,6 +49,29 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Blind Box Generator",
+  url: "https://blindbox-creator.vercel.app",
+  logo: "https://blindbox-creator.vercel.app/og-default.png",
+  description:
+    "Create magical paper blind boxes with AI-generated characters. Print, fold, and surprise!",
+  sameAs: [],
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Blind Box Generator",
+  url: "https://blindbox-creator.vercel.app",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://blindbox-creator.vercel.app/shop?q={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -52,6 +79,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={nunito.variable}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteJsonLd),
+          }}
+        />
+      </head>
       <body className="min-h-screen flex flex-col">
         <GoogleAnalytics />
         <Providers>

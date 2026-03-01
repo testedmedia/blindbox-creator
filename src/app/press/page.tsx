@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_NAME } from "@/lib/constants";
+import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import {
   Download,
   Camera,
@@ -23,10 +23,37 @@ export const metadata: Metadata = {
   title: "Press Kit",
   description:
     "Press kit and media resources for Blind Box Creator. Brand assets, statistics, influencer partnerships, and media contact information.",
+  alternates: {
+    canonical: "/press",
+  },
   openGraph: {
     title: `Press Kit | ${SITE_NAME}`,
     description:
       "Brand assets, stats, and partnership opportunities for Blind Box Creator.",
+    images: [{ url: `${SITE_URL}/og-default.png`, width: 1200, height: 630, alt: "Blind Box Creator Press Kit" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Press Kit | ${SITE_NAME}`,
+    description:
+      "Brand assets, stats, and partnership opportunities for Blind Box Creator.",
+    images: [`${SITE_URL}/og-default.png`],
+  },
+};
+
+const pressJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Blind Box Creator",
+  url: SITE_URL,
+  logo: `${SITE_URL}/og-default.png`,
+  description:
+    "AI-powered kawaii blind box paper crafts for families, teachers, and crafters.",
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "press@blindbox-creator.com",
+    contactType: "press",
+    availableLanguage: ["English", "Spanish"],
   },
 };
 
@@ -148,6 +175,11 @@ Timestamps:
 
 export default function PressPage() {
   return (
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(pressJsonLd) }}
+    />
     <div className="min-h-screen">
       {/* Hero */}
       <section className="py-16 sm:py-24 px-4 bg-gradient-to-b from-pink-50 to-white">
@@ -538,5 +570,6 @@ export default function PressPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }
