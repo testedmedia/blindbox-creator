@@ -197,7 +197,7 @@ jobs:
             body += `| Files Reviewed | ${review.metrics.filesReviewed} |\n`;
             body += `| Issues Found | ${review.metrics.issuesFound} |\n`;
             body += `| Changed Files | ${{ steps.changes.outputs.count }} |\n`;
-            body += `| Auto-Fix | ${review.findings.filter(f => f.severity === 'high' || f.severity === 'medium').length > 0 ? 'Triggered' : 'Not needed'} |\n\n`;
+            body += `| Auto-Fix | ${review.findings.filter(f => f.severity === 'high').length > 0 ? 'Triggered' : 'Not needed'} |\n\n`;
 
             if (review.findings.length > 0) {
               body += '### Findings\n\n';
@@ -230,7 +230,7 @@ jobs:
               description: `${review.metrics.issuesFound} issue(s) in ${review.metrics.filesReviewed} files`
             });
 
-            const fixable = review.findings.filter(f => f.severity === 'high' || f.severity === 'medium');
+            const fixable = review.findings.filter(f => f.severity === 'high');
             core.setOutput('has_fixable', fixable.length > 0 ? 'true' : 'false');
             core.setOutput('fixable_count', fixable.length.toString());
 
@@ -247,7 +247,7 @@ jobs:
           const path = require('path');
 
           const review = JSON.parse(fs.readFileSync('deep_review.json', 'utf8'));
-          const fixable = review.findings.filter(f => f.severity === 'high' || f.severity === 'medium');
+          const fixable = review.findings.filter(f => f.severity === 'high');
 
           if (fixable.length === 0) { console.log('No fixable issues found'); process.exit(0); }
 
