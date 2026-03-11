@@ -5,6 +5,10 @@ on:
     types: [opened, synchronize, reopened]
     branches: [master, main]
 
+concurrency:
+  group: deep-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
   pull-requests: write
@@ -393,7 +397,7 @@ jobs:
           Triggered by: Layer 4 Deep Review (Claude Sonnet 4.6)
           Auto-generated — review the changes before merging."
 
-          git push
+          git push 2>&1 || echo "PUSH_FAILED=true" >> $GITHUB_ENV
           echo "Auto-fix committed and pushed to PR branch"
 
       - name: Post auto-fix comment
