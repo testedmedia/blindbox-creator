@@ -1,0 +1,336 @@
+name: "AI Review / Layer 4 (Deep Review + Auto-Fix)"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [master, main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  deep-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    if: >-
+      !contains(github.event.pull_request.title, '[auto-fix]') &&
+      github.event.pull_request.user.login != 'debug-quad[bot]'
+    steps:
+      - name: Check for auto-fix loop
+        id: loop_check
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const commits = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              per_page: 5
+            });
+            const lastCommit = commits.data[commits.data.length - 1];
+            const isAutoFix = lastCommit?.commit?.message?.startsWith('fix(auto):') ||
+                              lastCommit?.commit?.author?.name === 'Debug Quad Auto-Fix';
+            core.setOutput('skip', isAutoFix ? 'true' : 'false');
+
+      - name: Checkout
+        if: steps.loop_check.outputs.skip != 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get changed files and diff
+        if: steps.loop_check.outputs.skip != 'true'
+        id: changes
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD > changed_files.txt
+          git diff -U3 origin/${{ github.event.pull_request.base.ref }}...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' > code_diff.txt
+
+          FILES=$(cat changed_files.txt | tr '\n' ', ' | sed 's/,$//')
+          COUNT=$(wc -l < changed_files.txt | tr -d ' ')
+
+          DIFF_SIZE=$(wc -c < code_diff.txt)
+          if [ "$DIFF_SIZE" -gt 60000 ]; then
+            head -c 60000 code_diff.txt > code_diff_trunc.txt
+            mv code_diff_trunc.txt code_diff.txt
+          fi
+
+          echo "files=$FILES" >> $GITHUB_OUTPUT
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+
+      - name: Setup Node
+        if: steps.loop_check.outputs.skip != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Deep code review
+        if: steps.loop_check.outputs.skip != 'true'
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          node << 'SCRIPT'
+          const fs = require('fs');
+
+          const diff = fs.readFileSync('code_diff.txt', 'utf8');
+          const files = fs.readFileSync('changed_files.txt', 'utf8').trim();
+
+          if (!diff.trim()) {
+            fs.writeFileSync('deep_review.json', JSON.stringify({
+              findings: [], summary: 'No JS/TS changes to review.',
+              metrics: { filesReviewed: 0, issuesFound: 0 }
+            }));
+            process.exit(0);
+          }
+
+          const prompt = `You are a meticulous code reviewer doing a deep review of BlindBox Creator — a Next.js + TypeScript e-commerce platform for AI-generated blind box collectibles with Stripe checkout and AI image generation.
+
+          Changed files:
+          ${files}
+
+          Diff:
+          ${diff}
+
+          Review with EXTRA SCRUTINY on:
+          1. **Payment Checkout Security**: Stripe checkout session creation, webhook verification, price manipulation, duplicate payment handling
+          2. **AI Generation Pipeline**: Prompt injection in user inputs sent to AI, rate limiting on generation endpoints, cost control
+          3. **Product Catalog Integrity**: Price validation, inventory management, catalog data sanitization
+          4. **API Auth**: Missing auth checks, session validation, admin route protection
+          5. **Type Safety**: \`any\` usage, missing types, unsafe casts
+          6. **Error Handling**: Missing try-catch, unhandled promises, null/undefined risks
+          7. **Input Validation**: User input sanitization, XSS vectors, file upload risks
+
+          Return ONLY valid JSON (no markdown, no code blocks):
+          {
+            "findings": [
+              {
+                "file": "path/to/file.ts",
+                "line": 42,
+                "severity": "high|medium|low",
+                "issue": "Description of the issue",
+                "fix": "Suggested fix"
+              }
+            ],
+            "summary": "Overall assessment in 2-3 sentences",
+            "metrics": {
+              "filesReviewed": 5,
+              "issuesFound": 3
+            }
+          }
+
+          If no issues: {"findings":[],"summary":"Clean code, no issues found.","metrics":{"filesReviewed":N,"issuesFound":0}}`;
+
+          const data = JSON.stringify({
+            model: 'anthropic/claude-sonnet-4-6',
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.2,
+            max_tokens: 6000
+          });
+
+          const req = require('https').request({
+            hostname: 'openrouter.ai', path: '/api/v1/chat/completions', method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': 'https://blindboxcreator.com',
+              'X-Title': 'Debug Quad Layer 4 — BlindBox Creator',
+              'Content-Length': Buffer.byteLength(data)
+            }
+          }, (res) => {
+            let body = '';
+            res.on('data', chunk => body += chunk);
+            res.on('end', () => {
+              try {
+                const response = JSON.parse(body);
+                if (response.error) throw new Error(response.error.message || JSON.stringify(response.error));
+                const content = response.choices[0].message.content;
+                const jsonMatch = content.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+                const reviewStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
+                const review = JSON.parse(reviewStr);
+                review._model = response.model || 'unknown';
+                review._tokens = response.usage?.total_tokens || 0;
+                fs.writeFileSync('deep_review.json', JSON.stringify(review, null, 2));
+                console.log('Deep review:', review.metrics.issuesFound, 'issues in', review.metrics.filesReviewed, 'files');
+              } catch (e) {
+                console.error('Parse error:', e.message);
+                fs.writeFileSync('deep_review.json', JSON.stringify({
+                  findings: [], summary: `Review error: ${e.message}`,
+                  metrics: { filesReviewed: 0, issuesFound: 0 }, _error: e.message
+                }));
+              }
+            });
+          });
+          req.on('error', (e) => {
+            fs.writeFileSync('deep_review.json', JSON.stringify({
+              findings: [], summary: `API error: ${e.message}`,
+              metrics: { filesReviewed: 0, issuesFound: 0 }, _error: e.message
+            }));
+          });
+          req.write(data);
+          req.end();
+          SCRIPT
+
+      - name: Post review comment
+        if: steps.loop_check.outputs.skip != 'true'
+        id: review
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const review = JSON.parse(fs.readFileSync('deep_review.json', 'utf8'));
+
+            let body = '## Layer 4: Deep Code Review (Claude Sonnet 4.6)\n\n';
+            body += `| Metric | Value |\n|--------|-------|\n`;
+            body += `| Files Reviewed | ${review.metrics.filesReviewed} |\n`;
+            body += `| Issues Found | ${review.metrics.issuesFound} |\n`;
+            body += `| Changed Files | ${{ steps.changes.outputs.count }} |\n`;
+            body += `| Auto-Fix | ${review.findings.filter(f => f.severity === 'high' || f.severity === 'medium').length > 0 ? 'Triggered' : 'Not needed'} |\n\n`;
+
+            if (review.findings.length > 0) {
+              body += '### Findings\n\n';
+              const icons = {high:'HIGH',medium:'MEDIUM',low:'LOW'};
+              review.findings.forEach((f, i) => {
+                body += `**${i+1}. [${icons[f.severity] || 'INFO'}] \`${f.file}:${f.line}\`**\n`;
+                body += `> ${f.issue}\n`;
+                if (f.fix) body += `> **Fix:** ${f.fix}\n`;
+                body += '\n';
+              });
+            } else {
+              body += '### No issues found\n\n';
+            }
+
+            body += `### Summary\n${review.summary}\n\n`;
+            body += `---\n_Model: ${review._model || 'claude-sonnet-4-6'} | Tokens: ${review._tokens || '?'} | ${new Date().toISOString()}_`;
+            if (review._error) body += `\n\n_Error: ${review._error}_`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number, body
+            });
+
+            const highIssues = review.findings.filter(f => f.severity === 'high');
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner, repo: context.repo.repo,
+              sha: context.payload.pull_request.head.sha,
+              state: highIssues.length > 3 ? 'failure' : 'success',
+              context: 'AI Review / Layer 4 (Deep Review)',
+              description: `${review.metrics.issuesFound} issue(s) in ${review.metrics.filesReviewed} files`
+            });
+
+            const fixable = review.findings.filter(f => f.severity === 'high' || f.severity === 'medium');
+            core.setOutput('has_fixable', fixable.length > 0 ? 'true' : 'false');
+            core.setOutput('fixable_count', fixable.length.toString());
+
+      - name: Auto-fix (Layer 5 — Self-Healing)
+        if: steps.review.outputs.has_fixable == 'true' && steps.loop_check.outputs.skip != 'true'
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          node << 'AUTOFIX'
+          const fs = require('fs');
+          const path = require('path');
+          const review = JSON.parse(fs.readFileSync('deep_review.json', 'utf8'));
+          const fixable = review.findings.filter(f => f.severity === 'high' || f.severity === 'medium');
+          if (fixable.length === 0) { process.exit(0); }
+          const byFile = {};
+          for (const f of fixable) { if (!byFile[f.file]) byFile[f.file] = []; byFile[f.file].push(f); }
+          const fileContexts = [];
+          for (const [filePath, findings] of Object.entries(byFile)) {
+            try { fileContexts.push({ file: filePath, content: fs.readFileSync(filePath, 'utf8'), findings }); }
+            catch (e) { console.error(`Cannot read ${filePath}: ${e.message}`); }
+          }
+          if (fileContexts.length === 0) { process.exit(0); }
+
+          let fixPrompt = `You are a senior TypeScript engineer. Fix the following issues in BlindBox Creator (Next.js e-commerce + AI generation).
+          Return ONLY valid JSON: { "fixes": [{ "file": "...", "content": "...complete file...", "changes": ["..."] }], "summary": "..." }
+          Return COMPLETE file content. Do NOT change anything not flagged.\n\n`;
+          for (const ctx of fileContexts) {
+            fixPrompt += `--- FILE: ${ctx.file} ---\n${ctx.content}\n--- ISSUES ---\n`;
+            for (const f of ctx.findings) { fixPrompt += `Line ${f.line} [${f.severity}]: ${f.issue}\nFix: ${f.fix}\n\n`; }
+          }
+
+          const data = JSON.stringify({ model: 'anthropic/claude-sonnet-4-6', messages: [{ role: 'user', content: fixPrompt }], temperature: 0.1, max_tokens: 16000 });
+          const req = require('https').request({
+            hostname: 'openrouter.ai', path: '/api/v1/chat/completions', method: 'POST',
+            headers: { 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://blindboxcreator.com', 'X-Title': 'Debug Quad Auto-Fix', 'Content-Length': Buffer.byteLength(data) }
+          }, (res) => {
+            let body = '';
+            res.on('data', chunk => body += chunk);
+            res.on('end', () => {
+              try {
+                const response = JSON.parse(body);
+                if (response.error) throw new Error(response.error.message || JSON.stringify(response.error));
+                const content = response.choices[0].message.content;
+                const jsonMatch = content.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+                const fixResult = JSON.parse(jsonMatch ? jsonMatch[1].trim() : content.trim());
+                let fixCount = 0;
+                for (const fix of fixResult.fixes) {
+                  try { const dir = path.dirname(fix.file); if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(fix.file, fix.content); fixCount++; console.log(`Fixed: ${fix.file}`); }
+                  catch (e) { console.error(`Failed: ${fix.file}: ${e.message}`); }
+                }
+                fs.writeFileSync('autofix_result.json', JSON.stringify({ ...fixResult, filesFixed: fixCount, _model: response.model, _tokens: response.usage?.total_tokens || 0 }, null, 2));
+              } catch (e) {
+                console.error('Auto-fix error:', e.message);
+                fs.writeFileSync('autofix_result.json', JSON.stringify({ fixes: [], summary: `Fix error: ${e.message}`, filesFixed: 0, _error: e.message }));
+              }
+            });
+          });
+          req.on('error', (e) => { fs.writeFileSync('autofix_result.json', JSON.stringify({ fixes: [], summary: `API error: ${e.message}`, filesFixed: 0, _error: e.message })); });
+          req.write(data);
+          req.end();
+          AUTOFIX
+
+      - name: Commit and push fixes
+        if: steps.review.outputs.has_fixable == 'true' && steps.loop_check.outputs.skip != 'true'
+        run: |
+          if [ ! -f autofix_result.json ]; then exit 0; fi
+          FILES_FIXED=$(node -e "const r=JSON.parse(require('fs').readFileSync('autofix_result.json','utf8'));console.log(r.filesFixed||0)")
+          if [ "$FILES_FIXED" = "0" ]; then exit 0; fi
+          FIX_SUMMARY=$(node -e "const r=JSON.parse(require('fs').readFileSync('autofix_result.json','utf8'));console.log(r.summary||'Auto-fix applied')")
+          git config user.name "Debug Quad Auto-Fix"
+          git config user.email "debug-quad@jarvis.local"
+          node -e "const r=JSON.parse(require('fs').readFileSync('autofix_result.json','utf8'));for(const f of r.fixes||[]){console.log(f.file)}" | while read file; do
+            if [ -f "$file" ]; then git add "$file"; fi
+          done
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "fix(auto): Debug Quad Layer 4 auto-fix
+
+          $FIX_SUMMARY
+
+          Files fixed: $FILES_FIXED
+          Triggered by: Layer 4 Deep Review (Claude Sonnet 4.6)
+          Auto-generated — review the changes before merging."
+          git push
+
+      - name: Post auto-fix comment
+        if: steps.review.outputs.has_fixable == 'true' && steps.loop_check.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            if (!fs.existsSync('autofix_result.json')) return;
+            const result = JSON.parse(fs.readFileSync('autofix_result.json', 'utf8'));
+            if (!result.filesFixed || result.filesFixed === 0) return;
+            let body = '## Layer 4: Auto-Fix Applied\n\n';
+            body += `| Files Fixed | ${result.filesFixed} | Model | ${result._model || 'claude-sonnet-4-6'} |\n`;
+            body += `|---|---|---|---|\n\n`;
+            if (result.fixes) { for (const fix of result.fixes) { body += `**\`${fix.file}\`**\n`; for (const c of (fix.changes||[])) { body += `- ${c}\n`; } body += '\n'; } }
+            body += `**Summary:** ${result.summary}\n\n> Review these auto-fixes before merging.\n\n---\n_Debug Quad Layer 4 | ${new Date().toISOString()}_`;
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body });
+
+      - name: Upload review artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: layer4-review-${{ github.run_id }}
+          path: |
+            deep_review.json
+            autofix_result.json
+          retention-days: 30
