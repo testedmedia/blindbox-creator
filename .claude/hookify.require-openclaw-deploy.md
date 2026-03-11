@@ -6,7 +6,7 @@
 **Message:** "BLOCKED: Use `openclaw-deploy` instead of `bash scripts/deploy.sh`. The wrapper enforces the full Debug Quad (secrets + tests + SAST + codex review). Run: openclaw-deploy <version> <tag> '<title>' '<changes>'"
 
 ## Details
-The `openclaw-deploy` wrapper at `~/.openclaw/scripts/openclaw-deploy.sh` is the ONLY sanctioned way to deploy any project. It enforces secrets scanning, type checking, unit tests, SAST scanning, and GPT-4.1 code review BEFORE delegating to the project's deploy.sh.
+The `openclaw-deploy` wrapper at `~/ClaudeCode/scripts/openclaw-deploy.sh` is the ONLY sanctioned way to deploy any project. It enforces secrets scanning, type checking, unit tests, SAST scanning, and GPT-4.1 code review BEFORE delegating to the project's deploy.sh.
 
 Running `bash scripts/deploy.sh` directly bypasses all Debug Quad layers except whatever the project script itself implements (which varies — some have zero code review).
 

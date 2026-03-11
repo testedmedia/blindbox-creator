@@ -11,7 +11,7 @@ action: warn
 Before deploying, run the Codex code review:
 
 ```
-bash ~/.openclaw/scripts/codex-review.sh
+bash ~/ClaudeCode/scripts/codex-review.sh
 ```
 
 This sends your changes to GPT-5.3 Codex for automated bug, security, and logic review.
