@@ -6,7 +6,7 @@ on:
     branches: [master, main]
 
 concurrency:
-  group: deep-review-${{ github.event.pull_request.number }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 permissions:
@@ -445,3 +445,9 @@ jobs:
             deep_review.json
             autofix_result.json
           retention-days: 30
+
+      - name: Fail if auto-fix push failed
+        if: env.PUSH_FAILED == 'true'
+        run: |
+          echo "Auto-fix push failed. Review the auto-fix comment above for details."
+          exit 1
