@@ -54,8 +54,8 @@ jobs:
           git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD > changed_files.txt
           git diff -U3 origin/${{ github.event.pull_request.base.ref }}...HEAD -- '*.ts' '*.tsx' > code_diff.txt
 
-          FILES=$(cat changed_files.txt | tr '\n' ', ' | sed 's/,$//')
-          COUNT=$(wc -l < changed_files.txt | tr -d ' ')
+          FILES="$(cat changed_files.txt | tr '\n' ', ' | sed 's/,$//')"
+          COUNT="$(wc -l < changed_files.txt | tr -d ' ')"
 
           DIFF_SIZE=$(wc -c < code_diff.txt)
           if [ "$DIFF_SIZE" -gt 60000 ]; then
@@ -379,7 +379,7 @@ jobs:
           node -e "
             const r=JSON.parse(require('fs').readFileSync('autofix_result.json','utf8'));
             for(const f of r.fixes||[]){console.log(f.file)}
-          " | while read file; do
+          " | while read -r file; do
             if [ -f "$file" ]; then git add "$file"; echo "Staged: $file"; fi
           done
 
