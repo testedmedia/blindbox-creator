@@ -14,6 +14,13 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            try {
+              await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: 'jules' });
+            } catch (e) {
+              if (e.status === 404) {
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name: 'jules', color: '7C3AED', description: 'Reviewed by Jules (Gemini Pro)' });
+              }
+            }
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -21,27 +28,3 @@ jobs:
               labels: ['jules']
             });
             console.log(`Labeled PR #${context.issue.number} for Jules review`);
-
-  jules-review:
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: read
-    steps:
-      - name: Jules Code Review
-        uses: google-labs-code/jules-invoke@v1
-        with:
-          prompt: |
-            Review this pull request for bugs, security issues, and logic errors.
-            Focus on:
-            - Trading logic correctness (edge calculations, position sizing, risk limits)
-            - API integration safety (rate limiting, error handling, retries)
-            - Database query efficiency (async sessions, connection pooling)
-            - Security (no hardcoded keys, proper env var usage)
-            - Celery task reliability (idempotency, timeout handling)
-            - Python best practices and type safety
-            This is a real-money Polymarket trading system. Any bug can lose money.
-            Post your review as a PR comment with specific file:line references.
-          jules_api_key: ${{ secrets.JULES_API_KEY }}
-          include_last_commit: true
-          include_commit_log: true
