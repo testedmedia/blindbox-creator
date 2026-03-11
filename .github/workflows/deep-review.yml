@@ -34,6 +34,9 @@ jobs:
             const isAutoFix = lastCommit?.commit?.message?.startsWith('fix(auto):') ||
                               lastCommit?.commit?.author?.name === 'Debug Quad Auto-Fix';
             core.setOutput('skip', isAutoFix ? 'true' : 'false');
+            if (isAutoFix) {
+              console.log('Circuit breaker: Last commit was auto-fix — skipping review to prevent loop');
+            }
 
       - name: Checkout
         if: steps.loop_check.outputs.skip != 'true'
@@ -49,7 +52,7 @@ jobs:
         run: |
           git fetch origin ${{ github.event.pull_request.base.ref }}
           git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD > changed_files.txt
-          git diff -U3 origin/${{ github.event.pull_request.base.ref }}...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' > code_diff.txt
+          git diff -U3 origin/${{ github.event.pull_request.base.ref }}...HEAD -- '*.ts' '*.tsx' > code_diff.txt
 
           FILES=$(cat changed_files.txt | tr '\n' ', ' | sed 's/,$//')
           COUNT=$(wc -l < changed_files.txt | tr -d ' ')
@@ -82,13 +85,13 @@ jobs:
 
           if (!diff.trim()) {
             fs.writeFileSync('deep_review.json', JSON.stringify({
-              findings: [], summary: 'No JS/TS changes to review.',
+              findings: [], summary: 'No TypeScript/TSX changes to review.',
               metrics: { filesReviewed: 0, issuesFound: 0 }
             }));
             process.exit(0);
           }
 
-          const prompt = `You are a meticulous code reviewer doing a deep review of BlindBox Creator — a Next.js + TypeScript e-commerce platform for AI-generated blind box collectibles with Stripe checkout and AI image generation.
+          const prompt = `You are a meticulous code reviewer doing a deep review of BlindBox Creator — a Next.js + TypeScript AI-powered blind box e-commerce platform with payment checkout, AI image generation, and product catalog management.
 
           Changed files:
           ${files}
@@ -97,13 +100,13 @@ jobs:
           ${diff}
 
           Review with EXTRA SCRUTINY on:
-          1. **Payment Checkout Security**: Stripe checkout session creation, webhook verification, price manipulation, duplicate payment handling
-          2. **AI Generation Pipeline**: Prompt injection in user inputs sent to AI, rate limiting on generation endpoints, cost control
-          3. **Product Catalog Integrity**: Price validation, inventory management, catalog data sanitization
-          4. **API Auth**: Missing auth checks, session validation, admin route protection
-          5. **Type Safety**: \`any\` usage, missing types, unsafe casts
-          6. **Error Handling**: Missing try-catch, unhandled promises, null/undefined risks
-          7. **Input Validation**: User input sanitization, XSS vectors, file upload risks
+          1. **Payment Checkout Security**: Stripe/payment webhook verification, idempotency, race conditions in order processing, price manipulation, inventory overselling
+          2. **AI Generation Safety**: Prompt injection in AI image generation, content moderation, rate limiting on expensive AI calls, timeout handling
+          3. **Product Catalog Integrity**: Stock management, price consistency, concurrent purchase handling, catalog data validation
+          4. **API Auth**: Token validation, rate limiting, privilege escalation, missing auth checks on admin/order routes
+          5. **Type Safety**: \`any\` usage, missing types, unsafe casts, strict mode violations
+          6. **Error Handling**: Missing try-catch, unhandled promises, null/undefined risks in checkout flows
+          7. **Data Validation**: User input sanitization, SQL injection, XSS vectors in product descriptions
 
           Return ONLY valid JSON (no markdown, no code blocks):
           {
@@ -133,7 +136,9 @@ jobs:
           });
 
           const req = require('https').request({
-            hostname: 'openrouter.ai', path: '/api/v1/chat/completions', method: 'POST',
+            hostname: 'openrouter.ai',
+            path: '/api/v1/chat/completions',
+            method: 'POST',
             headers: {
               'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
               'Content-Type': 'application/json',
@@ -165,12 +170,14 @@ jobs:
               }
             });
           });
+
           req.on('error', (e) => {
             fs.writeFileSync('deep_review.json', JSON.stringify({
               findings: [], summary: `API error: ${e.message}`,
               metrics: { filesReviewed: 0, issuesFound: 0 }, _error: e.message
             }));
           });
+
           req.write(data);
           req.end();
           SCRIPT
@@ -232,33 +239,84 @@ jobs:
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
+          echo "AUTO-FIX TRIGGERED — Fixing issues found by Layer 4"
+          echo "Fixable issues: ${{ steps.review.outputs.fixable_count }}"
+
           node << 'AUTOFIX'
           const fs = require('fs');
           const path = require('path');
+
           const review = JSON.parse(fs.readFileSync('deep_review.json', 'utf8'));
           const fixable = review.findings.filter(f => f.severity === 'high' || f.severity === 'medium');
-          if (fixable.length === 0) { process.exit(0); }
+
+          if (fixable.length === 0) { console.log('No fixable issues found'); process.exit(0); }
+
           const byFile = {};
           for (const f of fixable) { if (!byFile[f.file]) byFile[f.file] = []; byFile[f.file].push(f); }
+
           const fileContexts = [];
           for (const [filePath, findings] of Object.entries(byFile)) {
-            try { fileContexts.push({ file: filePath, content: fs.readFileSync(filePath, 'utf8'), findings }); }
-            catch (e) { console.error(`Cannot read ${filePath}: ${e.message}`); }
+            try {
+              const content = fs.readFileSync(filePath, 'utf8');
+              fileContexts.push({ file: filePath, content, findings });
+            } catch (e) { console.error(`Cannot read ${filePath}: ${e.message}`); }
           }
-          if (fileContexts.length === 0) { process.exit(0); }
 
-          let fixPrompt = `You are a senior TypeScript engineer. Fix the following issues in BlindBox Creator (Next.js e-commerce + AI generation).
-          Return ONLY valid JSON: { "fixes": [{ "file": "...", "content": "...complete file...", "changes": ["..."] }], "summary": "..." }
-          Return COMPLETE file content. Do NOT change anything not flagged.\n\n`;
+          if (fileContexts.length === 0) { console.log('No files to fix'); process.exit(0); }
+
+          let fixPrompt = `You are a senior TypeScript engineer. Fix the following issues found during code review of BlindBox Creator (Next.js + TypeScript AI blind box e-commerce platform).
+          For each file, return the COMPLETE fixed file content.
+
+          IMPORTANT RULES:
+          - Return ONLY valid JSON (no markdown, no code blocks)
+          - Return the COMPLETE file content for each file, not just the changed lines
+          - Do NOT change anything that wasn't flagged as an issue
+          - Preserve all existing functionality
+          - Only fix high and medium severity issues
+
+          Return format:
+          {
+            "fixes": [
+              {
+                "file": "path/to/file.ts",
+                "content": "...complete fixed file content...",
+                "changes": ["Description of fix 1", "Description of fix 2"]
+              }
+            ],
+            "summary": "What was fixed in 1-2 sentences"
+          }
+
+          Files and issues to fix:\n\n`;
+
           for (const ctx of fileContexts) {
-            fixPrompt += `--- FILE: ${ctx.file} ---\n${ctx.content}\n--- ISSUES ---\n`;
-            for (const f of ctx.findings) { fixPrompt += `Line ${f.line} [${f.severity}]: ${f.issue}\nFix: ${f.fix}\n\n`; }
+            fixPrompt += `--- FILE: ${ctx.file} ---\n`;
+            fixPrompt += ctx.content + '\n';
+            fixPrompt += `--- ISSUES IN ${ctx.file} ---\n`;
+            for (const f of ctx.findings) {
+              fixPrompt += `Line ${f.line} [${f.severity}]: ${f.issue}\n`;
+              fixPrompt += `Suggested fix: ${f.fix}\n\n`;
+            }
+            fixPrompt += '\n';
           }
 
-          const data = JSON.stringify({ model: 'anthropic/claude-sonnet-4-6', messages: [{ role: 'user', content: fixPrompt }], temperature: 0.1, max_tokens: 16000 });
+          const data = JSON.stringify({
+            model: 'anthropic/claude-sonnet-4-6',
+            messages: [{ role: 'user', content: fixPrompt }],
+            temperature: 0.1,
+            max_tokens: 16000
+          });
+
           const req = require('https').request({
-            hostname: 'openrouter.ai', path: '/api/v1/chat/completions', method: 'POST',
-            headers: { 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://blindboxcreator.com', 'X-Title': 'Debug Quad Auto-Fix', 'Content-Length': Buffer.byteLength(data) }
+            hostname: 'openrouter.ai',
+            path: '/api/v1/chat/completions',
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': 'https://blindboxcreator.com',
+              'X-Title': 'Debug Quad Auto-Fix — BlindBox Creator',
+              'Content-Length': Buffer.byteLength(data)
+            }
           }, (res) => {
             let body = '';
             res.on('data', chunk => body += chunk);
@@ -268,20 +326,41 @@ jobs:
                 if (response.error) throw new Error(response.error.message || JSON.stringify(response.error));
                 const content = response.choices[0].message.content;
                 const jsonMatch = content.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
-                const fixResult = JSON.parse(jsonMatch ? jsonMatch[1].trim() : content.trim());
+                const fixStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
+                const fixResult = JSON.parse(fixStr);
+
                 let fixCount = 0;
                 for (const fix of fixResult.fixes) {
-                  try { const dir = path.dirname(fix.file); if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(fix.file, fix.content); fixCount++; console.log(`Fixed: ${fix.file}`); }
-                  catch (e) { console.error(`Failed: ${fix.file}: ${e.message}`); }
+                  try {
+                    const dir = path.dirname(fix.file);
+                    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+                    fs.writeFileSync(fix.file, fix.content);
+                    console.log(`Fixed: ${fix.file} (${fix.changes.length} changes)`);
+                    for (const change of fix.changes) console.log(`  - ${change}`);
+                    fixCount++;
+                  } catch (e) { console.error(`Failed to write ${fix.file}: ${e.message}`); }
                 }
-                fs.writeFileSync('autofix_result.json', JSON.stringify({ ...fixResult, filesFixed: fixCount, _model: response.model, _tokens: response.usage?.total_tokens || 0 }, null, 2));
+
+                fs.writeFileSync('autofix_result.json', JSON.stringify({
+                  ...fixResult, filesFixed: fixCount, _model: response.model, _tokens: response.usage?.total_tokens || 0
+                }, null, 2));
+                console.log(`\nAuto-fix complete: ${fixCount} files fixed`);
+                console.log(`Summary: ${fixResult.summary}`);
               } catch (e) {
-                console.error('Auto-fix error:', e.message);
-                fs.writeFileSync('autofix_result.json', JSON.stringify({ fixes: [], summary: `Fix error: ${e.message}`, filesFixed: 0, _error: e.message }));
+                console.error('Auto-fix parse error:', e.message);
+                fs.writeFileSync('autofix_result.json', JSON.stringify({
+                  fixes: [], summary: `Fix error: ${e.message}`, filesFixed: 0, _error: e.message
+                }));
               }
             });
           });
-          req.on('error', (e) => { fs.writeFileSync('autofix_result.json', JSON.stringify({ fixes: [], summary: `API error: ${e.message}`, filesFixed: 0, _error: e.message })); });
+
+          req.on('error', (e) => {
+            fs.writeFileSync('autofix_result.json', JSON.stringify({
+              fixes: [], summary: `API error: ${e.message}`, filesFixed: 0, _error: e.message
+            }));
+          });
+
           req.write(data);
           req.end();
           AUTOFIX
@@ -289,16 +368,23 @@ jobs:
       - name: Commit and push fixes
         if: steps.review.outputs.has_fixable == 'true' && steps.loop_check.outputs.skip != 'true'
         run: |
-          if [ ! -f autofix_result.json ]; then exit 0; fi
+          if [ ! -f autofix_result.json ]; then echo "No autofix result file — skipping commit"; exit 0; fi
           FILES_FIXED=$(node -e "const r=JSON.parse(require('fs').readFileSync('autofix_result.json','utf8'));console.log(r.filesFixed||0)")
-          if [ "$FILES_FIXED" = "0" ]; then exit 0; fi
+          if [ "$FILES_FIXED" = "0" ]; then echo "No files were fixed — skipping commit"; exit 0; fi
           FIX_SUMMARY=$(node -e "const r=JSON.parse(require('fs').readFileSync('autofix_result.json','utf8'));console.log(r.summary||'Auto-fix applied')")
+
           git config user.name "Debug Quad Auto-Fix"
           git config user.email "debug-quad@jarvis.local"
-          node -e "const r=JSON.parse(require('fs').readFileSync('autofix_result.json','utf8'));for(const f of r.fixes||[]){console.log(f.file)}" | while read file; do
-            if [ -f "$file" ]; then git add "$file"; fi
+
+          node -e "
+            const r=JSON.parse(require('fs').readFileSync('autofix_result.json','utf8'));
+            for(const f of r.fixes||[]){console.log(f.file)}
+          " | while read file; do
+            if [ -f "$file" ]; then git add "$file"; echo "Staged: $file"; fi
           done
-          if git diff --cached --quiet; then exit 0; fi
+
+          if git diff --cached --quiet; then echo "No changes to commit after auto-fix"; exit 0; fi
+
           git commit -m "fix(auto): Debug Quad Layer 4 auto-fix
 
           $FIX_SUMMARY
@@ -306,7 +392,9 @@ jobs:
           Files fixed: $FILES_FIXED
           Triggered by: Layer 4 Deep Review (Claude Sonnet 4.6)
           Auto-generated — review the changes before merging."
+
           git push
+          echo "Auto-fix committed and pushed to PR branch"
 
       - name: Post auto-fix comment
         if: steps.review.outputs.has_fixable == 'true' && steps.loop_check.outputs.skip != 'true'
@@ -318,12 +406,31 @@ jobs:
             if (!fs.existsSync('autofix_result.json')) return;
             const result = JSON.parse(fs.readFileSync('autofix_result.json', 'utf8'));
             if (!result.filesFixed || result.filesFixed === 0) return;
+
             let body = '## Layer 4: Auto-Fix Applied\n\n';
-            body += `| Files Fixed | ${result.filesFixed} | Model | ${result._model || 'claude-sonnet-4-6'} |\n`;
-            body += `|---|---|---|---|\n\n`;
-            if (result.fixes) { for (const fix of result.fixes) { body += `**\`${fix.file}\`**\n`; for (const c of (fix.changes||[])) { body += `- ${c}\n`; } body += '\n'; } }
-            body += `**Summary:** ${result.summary}\n\n> Review these auto-fixes before merging.\n\n---\n_Debug Quad Layer 4 | ${new Date().toISOString()}_`;
-            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body });
+            body += `| Metric | Value |\n|--------|-------|\n`;
+            body += `| Files Fixed | ${result.filesFixed} |\n`;
+            body += `| Model | ${result._model || 'claude-sonnet-4-6'} |\n`;
+            body += `| Tokens | ${result._tokens || '?'} |\n\n`;
+
+            if (result.fixes) {
+              body += '### Changes Made\n\n';
+              for (const fix of result.fixes) {
+                body += `**\`${fix.file}\`**\n`;
+                for (const change of (fix.changes || [])) body += `- ${change}\n`;
+                body += '\n';
+              }
+            }
+
+            body += `### Summary\n${result.summary}\n\n`;
+            body += '> Review these auto-fixes before merging. The Debug Quad will re-review the fixes on the next push.\n\n';
+            body += `---\n_Auto-Fix by Debug Quad Layer 4 | ${new Date().toISOString()}_`;
+            if (result._error) body += `\n\n_Auto-fix error: ${result._error}_`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number, body
+            });
 
       - name: Upload review artifact
         if: always()
