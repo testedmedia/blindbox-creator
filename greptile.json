@@ -1,0 +1,20 @@
+{
+  "strictness": 2,
+  "commentTypes": ["logic", "syntax", "checks"],
+  "instructions": "This is BlindBox Creator - a Next.js 16 + React 19 + TypeScript e-commerce platform with Stripe + OpenAI/OpenRouter for AI generation. Review with extreme scrutiny on: 1) Payment checkout - Stripe sessions must be server-created with server-side pricing, webhook signature verification required. 2) AI generation API - rate limit AI endpoints, validate inputs, handle API failures gracefully, never expose API keys client-side. 3) Product catalog - verify data integrity, prevent price manipulation. 4) OpenAI/OpenRouter API key handling - keys must never appear in client bundles or logs. 5) Never allow secrets, API keys, or .env values in code.",
+  "excludeAuthors": ["dependabot[bot]", "renovate[bot]"],
+  "triggerOnUpdates": true,
+  "fileChangeLimit": 100,
+  "fixWithAI": true,
+  "statusCheck": true,
+  "ignorePatterns": "node_modules\n.next\ndist\nbuild\ncoverage\n*.lock\n*.log",
+  "customContext": {
+    "rules": [
+      {"rule": "Stripe checkout sessions must use server-side pricing from the product catalog. Never accept client-submitted prices.", "scope": ["app/api/", "lib/"]},
+      {"rule": "AI generation endpoints must be rate-limited and must validate all inputs. Flag any AI endpoint without rate limiting.", "scope": ["app/api/"]},
+      {"rule": "OpenAI and OpenRouter API keys must only be used server-side. Flag any import of API keys in client components.", "scope": ["app/", "components/"]},
+      {"rule": "Product catalog data must be sourced from the database, not hardcoded. Flag hardcoded prices or product data.", "scope": ["app/", "lib/", "components/"]},
+      {"rule": "AI-generated content must be sanitized before rendering. Flag any dangerouslySetInnerHTML with AI output.", "scope": ["app/", "components/"]}
+    ]
+  }
+}
