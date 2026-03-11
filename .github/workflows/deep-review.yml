@@ -235,7 +235,7 @@ jobs:
             core.setOutput('fixable_count', fixable.length.toString());
 
       - name: Auto-fix (Layer 5 — Self-Healing)
-        if: steps.review.outputs.has_fixable == 'true' && steps.loop_check.outputs.skip != 'true'
+        if: steps.review.outputs.has_fixable == 'true' && steps.loop_check.outputs.skip != 'true' && github.event.pull_request.head.repo.full_name == github.repository
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
@@ -366,7 +366,7 @@ jobs:
           AUTOFIX
 
       - name: Commit and push fixes
-        if: steps.review.outputs.has_fixable == 'true' && steps.loop_check.outputs.skip != 'true'
+        if: steps.review.outputs.has_fixable == 'true' && steps.loop_check.outputs.skip != 'true' && github.event.pull_request.head.repo.full_name == github.repository
         run: |
           if [ ! -f autofix_result.json ]; then echo "No autofix result file — skipping commit"; exit 0; fi
           FILES_FIXED=$(node -e "const r=JSON.parse(require('fs').readFileSync('autofix_result.json','utf8'));console.log(r.filesFixed||0)")
@@ -397,7 +397,7 @@ jobs:
           echo "Auto-fix committed and pushed to PR branch"
 
       - name: Post auto-fix comment
-        if: steps.review.outputs.has_fixable == 'true' && steps.loop_check.outputs.skip != 'true'
+        if: steps.review.outputs.has_fixable == 'true' && steps.loop_check.outputs.skip != 'true' && github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
