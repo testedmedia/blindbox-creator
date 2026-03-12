@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
+import { openAIIntegration } from "@sentry/node";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -17,6 +18,7 @@ Sentry.init({
 
   integrations: [
     nodeProfilingIntegration(),
+    openAIIntegration(),
     Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
   ],
 });
