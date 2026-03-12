@@ -14,8 +14,8 @@ concurrency:
 
 jobs:
   seer-autofix:
-    # SECURITY: Only run for verified Sentry bot actor - labels alone are not trusted
-    if: github.actor == 'sentry[bot]'
+    # SECURITY: Only run for PRs authored by the Sentry GitHub App
+    if: github.event.pull_request.user.login == 'sentry[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
