@@ -2,6 +2,20 @@
 
 All notable changes to Blind Box Creator will be documented in this file.
 
+## v4.3.0 — UPDATE — 2026-03-12 @ 12:48 AM AST
+
+**Sentry Maximization — full observability stack**
+
+- Enabled server profiling via @sentry/profiling-node
+- Added release tracking with NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
+- Added authToken for source map uploads in next.config.ts
+- Instrumented 7 API routes with Sentry metrics (request counters, latency histograms)
+- Fixed edge config to use NEXT_PUBLIC_SENTRY_DSN for runtime access
+- Fixed deploy.sh secrets scan false positives on process.env reads
+- Suppressed false positive SAST findings in offline CLI scripts
+
+---
+
 ## v4.2.0 — UPDATE — 2026-03-10 @ 03:12 AM AST
 
 **Documentation overhaul — CLAUDE.md and CHANGELOG.md reformatted to standards**

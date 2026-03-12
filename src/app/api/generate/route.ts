@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 
 function getOpenRouter() {
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -126,6 +127,7 @@ async function describeImage(base64Url: string): Promise<string> {
 }
 
 export async function POST(request: NextRequest) {
+  const _metricsStart = Date.now();
   try {
     const body = await request.json();
     const { prompt, theme, referenceImage } = body;
@@ -157,6 +159,8 @@ export async function POST(request: NextRequest) {
 
     if (imageUrl) {
       const rarity = rollRarity();
+      Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/generate", method: "POST", status: "200" } });
+      Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/generate" } });
       return NextResponse.json({
         imageUrl,
         rarity: rarity.name,
@@ -171,6 +175,8 @@ export async function POST(request: NextRequest) {
     const imageUrl2 = await generateWithGemini(genPrompt, "google/gemini-3-pro-image-preview");
     if (imageUrl2) {
       const rarity = rollRarity();
+      Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/generate", method: "POST", status: "200" } });
+      Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/generate" } });
       return NextResponse.json({
         imageUrl: imageUrl2,
         rarity: rarity.name,
@@ -183,9 +189,13 @@ export async function POST(request: NextRequest) {
 
     // All generation methods failed
     console.log("All image generation failed, returning sample character");
+    Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/generate", method: "POST", status: "200_fallback" } });
+    Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/generate" } });
     return NextResponse.json(getFallbackCharacter());
   } catch (error: unknown) {
     console.error("Generation error:", error);
+    Sentry.metrics.count("api.errors", 1, { attributes: { endpoint: "/api/generate" } });
+    Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/generate" } });
     return NextResponse.json(getFallbackCharacter());
   }
 }

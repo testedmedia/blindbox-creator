@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 
 // Generate a short affiliate code
 function generateCode(): string {
@@ -22,6 +23,7 @@ function hashIP(ip: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const _metricsStart = Date.now();
   try {
     const body = await request.json();
     const { action, ref } = body;
@@ -34,6 +36,8 @@ export async function POST(request: NextRequest) {
       // For now: code is generated client-side and stored in localStorage
       console.log(`[AFFILIATE] New code generated: ${code}`);
 
+      Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/affiliate", method: "POST", status: "200" } });
+      Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/affiliate" } });
       return NextResponse.json({
         code,
         url: affiliateUrl,
@@ -77,6 +81,8 @@ export async function POST(request: NextRequest) {
         sameSite: "lax",
       });
 
+      Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/affiliate", method: "POST", status: "200" } });
+      Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/affiliate" } });
       return response;
     }
 
@@ -85,6 +91,8 @@ export async function POST(request: NextRequest) {
       // In production: query Supabase aggregate
       // For now: return placeholder indicating tracking is active
 
+      Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/affiliate", method: "POST", status: "200" } });
+      Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/affiliate" } });
       return NextResponse.json({
         code: ref,
         clicks: 0,
@@ -99,12 +107,15 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch {
+    Sentry.metrics.count("api.errors", 1, { attributes: { endpoint: "/api/affiliate" } });
+    Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/affiliate" } });
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 
 // Track affiliate click via GET (for simple redirect tracking)
 export async function GET(request: NextRequest) {
+  const _metricsStart = Date.now();
   const ref = request.nextUrl.searchParams.get("ref");
   if (!ref) {
     return NextResponse.json({ error: "No ref code" }, { status: 400 });
@@ -114,5 +125,7 @@ export async function GET(request: NextRequest) {
   const ipHash = hashIP(ip);
   console.log(`[AFFILIATE CLICK GET] ref=${ref} ip_hash=${ipHash}`);
 
+  Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/affiliate", method: "GET", status: "200" } });
+  Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/affiliate" } });
   return NextResponse.json({ tracked: true, ref });
 }

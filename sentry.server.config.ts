@@ -1,11 +1,14 @@
 import * as Sentry from "@sentry/nextjs";
+import { nodeProfilingIntegration } from "@sentry/profiling-node";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
+  release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
   environment: process.env.NEXT_PUBLIC_VERCEL_ENV || "development",
 
   // Performance: Traces
   tracesSampleRate: 0.2,
+  profilesSampleRate: 0.1,
 
   // Structured Logging
   enableLogs: true,
@@ -13,6 +16,7 @@ Sentry.init({
   sendDefaultPii: false,
 
   integrations: [
+    nodeProfilingIntegration(),
     Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
   ],
 });

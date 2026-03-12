@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { getStripe } from "@/lib/stripe";
 import { createOrder, createSubscription } from "@/lib/supabase";
 import { sendOrderConfirmation } from "@/lib/resend";
@@ -7,6 +8,7 @@ import type Stripe from "stripe";
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
 export async function POST(request: NextRequest) {
+  const _metricsStart = Date.now();
   let event: Stripe.Event;
 
   try {
@@ -24,6 +26,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("[webhook] Signature verification failed:", message);
+    Sentry.metrics.count("api.errors", 1, { attributes: { endpoint: "/api/webhook" } });
+    Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/webhook" } });
     return NextResponse.json(
       { error: `Webhook signature verification failed: ${message}` },
       { status: 400 }
@@ -117,6 +121,8 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error("[webhook] Error processing event:", error);
+    Sentry.metrics.count("api.errors", 1, { attributes: { endpoint: "/api/webhook" } });
+    Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/webhook" } });
     // Return 200 anyway so Stripe doesn't retry endlessly for processing errors.
     // The event was received and verified; we just failed to process it.
     return NextResponse.json(
@@ -125,5 +131,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/webhook", method: "POST", status: "200" } });
+  Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/webhook" } });
   return NextResponse.json({ received: true });
 }
