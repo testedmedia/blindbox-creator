@@ -1,0 +1,370 @@
+# =============================================================================
+# Policy Gate — Server-Side CI Enforcement
+# Jarvis Standards: Model Standards, Hookify, Secrets, CLAUDE.md, .env
+#
+# Triggers on: push to any branch, pull_request to main/master
+# Each check runs as a separate parallel job.
+# Overall workflow fails if ANY check fails.
+#
+# Exemptions: .policy-exemptions.yml in project root
+# Install via: bash ~/ClaudeCode/scripts/install-policy-gate.sh <project-path>
+# =============================================================================
+
+name: "Policy Gate"
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Model Standards — No gpt-4.1 / gpt-4.1-mini / gpt-4.1-nano in code
+  # ---------------------------------------------------------------------------
+  model-standards:
+    name: "Model Standards"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for exemption
+        id: exemption
+        run: |
+          if [ -f .policy-exemptions.yml ]; then
+            # Parse exemption with python (available on ubuntu-latest)
+            EXEMPT=$(python3 -c "
+          import yaml, sys, datetime
+          try:
+              with open('.policy-exemptions.yml') as f:
+                  data = yaml.safe_load(f)
+              ms = data.get('model_standards', {})
+              if not ms.get('exempt', False):
+                  print('false')
+                  sys.exit(0)
+              expires = ms.get('expires', '')
+              if expires:
+                  exp_date = datetime.datetime.strptime(str(expires), '%Y-%m-%d').date()
+                  if exp_date < datetime.date.today():
+                      print('expired')
+                      sys.exit(0)
+              print('true')
+          except Exception as e:
+              print('false')
+          ")
+            echo "exempt=$EXEMPT" >> "$GITHUB_OUTPUT"
+            if [ "$EXEMPT" = "true" ]; then
+              echo "Model standards check EXEMPTED via .policy-exemptions.yml"
+            elif [ "$EXEMPT" = "expired" ]; then
+              echo "::warning::Model standards exemption has EXPIRED. Check will run."
+            fi
+          else
+            echo "exempt=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Scan for banned models
+        if: steps.exemption.outputs.exempt != 'true'
+        run: |
+          echo "Scanning for banned model references (gpt-4.1, gpt-4.1-mini, gpt-4.1-nano)..."
+
+          # Patterns to search for
+          PATTERNS=(
+            'gpt-4\.1-mini'
+            'gpt-4\.1-nano'
+            'gpt-4\.1[^0-9]'
+            'gpt-4\.1"'
+            "gpt-4\.1'"
+          )
+
+          # Directories and files to exclude
+          EXCLUDE_ARGS=(
+            --exclude-dir=node_modules
+            --exclude-dir=.next
+            --exclude-dir=.git
+            --exclude-dir=dist
+            --exclude-dir=build
+            --exclude-dir=coverage
+            --exclude-dir=.fix-chain
+            --exclude-dir=.vercel
+            --exclude-dir=.vercel-backup-xavidash
+            --exclude='*.md'
+            --exclude='CHANGELOG*'
+            --exclude='*.lock'
+            --exclude='*.log'
+            --exclude='.policy-exemptions.yml'
+            --exclude='policy-gate.yml'
+            --exclude='*.github/workflows/policy-gate.yml'
+          )
+
+          FOUND=0
+          VIOLATIONS=""
+
+          for PATTERN in "${PATTERNS[@]}"; do
+            MATCHES=$(grep -rn "${EXCLUDE_ARGS[@]}" -E "$PATTERN" . 2>/dev/null || true)
+            if [ -n "$MATCHES" ]; then
+              FOUND=1
+              VIOLATIONS="${VIOLATIONS}${MATCHES}\n"
+            fi
+          done
+
+          if [ "$FOUND" -eq 1 ]; then
+            echo "::error::POLICY VIOLATION: Banned model references found in code."
+            echo ""
+            echo "The following files reference gpt-4.1 / gpt-4.1-mini / gpt-4.1-nano:"
+            echo ""
+            echo -e "$VIOLATIONS"
+            echo ""
+            echo "Standard: Use gpt-5.4 for everything. See model-standards.md."
+            echo "To exempt this project, create .policy-exemptions.yml with model_standards.exempt: true"
+            exit 1
+          else
+            echo "No banned model references found. Model standards: PASS"
+          fi
+
+  # ---------------------------------------------------------------------------
+  # 2. Hookify Compliance — All 5 mandatory hookify files must exist
+  # ---------------------------------------------------------------------------
+  hookify-compliance:
+    name: "Hookify Compliance"
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify mandatory hookify files
+        run: |
+          echo "Checking for 5 mandatory hookify files in .claude/..."
+
+          REQUIRED_FILES=(
+            ".claude/hookify.direct-git-push.md"
+            ".claude/hookify.codex-review-gate.md"
+            ".claude/hookify.require-tests.md"
+            ".claude/hookify.block-env-commits.md"
+            ".claude/hookify.require-jarvis-deploy.md"
+          )
+
+          MISSING=0
+          MISSING_LIST=""
+
+          for FILE in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$FILE" ]; then
+              MISSING=$((MISSING + 1))
+              MISSING_LIST="${MISSING_LIST}  - ${FILE}\n"
+              echo "::error file=${FILE}::Missing mandatory hookify file: ${FILE}"
+            else
+              echo "Found: $FILE"
+            fi
+          done
+
+          if [ "$MISSING" -gt 0 ]; then
+            echo ""
+            echo "::error::POLICY VIOLATION: ${MISSING} mandatory hookify file(s) missing."
+            echo ""
+            echo "Missing files:"
+            echo -e "$MISSING_LIST"
+            echo ""
+            echo "Every project must have all 5 hookify files. See hookify.md."
+            echo "Run: bash ~/ClaudeCode/scripts/install-policy-gate.sh <project-path>"
+            exit 1
+          else
+            echo ""
+            echo "All 5 mandatory hookify files present. Hookify compliance: PASS"
+          fi
+
+  # ---------------------------------------------------------------------------
+  # 3. Secrets Scan — Detect hardcoded API keys, passwords, tokens
+  # ---------------------------------------------------------------------------
+  secrets-scan:
+    name: "Secrets Scan"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Scan for hardcoded secrets
+        run: |
+          echo "Scanning for hardcoded secrets..."
+
+          EXCLUDE_ARGS=(
+            --exclude-dir=node_modules
+            --exclude-dir=.next
+            --exclude-dir=.git
+            --exclude-dir=dist
+            --exclude-dir=build
+            --exclude-dir=coverage
+            --exclude-dir=.fix-chain
+            --exclude-dir=.vercel
+            --exclude-dir=.vercel-backup-xavidash
+            --exclude='*.lock'
+            --exclude='*.map'
+            --exclude='*.woff*'
+            --exclude='*.ttf'
+            --exclude='*.ico'
+            --exclude='*.png'
+            --exclude='*.jpg'
+            --exclude='*.svg'
+            --exclude='.policy-exemptions.yml'
+          )
+
+          FOUND=0
+          VIOLATIONS=""
+
+          # Pattern: AWS keys (AKIA...)
+          MATCHES=$(grep -rn "${EXCLUDE_ARGS[@]}" -E 'AKIA[0-9A-Z]{16}' . 2>/dev/null || true)
+          if [ -n "$MATCHES" ]; then
+            FOUND=1
+            VIOLATIONS="${VIOLATIONS}\n--- AWS Access Key ---\n${MATCHES}\n"
+          fi
+
+          # Pattern: Generic API key assignments with actual values
+          # Matches: api_key = "sk-...", apiKey: "sk-...", API_KEY="sk-..."
+          MATCHES=$(grep -rn "${EXCLUDE_ARGS[@]}" -P '(api[_-]?key|apikey|api[_-]?secret)\s*[:=]\s*[\x22\x27][a-zA-Z0-9_\-]{20,}[\x22\x27]' . 2>/dev/null | grep -v '\.example' | grep -v 'process\.env' | grep -v '\$\{' | grep -v 'CHANGEME' | grep -v 'your-' | grep -v 'xxx' || true)
+          if [ -n "$MATCHES" ]; then
+            FOUND=1
+            VIOLATIONS="${VIOLATIONS}\n--- Hardcoded API Key ---\n${MATCHES}\n"
+          fi
+
+          # Pattern: Private keys
+          MATCHES=$(grep -rn "${EXCLUDE_ARGS[@]}" -l -E 'BEGIN (RSA |OPENSSH |EC |DSA )?PRIVATE KEY' . 2>/dev/null | grep -v 'policy-gate.yml' || true)
+          if [ -n "$MATCHES" ]; then
+            FOUND=1
+            VIOLATIONS="${VIOLATIONS}\n--- Private Key Files ---\n${MATCHES}\n"
+          fi
+
+          # Pattern: Slack tokens
+          MATCHES=$(grep -rn "${EXCLUDE_ARGS[@]}" -E 'xox[baprs]-[0-9a-zA-Z\-]{10,}' . 2>/dev/null || true)
+          if [ -n "$MATCHES" ]; then
+            FOUND=1
+            VIOLATIONS="${VIOLATIONS}\n--- Slack Token ---\n${MATCHES}\n"
+          fi
+
+          # Pattern: Generic password assignments with actual values (not env vars)
+          MATCHES=$(grep -rn "${EXCLUDE_ARGS[@]}" -P '(password|passwd|pwd)\s*[:=]\s*[\x22\x27][^\x22\x27]{8,}[\x22\x27]' . 2>/dev/null | grep -vi 'example\|placeholder\|changeme\|your-\|process\.env\|\$\{.*\}\|xxx\|test\|dummy\|mock\|fake\|sample' || true)
+          if [ -n "$MATCHES" ]; then
+            FOUND=1
+            VIOLATIONS="${VIOLATIONS}\n--- Hardcoded Password ---\n${MATCHES}\n"
+          fi
+
+          # Pattern: Supabase service role keys (eyJ... JWT format with service_role)
+          MATCHES=$(grep -rn "${EXCLUDE_ARGS[@]}" -P 'service_role[^=]*=\s*[\x22\x27]?eyJ[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+' . 2>/dev/null || true)
+          if [ -n "$MATCHES" ]; then
+            FOUND=1
+            VIOLATIONS="${VIOLATIONS}\n--- Supabase Service Role Key ---\n${MATCHES}\n"
+          fi
+
+          if [ "$FOUND" -eq 1 ]; then
+            echo "::error::POLICY VIOLATION: Potential hardcoded secrets detected."
+            echo ""
+            echo "Findings:"
+            echo -e "$VIOLATIONS"
+            echo ""
+            echo "Use environment variables instead. See block-env-commits hookify rule."
+            echo "If these are false positives, review the patterns and ensure secrets use process.env."
+            exit 1
+          else
+            echo "No hardcoded secrets detected. Secrets scan: PASS"
+          fi
+
+  # ---------------------------------------------------------------------------
+  # 4. CLAUDE.md Validation — Verify CLAUDE.md exists with required sections
+  # ---------------------------------------------------------------------------
+  claudemd-validation:
+    name: "CLAUDE.md Validation"
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate CLAUDE.md
+        run: |
+          echo "Validating CLAUDE.md..."
+
+          if [ ! -f "CLAUDE.md" ]; then
+            echo "::error::POLICY VIOLATION: CLAUDE.md not found in project root."
+            echo ""
+            echo "Every project MUST have a CLAUDE.md. Create it before any other work."
+            echo "See ~/CLAUDE.md for the required format."
+            exit 1
+          fi
+
+          echo "CLAUDE.md found. Checking required sections..."
+
+          REQUIRED_SECTIONS=(
+            "Stack"
+            "Current Version"
+            "Architecture"
+            "Environment Variables"
+            "Deploy"
+            "Production URL"
+          )
+
+          MISSING=0
+          MISSING_LIST=""
+
+          for SECTION in "${REQUIRED_SECTIONS[@]}"; do
+            # Case-insensitive section header search (## Section or # Section)
+            if ! grep -qi "^#\+.*${SECTION}" CLAUDE.md; then
+              MISSING=$((MISSING + 1))
+              MISSING_LIST="${MISSING_LIST}  - ${SECTION}\n"
+              echo "::warning::Missing section in CLAUDE.md: ${SECTION}"
+            else
+              echo "Found section: $SECTION"
+            fi
+          done
+
+          if [ "$MISSING" -gt 0 ]; then
+            echo ""
+            echo "::error::POLICY VIOLATION: CLAUDE.md is missing ${MISSING} required section(s)."
+            echo ""
+            echo "Missing sections:"
+            echo -e "$MISSING_LIST"
+            echo ""
+            echo "See ~/CLAUDE.md PROJECT CLAUDE.md REQUIREMENTS for the full list."
+            exit 1
+          else
+            echo ""
+            echo "All required sections present. CLAUDE.md validation: PASS"
+          fi
+
+  # ---------------------------------------------------------------------------
+  # 5. No .env Tracked — Verify no .env files are in git
+  # ---------------------------------------------------------------------------
+  no-env-tracked:
+    name: "No .env Tracked"
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for tracked .env files
+        run: |
+          echo "Checking for tracked .env files..."
+
+          # List all tracked files matching .env patterns
+          TRACKED_ENV=$(git ls-files | grep -E '(^|/)\.env($|\..*)' | grep -v '\.env\.example' | grep -v '\.env\.sample' | grep -v '\.env\.template' || true)
+
+          if [ -n "$TRACKED_ENV" ]; then
+            echo "::error::POLICY VIOLATION: .env files are tracked in git."
+            echo ""
+            echo "The following .env files are committed:"
+            echo "$TRACKED_ENV"
+            echo ""
+            echo "Remove them with: git rm --cached <file>"
+            echo "Add to .gitignore: .env*"
+            echo "Use .env.example for templates (without real values)."
+            exit 1
+          else
+            echo "No .env files tracked in git. No .env tracked: PASS"
+          fi
