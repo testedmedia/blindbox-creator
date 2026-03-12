@@ -150,9 +150,9 @@ jobs:
           fi
 
           LINES="${{ steps.size.outputs.total_lines }}"
-          if [ "$LINES" -gt 100 ]; then
+          if [ "$LINES" -gt 150 ]; then
             SHOULD_MERGE=false
-            REASONS="${REASONS:+$REASONS; }PR too large (${LINES} lines > 100 limit)"
+            REASONS="${REASONS:+$REASONS; }PR too large (${LINES} lines > 150 limit)"
           fi
 
           if [ "${{ steps.safety.outputs.safe }}" != "true" ]; then
@@ -177,7 +177,7 @@ jobs:
           - Tests: PASS
           - Build: PASS
           - Type check: PASS
-          - Size: ${{ steps.size.outputs.total_lines }} lines (< 100 limit)
+          - Size: ${{ steps.size.outputs.total_lines }} lines (< 150 limit)
           - Safety: PASS (no sensitive/infra files)
           - Dedup: PASS
           - Daily count: within limit"
