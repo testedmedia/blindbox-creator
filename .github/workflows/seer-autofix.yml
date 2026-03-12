@@ -8,6 +8,10 @@ permissions:
   contents: write
   pull-requests: write
 
+concurrency:
+  group: seer-autofix-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   seer-autofix:
     # SECURITY: Only run for verified Sentry bot actor - labels alone are not trusted
@@ -233,6 +237,7 @@ jobs:
 
       - name: Notify on auto-merge
         if: env.AUTO_MERGED == 'true'
+        continue-on-error: true
         run: |
           REPO_NAME="${{ github.repository }}"
           PR_NUM="${{ github.event.pull_request.number }}"
@@ -249,6 +254,7 @@ jobs:
 
       - name: Escalate repeated failures
         if: env.ESCALATE == 'true'
+        continue-on-error: true
         run: |
           ISSUE_ID="${{ steps.dedup.outputs.issue_id }}"
           gh pr edit ${{ github.event.pull_request.number }} --add-label "seer-skip"
