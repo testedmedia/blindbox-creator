@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 
 interface ContactBody {
   name: string;
@@ -10,6 +11,7 @@ interface ContactBody {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: NextRequest) {
+  const _metricsStart = Date.now();
   try {
     const body: ContactBody = await request.json();
 
@@ -42,12 +44,16 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
 
+    Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/contact", method: "POST", status: "200" } });
+    Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/contact" } });
     return NextResponse.json({
       success: true,
       message: "Message received! We'll get back to you within 24 hours.",
     });
   } catch (error) {
     console.error("[contact] Error processing contact form:", error);
+    Sentry.metrics.count("api.errors", 1, { attributes: { endpoint: "/api/contact" } });
+    Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/contact" } });
 
     if (error instanceof SyntaxError) {
       return NextResponse.json(

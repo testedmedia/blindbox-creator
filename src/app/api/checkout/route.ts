@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { createCheckoutSession } from "@/lib/stripe";
 import { TEMPLATE_PACKS, PARTY_KITS, CLASSROOM_BUNDLES, MEGA_BUNDLE, Product } from "@/lib/constants";
 
 const ALL_PRODUCTS: Product[] = [...TEMPLATE_PACKS, ...PARTY_KITS, ...CLASSROOM_BUNDLES, MEGA_BUNDLE];
 
 export async function GET(request: NextRequest) {
+  const _metricsStart = Date.now();
   const productId = request.nextUrl.searchParams.get("product");
 
   if (!productId) {
@@ -21,11 +23,16 @@ export async function GET(request: NextRequest) {
       [{ name: product.name, price: product.price, quantity: 1 }]
     );
     if (session.url) {
+      Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/checkout", method: "GET", status: "302" } });
+      Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/checkout" } });
       return NextResponse.redirect(session.url);
     }
+    Sentry.metrics.count("api.errors", 1, { attributes: { endpoint: "/api/checkout" } });
     return NextResponse.json({ error: "Could not create checkout session." }, { status: 500 });
   } catch (error) {
     console.error("[checkout GET] Error:", error);
+    Sentry.metrics.count("api.errors", 1, { attributes: { endpoint: "/api/checkout" } });
+    Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/checkout" } });
     // Stripe not configured yet - redirect to a friendly page
     const errorMessage = error instanceof Error ? error.message : "Checkout not available";
     if (errorMessage.includes("STRIPE_SECRET_KEY")) {
@@ -51,6 +58,7 @@ interface CheckoutBody {
 }
 
 export async function POST(request: NextRequest) {
+  const _metricsStart = Date.now();
   try {
     const body: CheckoutBody = await request.json();
 
@@ -85,9 +93,13 @@ export async function POST(request: NextRequest) {
       body.email
     );
 
+    Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/checkout", method: "POST", status: "200" } });
+    Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/checkout" } });
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error("[checkout] Error creating checkout session:", error);
+    Sentry.metrics.count("api.errors", 1, { attributes: { endpoint: "/api/checkout" } });
+    Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/checkout" } });
 
     if (error instanceof SyntaxError) {
       return NextResponse.json(

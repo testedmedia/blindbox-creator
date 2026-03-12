@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import productsData from "@/data/products.json";
 
 export async function GET(request: NextRequest) {
+  const _metricsStart = Date.now();
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
   const status = searchParams.get("status");
@@ -16,6 +18,8 @@ export async function GET(request: NextRequest) {
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
+    Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/products", method: "GET", status: "200" } });
+    Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/products" } });
     return NextResponse.json({ product });
   }
 
@@ -34,6 +38,8 @@ export async function GET(request: NextRequest) {
     products = products.filter((p) => p.collection === collection);
   }
 
+  Sentry.metrics.count("api.requests", 1, { attributes: { endpoint: "/api/products", method: "GET", status: "200" } });
+  Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/products" } });
   return NextResponse.json({
     products,
     total: products.length,
