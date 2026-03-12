@@ -407,6 +407,7 @@ function createZip(packId: string, verbose: boolean): string | null {
   try {
     // Use system zip command (available on macOS and most Linux)
     const pdfArgs = pdfs.map((f) => `"${f}"`).join(" ");
+    // nosemgrep: javascript.lang.security.detect-child-process.detect-child-process -- offline CLI script, not user-facing
     execSync(`cd "${packDir}" && zip -j "${zipPath}" ${pdfArgs}`, {
       stdio: verbose ? "inherit" : "pipe",
     });
@@ -422,6 +423,7 @@ function createZip(packId: string, verbose: boolean): string | null {
     }
 
     // Verify contents
+    // nosemgrep: javascript.lang.security.detect-child-process.detect-child-process -- offline CLI script, not user-facing
     const zipList = execSync(`unzip -l "${zipPath}"`, { encoding: "utf-8" });
     const fileCount = (zipList.match(/\.pdf/g) || []).length;
 
