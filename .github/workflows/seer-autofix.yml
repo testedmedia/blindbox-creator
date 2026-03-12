@@ -15,7 +15,7 @@ concurrency:
 jobs:
   seer-autofix:
     # SECURITY: Only run for verified Sentry bot actor - labels alone are not trusted
-    if: github.actor == 'sentry-io[bot]'
+    if: github.actor == 'sentry[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -23,10 +23,10 @@ jobs:
       - name: Verify PR provenance
         id: provenance
         run: |
-          # Double-check the PR was actually created by sentry-io[bot]
+          # Double-check the PR was actually created by sentry[bot]
           PR_AUTHOR=$(gh pr view ${{ github.event.pull_request.number }} --json author -q '.author.login')
-          if [ "$PR_AUTHOR" != "sentry-io[bot]" ]; then
-            echo "ABORT: PR author is '$PR_AUTHOR', not sentry-io[bot]"
+          if [ "$PR_AUTHOR" != "sentry[bot]" ] && [ "$PR_AUTHOR" != "app/sentry" ]; then
+            echo "ABORT: PR author is '$PR_AUTHOR', not sentry[bot]"
             echo "trusted=false" >> $GITHUB_OUTPUT
             exit 1
           fi
@@ -38,7 +38,7 @@ jobs:
             exit 1
           fi
           echo "trusted=true" >> $GITHUB_OUTPUT
-          echo "Provenance verified: author=sentry-io[bot], head_repo=testedmedia"
+          echo "Provenance verified: author=sentry[bot], head_repo=testedmedia"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
