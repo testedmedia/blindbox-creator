@@ -1,0 +1,188 @@
+name: Seer Autofix Pipeline
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  seer-autofix:
+    # Only run on Sentry Seer bot PRs or PRs labeled seer-autofix
+    if: >
+      github.actor == 'sentry-io[bot]' ||
+      contains(github.event.pull_request.labels.*.name, 'seer-autofix')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit || true
+        # Non-blocking for now - Seer fixes may not address all type issues
+
+      - name: Run tests
+        id: tests
+        run: npm test -- --run 2>&1 || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+
+      - name: Build
+        id: build
+        run: npm run build 2>&1 || echo "BUILD_FAILED=true" >> $GITHUB_ENV
+
+      - name: Calculate PR size
+        id: size
+        run: |
+          ADDITIONS=$(gh pr view ${{ github.event.pull_request.number }} --json additions -q '.additions')
+          DELETIONS=$(gh pr view ${{ github.event.pull_request.number }} --json deletions -q '.deletions')
+          TOTAL=$((ADDITIONS + DELETIONS))
+          echo "total_lines=$TOTAL" >> $GITHUB_OUTPUT
+          echo "PR size: +$ADDITIONS -$DELETIONS = $TOTAL lines changed"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check safety guardrails
+        id: safety
+        run: |
+          # Get list of changed files
+          CHANGED_FILES=$(gh pr view ${{ github.event.pull_request.number }} --json files -q '.files[].path')
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          SAFE=true
+
+          # Check for sensitive file patterns
+          if echo "$CHANGED_FILES" | grep -iE '(auth|middleware|payment|stripe|checkout|migration|\.env|webhook)'; then
+            echo "SENSITIVE_FILES=true" >> $GITHUB_ENV
+            SAFE=false
+            echo "WARNING: PR touches sensitive files"
+          fi
+
+          # Check daily auto-merge count
+          TODAY=$(date -u +%Y-%m-%d)
+          MERGED_TODAY=$(gh pr list --state merged --label "seer-auto-merged" --json mergedAt -q "[.[] | select(.mergedAt | startswith(\"$TODAY\"))] | length" 2>/dev/null || echo "0")
+          echo "Auto-merges today: $MERGED_TODAY"
+
+          if [ "$MERGED_TODAY" -ge 3 ]; then
+            echo "DAILY_LIMIT=true" >> $GITHUB_ENV
+            SAFE=false
+            echo "WARNING: Daily auto-merge limit reached (3/day)"
+          fi
+
+          echo "safe=$SAFE" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for duplicate Seer PRs
+        id: dedup
+        run: |
+          # Extract Sentry issue ID from PR body/title
+          PR_BODY=$(gh pr view ${{ github.event.pull_request.number }} --json body -q '.body')
+          PR_TITLE=$(gh pr view ${{ github.event.pull_request.number }} --json title -q '.title')
+
+          # Look for Sentry issue references
+          ISSUE_ID=$(echo "$PR_BODY $PR_TITLE" | grep -oP 'SENTRY-\w+-\w+|sentry\.io/issues/\d+' | head -1 || echo "")
+
+          if [ -n "$ISSUE_ID" ]; then
+            # Check if another open PR exists for the same Sentry issue
+            EXISTING=$(gh pr list --state open --search "$ISSUE_ID" --json number -q 'length' 2>/dev/null || echo "0")
+            if [ "$EXISTING" -gt 1 ]; then
+              echo "DUPLICATE=true" >> $GITHUB_ENV
+              echo "WARNING: Duplicate PR for Sentry issue $ISSUE_ID"
+            fi
+          fi
+
+          echo "issue_id=$ISSUE_ID" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-merge decision
+        id: decision
+        run: |
+          SHOULD_MERGE=true
+          REASON=""
+
+          if [ "${{ env.TESTS_FAILED }}" = "true" ]; then
+            SHOULD_MERGE=false
+            REASON="Tests failed"
+          fi
+
+          if [ "${{ env.BUILD_FAILED }}" = "true" ]; then
+            SHOULD_MERGE=false
+            REASON="Build failed"
+          fi
+
+          if [ "${{ steps.size.outputs.total_lines }}" -gt 100 ]; then
+            SHOULD_MERGE=false
+            REASON="PR too large (${{ steps.size.outputs.total_lines }} lines > 100 limit)"
+          fi
+
+          if [ "${{ steps.safety.outputs.safe }}" != "true" ]; then
+            SHOULD_MERGE=false
+            REASON="Safety guardrail triggered"
+          fi
+
+          if [ "${{ env.SENSITIVE_FILES }}" = "true" ]; then
+            SHOULD_MERGE=false
+            REASON="PR touches sensitive files (auth/payment/migration/env)"
+          fi
+
+          if [ "${{ env.DAILY_LIMIT }}" = "true" ]; then
+            SHOULD_MERGE=false
+            REASON="Daily auto-merge limit reached (3/day max)"
+          fi
+
+          if [ "${{ env.DUPLICATE }}" = "true" ]; then
+            SHOULD_MERGE=false
+            REASON="Duplicate PR for same Sentry issue"
+          fi
+
+          echo "should_merge=$SHOULD_MERGE" >> $GITHUB_OUTPUT
+          echo "reason=$REASON" >> $GITHUB_OUTPUT
+          echo "Decision: merge=$SHOULD_MERGE reason=$REASON"
+
+      - name: Auto-approve and merge
+        if: steps.decision.outputs.should_merge == 'true'
+        run: |
+          gh pr review ${{ github.event.pull_request.number }} --approve --body "Seer Autofix Pipeline: All checks passed. Auto-approving.
+
+          - Tests: PASS
+          - Build: PASS
+          - Size: ${{ steps.size.outputs.total_lines }} lines (< 100 limit)
+          - Safety: PASS
+          - Dedup: PASS"
+
+          gh pr edit ${{ github.event.pull_request.number }} --add-label "seer-auto-merged"
+          gh pr merge ${{ github.event.pull_request.number }} --squash --auto \
+            --subject "fix: Seer autofix - ${{ github.event.pull_request.title }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Label for human review
+        if: steps.decision.outputs.should_merge != 'true'
+        run: |
+          gh pr edit ${{ github.event.pull_request.number }} --add-label "needs-review"
+          gh pr comment ${{ github.event.pull_request.number }} --body "Seer Autofix Pipeline: Requires human review.
+
+          **Reason:** ${{ steps.decision.outputs.reason }}
+
+          **Checks:**
+          - Tests: ${{ env.TESTS_FAILED == 'true' && 'FAIL' || 'PASS' }}
+          - Build: ${{ env.BUILD_FAILED == 'true' && 'FAIL' || 'PASS' }}
+          - Size: ${{ steps.size.outputs.total_lines }} lines
+          - Safety: ${{ steps.safety.outputs.safe }}
+          - Sensitive files: ${{ env.SENSITIVE_FILES == 'true' && 'YES' || 'NO' }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
