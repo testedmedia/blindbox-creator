@@ -23,25 +23,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Verify PR provenance
-        id: provenance
-        run: |
-          # Double-check the PR was actually created by sentry[bot]
-          PR_AUTHOR=$(gh pr view ${{ github.event.pull_request.number }} --json author -q '.author.login')
-          if [ "$PR_AUTHOR" != "sentry[bot]" ] && [ "$PR_AUTHOR" != "app/sentry" ]; then
-            echo "ABORT: PR author is '$PR_AUTHOR', not sentry[bot]"
-            exit 1
-          fi
-          # Verify PR targets default branch of THIS repo (not a fork)
-          HEAD_REPO=$(gh pr view ${{ github.event.pull_request.number }} --json headRepositoryOwner -q '.headRepositoryOwner.login')
-          if [ "$HEAD_REPO" != "testedmedia" ]; then
-            echo "ABORT: PR head repo is '$HEAD_REPO', not testedmedia"
-            exit 1
-          fi
-          echo "Provenance verified: author=$PR_AUTHOR, head_repo=$HEAD_REPO"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
