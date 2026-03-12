@@ -77,7 +77,6 @@ blindbox-creator/
 │   └── products/                     # Product images, pack artwork, lifestyle photos
 │       └── packs/                    # 75 pack cover images
 ├── templates/                        # Paper craft HTML templates (box-net, standee, sticker-sheet, trading-card, assembly-guide)
-├── crafts/                           # Generated craft output files
 ├── packs/                            # Generated pack assets (bake-off, chibi-kitty-club)
 ├── scripts/
 │   ├── deploy.sh                     # Deploy script
