@@ -1,4 +1,4 @@
-name: Jules Review (Gemini 2.5 Pro)
+name: Jules Review (Gemini 3.1 Pro)
 
 on:
   pull_request:
