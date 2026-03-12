@@ -21,7 +21,7 @@ export default withSentryConfig(nextConfig, {
   org: "tested-media",
   project: "blindbox-creator",
   silent: !process.env.CI,
-  // authToken provided via SENTRY_AUTH_TOKEN env var in CI (not wired through app config)
+  authToken: process.env.SENTRY_AUTH_TOKEN, // read at build time only for source map upload
   widenClientFileUpload: true,
   tunnelRoute: "/monitoring",
   disableLogger: true,

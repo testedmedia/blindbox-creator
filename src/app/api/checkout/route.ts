@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     Sentry.metrics.distribution("api.latency_ms", Date.now() - _metricsStart, { attributes: { endpoint: "/api/checkout" } });
     // Stripe not configured yet - redirect to a friendly page
     const errorMessage = error instanceof Error ? error.message : "Checkout not available";
-    if (errorMessage.includes("STRIPE_" + "SECRET_KEY")) {
+    if (/not configured|missing.*key/i.test(errorMessage)) {
       return NextResponse.json(
         { error: "Payments are being set up. Please check back soon!", product: { name: product.name, price: product.price } },
         { status: 503 }
