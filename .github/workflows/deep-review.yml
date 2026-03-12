@@ -19,7 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     if: >-
+      github.actor != 'dependabot[bot]' &&
+      github.actor != 'renovate[bot]' &&
       !contains(github.event.pull_request.title, '[auto-fix]') &&
+      !contains(github.event.pull_request.title, 'fix(auto):') &&
       github.event.pull_request.user.login != 'debug-quad[bot]'
     steps:
       - name: Check for auto-fix loop
