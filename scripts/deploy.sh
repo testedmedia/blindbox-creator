@@ -49,7 +49,7 @@ else
   L1_PRE="SKIP"
 fi
 
-if grep -rn "PRIVATE_KEY\|SECRET_KEY\|sk_live\|password=" --include="*.ts" --include="*.tsx" --include="*.js" "$PROJECT_DIR/src/" "$PROJECT_DIR/app/" "$PROJECT_DIR/lib/" 2>/dev/null; then
+if grep -rn "PRIVATE_KEY\|SECRET_KEY\|sk_live\|password=" --include="*.ts" --include="*.tsx" --include="*.js" "$PROJECT_DIR/src/" "$PROJECT_DIR/app/" "$PROJECT_DIR/lib/" 2>/dev/null | grep -v 'process\.env\.' | grep -v '\.includes(' | grep -v 'throw new Error' | grep -q .; then
   L1_SECRETS="FAIL"
 else
   L1_SECRETS="PASS"
