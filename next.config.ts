@@ -2,7 +2,19 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Document-Policy",
+            value: "js-profiling",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default withSentryConfig(nextConfig, {
@@ -10,6 +22,7 @@ export default withSentryConfig(nextConfig, {
   project: "blindbox-creator",
   silent: !process.env.CI,
   widenClientFileUpload: true,
-  disableLogger: true,
   tunnelRoute: "/monitoring",
+  disableLogger: true,
+  automaticVercelMonitors: true,
 });
