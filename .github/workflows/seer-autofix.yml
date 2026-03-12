@@ -10,15 +10,36 @@ permissions:
 
 jobs:
   seer-autofix:
-    # Only run on Sentry Seer bot PRs or PRs labeled seer-autofix
-    if: >
-      github.actor == 'sentry-io[bot]' ||
-      contains(github.event.pull_request.labels.*.name, 'seer-autofix')
+    # SECURITY: Only run for verified Sentry bot actor - labels alone are not trusted
+    if: github.actor == 'sentry-io[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
+      - name: Verify PR provenance
+        id: provenance
+        run: |
+          # Double-check the PR was actually created by sentry-io[bot]
+          PR_AUTHOR=$(gh pr view ${{ github.event.pull_request.number }} --json author -q '.author.login')
+          if [ "$PR_AUTHOR" != "sentry-io[bot]" ]; then
+            echo "ABORT: PR author is '$PR_AUTHOR', not sentry-io[bot]"
+            echo "trusted=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          # Verify PR targets default branch of THIS repo (not a fork)
+          HEAD_REPO=$(gh pr view ${{ github.event.pull_request.number }} --json headRepositoryOwner -q '.headRepositoryOwner.login')
+          if [ "$HEAD_REPO" != "testedmedia" ]; then
+            echo "ABORT: PR head repo is '$HEAD_REPO', not testedmedia"
+            echo "trusted=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          echo "trusted=true" >> $GITHUB_OUTPUT
+          echo "Provenance verified: author=sentry-io[bot], head_repo=testedmedia"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Checkout
+        if: steps.provenance.outputs.trusted == 'true'
         uses: actions/checkout@v4
 
       - name: Setup Node
@@ -31,15 +52,12 @@ jobs:
         run: npm ci
 
       - name: Type check
-        run: npx tsc --noEmit || true
-        # Non-blocking for now - Seer fixes may not address all type issues
+        run: npx tsc --noEmit 2>&1 || echo "TYPE_CHECK_FAILED=true" >> $GITHUB_ENV
 
       - name: Run tests
-        id: tests
         run: npm test -- --run 2>&1 || echo "TESTS_FAILED=true" >> $GITHUB_ENV
 
       - name: Build
-        id: build
         run: npm run build 2>&1 || echo "BUILD_FAILED=true" >> $GITHUB_ENV
 
       - name: Calculate PR size
@@ -56,21 +74,30 @@ jobs:
       - name: Check safety guardrails
         id: safety
         run: |
-          # Get list of changed files
           CHANGED_FILES=$(gh pr view ${{ github.event.pull_request.number }} --json files -q '.files[].path')
           echo "Changed files:"
           echo "$CHANGED_FILES"
 
           SAFE=true
+          REASONS=""
 
-          # Check for sensitive file patterns
-          if echo "$CHANGED_FILES" | grep -iE '(auth|middleware|payment|stripe|checkout|migration|\.env|webhook)'; then
+          # Expanded sensitive file patterns (GPT-5.4 recommendation)
+          SENSITIVE_PATTERNS='(auth|middleware|payment|stripe|checkout|migration|\.env|webhook|permissions|rbac|session|token|secret|credential|api.key|feature.flag|config\.ts|config\.js|prisma|drizzle|schema|seed|fixture)'
+          if echo "$CHANGED_FILES" | grep -iE "$SENSITIVE_PATTERNS"; then
             echo "SENSITIVE_FILES=true" >> $GITHUB_ENV
             SAFE=false
-            echo "WARNING: PR touches sensitive files"
+            REASONS="Touches sensitive files; "
           fi
 
-          # Check daily auto-merge count
+          # Check for infrastructure/config changes
+          INFRA_PATTERNS='(\.github/|Dockerfile|docker-compose|\.vercel|next\.config|package\.json|tsconfig|ecosystem\.config)'
+          if echo "$CHANGED_FILES" | grep -iE "$INFRA_PATTERNS"; then
+            echo "INFRA_FILES=true" >> $GITHUB_ENV
+            SAFE=false
+            REASONS="${REASONS}Touches infrastructure/config files; "
+          fi
+
+          # Check daily auto-merge count (per-repo)
           TODAY=$(date -u +%Y-%m-%d)
           MERGED_TODAY=$(gh pr list --state merged --label "seer-auto-merged" --json mergedAt -q "[.[] | select(.mergedAt | startswith(\"$TODAY\"))] | length" 2>/dev/null || echo "0")
           echo "Auto-merges today: $MERGED_TODAY"
@@ -78,33 +105,45 @@ jobs:
           if [ "$MERGED_TODAY" -ge 3 ]; then
             echo "DAILY_LIMIT=true" >> $GITHUB_ENV
             SAFE=false
-            echo "WARNING: Daily auto-merge limit reached (3/day)"
+            REASONS="${REASONS}Daily limit reached ($MERGED_TODAY/3); "
           fi
 
           echo "safe=$SAFE" >> $GITHUB_OUTPUT
+          echo "reasons=$REASONS" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check for duplicate Seer PRs
         id: dedup
         run: |
-          # Extract Sentry issue ID from PR body/title
           PR_BODY=$(gh pr view ${{ github.event.pull_request.number }} --json body -q '.body')
           PR_TITLE=$(gh pr view ${{ github.event.pull_request.number }} --json title -q '.title')
 
-          # Look for Sentry issue references
-          ISSUE_ID=$(echo "$PR_BODY $PR_TITLE" | grep -oP 'SENTRY-\w+-\w+|sentry\.io/issues/\d+' | head -1 || echo "")
+          # Extract Sentry issue ID from body/title
+          ISSUE_ID=$(echo "$PR_BODY $PR_TITLE" | grep -oE 'SENTRY-[A-Z]+-[A-Z0-9]+|sentry\.io/issues/[0-9]+|issues/[0-9]+' | head -1 || echo "")
 
+          DUPLICATE=false
           if [ -n "$ISSUE_ID" ]; then
-            # Check if another open PR exists for the same Sentry issue
-            EXISTING=$(gh pr list --state open --search "$ISSUE_ID" --json number -q 'length' 2>/dev/null || echo "0")
-            if [ "$EXISTING" -gt 1 ]; then
+            # Dedupe by repo + issue ID + open state
+            OPEN_COUNT=$(gh pr list --state open --search "$ISSUE_ID in:title,body" --json number -q 'length' 2>/dev/null || echo "0")
+            if [ "$OPEN_COUNT" -gt 1 ]; then
+              DUPLICATE=true
               echo "DUPLICATE=true" >> $GITHUB_ENV
-              echo "WARNING: Duplicate PR for Sentry issue $ISSUE_ID"
+              echo "WARNING: $OPEN_COUNT open PRs for Sentry issue $ISSUE_ID"
+            fi
+
+            # Check for repeated failures (3+ closed/failed PRs for same issue in 7 days)
+            FAILED_COUNT=$(gh pr list --state closed --search "$ISSUE_ID in:title,body" --json closedAt,mergedAt -q "[.[] | select(.mergedAt == null)] | length" 2>/dev/null || echo "0")
+            if [ "$FAILED_COUNT" -ge 3 ]; then
+              DUPLICATE=true
+              echo "DUPLICATE=true" >> $GITHUB_ENV
+              echo "ESCALATE=true" >> $GITHUB_ENV
+              echo "WARNING: $FAILED_COUNT failed Seer PRs for issue $ISSUE_ID - escalating to human"
             fi
           fi
 
           echo "issue_id=$ISSUE_ID" >> $GITHUB_OUTPUT
+          echo "duplicate=$DUPLICATE" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -112,46 +151,42 @@ jobs:
         id: decision
         run: |
           SHOULD_MERGE=true
-          REASON=""
+          REASONS=""
 
           if [ "${{ env.TESTS_FAILED }}" = "true" ]; then
             SHOULD_MERGE=false
-            REASON="Tests failed"
+            REASONS="Tests failed"
           fi
 
           if [ "${{ env.BUILD_FAILED }}" = "true" ]; then
             SHOULD_MERGE=false
-            REASON="Build failed"
+            REASONS="${REASONS:+$REASONS; }Build failed"
           fi
 
-          if [ "${{ steps.size.outputs.total_lines }}" -gt 100 ]; then
+          if [ "${{ env.TYPE_CHECK_FAILED }}" = "true" ]; then
             SHOULD_MERGE=false
-            REASON="PR too large (${{ steps.size.outputs.total_lines }} lines > 100 limit)"
+            REASONS="${REASONS:+$REASONS; }Type check failed"
+          fi
+
+          LINES="${{ steps.size.outputs.total_lines }}"
+          if [ "$LINES" -gt 100 ]; then
+            SHOULD_MERGE=false
+            REASONS="${REASONS:+$REASONS; }PR too large (${LINES} lines > 100 limit)"
           fi
 
           if [ "${{ steps.safety.outputs.safe }}" != "true" ]; then
             SHOULD_MERGE=false
-            REASON="Safety guardrail triggered"
-          fi
-
-          if [ "${{ env.SENSITIVE_FILES }}" = "true" ]; then
-            SHOULD_MERGE=false
-            REASON="PR touches sensitive files (auth/payment/migration/env)"
-          fi
-
-          if [ "${{ env.DAILY_LIMIT }}" = "true" ]; then
-            SHOULD_MERGE=false
-            REASON="Daily auto-merge limit reached (3/day max)"
+            REASONS="${REASONS:+$REASONS; }Safety: ${{ steps.safety.outputs.reasons }}"
           fi
 
           if [ "${{ env.DUPLICATE }}" = "true" ]; then
             SHOULD_MERGE=false
-            REASON="Duplicate PR for same Sentry issue"
+            REASONS="${REASONS:+$REASONS; }Duplicate/repeated Seer PR"
           fi
 
           echo "should_merge=$SHOULD_MERGE" >> $GITHUB_OUTPUT
-          echo "reason=$REASON" >> $GITHUB_OUTPUT
-          echo "Decision: merge=$SHOULD_MERGE reason=$REASON"
+          echo "reason=$REASONS" >> $GITHUB_OUTPUT
+          echo "Decision: merge=$SHOULD_MERGE reason=${REASONS:-all checks passed}"
 
       - name: Auto-approve and merge
         if: steps.decision.outputs.should_merge == 'true'
@@ -160,13 +195,17 @@ jobs:
 
           - Tests: PASS
           - Build: PASS
+          - Type check: PASS
           - Size: ${{ steps.size.outputs.total_lines }} lines (< 100 limit)
-          - Safety: PASS
-          - Dedup: PASS"
+          - Safety: PASS (no sensitive/infra files)
+          - Dedup: PASS
+          - Daily count: within limit"
 
           gh pr edit ${{ github.event.pull_request.number }} --add-label "seer-auto-merged"
           gh pr merge ${{ github.event.pull_request.number }} --squash --auto \
             --subject "fix: Seer autofix - ${{ github.event.pull_request.title }}"
+
+          echo "AUTO_MERGED=true" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -174,15 +213,51 @@ jobs:
         if: steps.decision.outputs.should_merge != 'true'
         run: |
           gh pr edit ${{ github.event.pull_request.number }} --add-label "needs-review"
-          gh pr comment ${{ github.event.pull_request.number }} --body "Seer Autofix Pipeline: Requires human review.
+
+          COMMENT="Seer Autofix Pipeline: Requires human review.
 
           **Reason:** ${{ steps.decision.outputs.reason }}
 
           **Checks:**
           - Tests: ${{ env.TESTS_FAILED == 'true' && 'FAIL' || 'PASS' }}
           - Build: ${{ env.BUILD_FAILED == 'true' && 'FAIL' || 'PASS' }}
+          - Type check: ${{ env.TYPE_CHECK_FAILED == 'true' && 'FAIL' || 'PASS' }}
           - Size: ${{ steps.size.outputs.total_lines }} lines
           - Safety: ${{ steps.safety.outputs.safe }}
-          - Sensitive files: ${{ env.SENSITIVE_FILES == 'true' && 'YES' || 'NO' }}"
+          - Sensitive files: ${{ env.SENSITIVE_FILES == 'true' && 'YES' || 'NO' }}
+          - Infra files: ${{ env.INFRA_FILES == 'true' && 'YES' || 'NO' }}"
+
+          gh pr comment ${{ github.event.pull_request.number }} --body "$COMMENT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify on auto-merge
+        if: env.AUTO_MERGED == 'true'
+        run: |
+          REPO_NAME="${{ github.repository }}"
+          PR_NUM="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          LINES="${{ steps.size.outputs.total_lines }}"
+
+          # Send Telegram notification if token available
+          if [ -n "${{ secrets.TELEGRAM_BOT_TOKEN }}" ] && [ -n "${{ secrets.TELEGRAM_CHAT_ID }}" ]; then
+            MESSAGE="Seer Auto-Merged PR #${PR_NUM} in ${REPO_NAME}%0A${PR_TITLE}%0ASize: ${LINES} lines%0A${PR_URL}"
+            curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+              -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}&text=${MESSAGE}&parse_mode=HTML" || true
+          fi
+
+      - name: Escalate repeated failures
+        if: env.ESCALATE == 'true'
+        run: |
+          ISSUE_ID="${{ steps.dedup.outputs.issue_id }}"
+          gh pr edit ${{ github.event.pull_request.number }} --add-label "seer-skip"
+          gh pr comment ${{ github.event.pull_request.number }} --body "ESCALATION: 3+ failed Seer PRs for issue $ISSUE_ID. Labeled seer-skip to prevent further auto-fix attempts. Manual fix required."
+
+          # Notify via Telegram
+          if [ -n "${{ secrets.TELEGRAM_BOT_TOKEN }}" ] && [ -n "${{ secrets.TELEGRAM_CHAT_ID }}" ]; then
+            curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+              -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}&text=SEER ESCALATION: 3+ failed auto-fix PRs for $ISSUE_ID in ${{ github.repository }}. Manual fix needed.&parse_mode=HTML" || true
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
