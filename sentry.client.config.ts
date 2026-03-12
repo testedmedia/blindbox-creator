@@ -6,14 +6,14 @@ Sentry.init({
   environment: process.env.NEXT_PUBLIC_VERCEL_ENV || "development",
 
   // Performance: Traces
-  tracesSampleRate: 0.2,
+  tracesSampleRate: 1.0,
 
   // Session Replay
-  replaysSessionSampleRate: 0.1,
+  replaysSessionSampleRate: 1.0,
   replaysOnErrorSampleRate: 1.0,
 
   // Profiling (browser)
-  profileSessionSampleRate: 0.1,
+  profileSessionSampleRate: 1.0,
   profileLifecycle: "trace",
 
   // Structured Logging
