@@ -6,7 +6,7 @@ Sentry.init({
   environment: process.env.NEXT_PUBLIC_VERCEL_ENV || "development",
 
   // Performance: Traces
-  tracesSampleRate: 0.2,
+  tracesSampleRate: 1.0,
 
   // Structured Logging
   enableLogs: true,
