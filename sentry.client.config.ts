@@ -9,7 +9,7 @@ Sentry.init({
   tracesSampleRate: 1.0,
 
   // Session Replay
-  replaysSessionSampleRate: 1.0,
+  replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
 
   // Profiling (browser)
