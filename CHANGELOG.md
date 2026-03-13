@@ -2,6 +2,14 @@
 
 All notable changes to Blind Box Creator will be documented in this file.
 
+## v4.3.1 — FIX — 2026-03-13 @ 11:43 AM AST
+
+**Sentry replay reduction**
+
+- Reduced replaysOnErrorSampleRate from 1.0 to 0.1 in sentry.client.config.ts to reduce Sentry costs
+- Updated sentry.edge.config.ts and sentry.server.config.ts configs
+- Updated global-error.tsx error boundary component
+
 ## v4.3.0 — UPDATE — 2026-03-12 @ 12:48 AM AST
 
 **Sentry Maximization — full observability stack**
