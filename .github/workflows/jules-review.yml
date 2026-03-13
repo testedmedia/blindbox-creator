@@ -18,7 +18,7 @@ jobs:
               await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: 'jules' });
             } catch (e) {
               if (e.status === 404) {
-                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name: 'jules', color: '7C3AED', description: 'Reviewed by Jules (Gemini Pro)' });
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name: 'jules', color: '7C3AED', description: 'Reviewed by Jules (Gemini 3.1 Pro)' });
               }
             }
             await github.rest.issues.addLabels({
